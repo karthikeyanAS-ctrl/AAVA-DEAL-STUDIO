@@ -1,0 +1,367 @@
+{
+  "deal_id": "deal_id",
+  "source_table": "workspace.aava_deal_studio.mgmt_claim",
+  "claim_count": 12,
+  "claims": [
+    {
+      "claim_id": "CLM-01",
+      "claim_text": "No single customer accounts for more than 10% of revenue.",
+      "metric_key": "customer_concentration_top1_pct",
+      "period": "FY2025",
+      "test_predicate": "Measure the percentage of FY2025 revenue contributed by the single largest customer, consolidated to the parent customer group where relevant.",
+      "test_type": "sql",
+      "tables": [
+        "v_revenue_line",
+        "dim_customer"
+      ],
+      "documents": [
+        "01_CIM_Excerpt_Harborline.md"
+      ],
+      "trusted_sources": [
+        "executed contracts",
+        "system tables"
+      ],
+      "sources_to_challenge": [
+        "cim"
+      ],
+      "claimed_value": "10.0",
+      "unit": "percent",
+      "tolerance": "+/-0.5pp",
+      "cim_ref": {
+        "file": "01_CIM_Excerpt_Harborline.md",
+        "page": 12,
+        "verified": true
+      },
+      "mapping_note": null
+    },
+    {
+      "claim_id": "CLM-02",
+      "claim_text": "Net revenue retention of 118% demonstrates best-in-class expansion.",
+      "metric_key": "net_revenue_retention_pct",
+      "period": "FY2025",
+      "test_predicate": "Measure FY2025 net revenue retention for the starting customer cohort, consolidated to the parent customer group where relevant, including expansion, contraction, and churn.",
+      "test_type": "sql_and_document",
+      "tables": [
+        "v_arr_month",
+        "dim_customer"
+      ],
+      "documents": [],
+      "trusted_sources": [
+        "executed contracts",
+        "system tables"
+      ],
+      "sources_to_challenge": [
+        "mgmt_contract_summary",
+        "cim"
+      ],
+      "claimed_value": "118.0",
+      "unit": "percent",
+      "tolerance": "+/-0.5pp",
+      "cim_ref": {
+        "file": "01_CIM_Excerpt_Harborline.md",
+        "page": 14,
+        "verified": true
+      },
+      "mapping_note": null
+    },
+    {
+      "claim_id": "CLM-03",
+      "claim_text": "94% of revenue is recurring subscription revenue.",
+      "metric_key": "recurring_revenue_pct",
+      "period": "FY2025",
+      "test_predicate": "Measure the percentage of FY2025 revenue classified as recurring subscription revenue based on revenue type tagging.",
+      "test_type": "sql",
+      "tables": [
+        "v_revenue_line",
+        "dim_product"
+      ],
+      "documents": [
+        "01_CIM_Excerpt_Harborline.md"
+      ],
+      "trusted_sources": [
+        "executed contracts",
+        "system tables"
+      ],
+      "sources_to_challenge": [
+        "fact_invoice_line.revenue_type tag",
+        "cim"
+      ],
+      "claimed_value": "94.0",
+      "unit": "percent",
+      "tolerance": "+/-0.5pp",
+      "cim_ref": {
+        "file": "01_CIM_Excerpt_Harborline.md",
+        "page": 11,
+        "verified": true
+      },
+      "mapping_note": null
+    },
+    {
+      "claim_id": "CLM-04",
+      "claim_text": "Logo churn has remained below 5% annually.",
+      "metric_key": "logo_churn_pct",
+      "period": "FY2025",
+      "test_predicate": "Measure FY2025 logo churn for the starting customer cohort, consolidated to the parent customer group where relevant, by counting customers lost during the period.",
+      "test_type": "sql_and_document",
+      "tables": [
+        "v_arr_month",
+        "dim_customer"
+      ],
+      "documents": [],
+      "trusted_sources": [
+        "executed contracts",
+        "system tables"
+      ],
+      "sources_to_challenge": [
+        "mgmt_contract_summary",
+        "cim"
+      ],
+      "claimed_value": "5.0",
+      "unit": "percent",
+      "tolerance": "+/-0.5pp",
+      "cim_ref": {
+        "file": "01_CIM_Excerpt_Harborline.md",
+        "page": 14,
+        "verified": true
+      },
+      "mapping_note": null
+    },
+    {
+      "claim_id": "CLM-05",
+      "claim_text": "Adjusted EBITDA of $12.4M represents a 32% margin.",
+      "metric_key": "adjusted_ebitda_usd",
+      "period": "FY2025",
+      "test_predicate": "Measure adjusted EBITDA in FY2025 by combining revenue records with documented EBITDA adjustments and identifying which adjustments are included.",
+      "test_type": "sql_and_document",
+      "tables": [
+        "mgmt_ebitda_adjustment",
+        "v_revenue_line",
+        "dim_product"
+      ],
+      "documents": [],
+      "trusted_sources": [
+        "executed contracts",
+        "system tables"
+      ],
+      "sources_to_challenge": [
+        "mgmt_ebitda_adjustment",
+        "qoe_schedule",
+        "cim"
+      ],
+      "claimed_value": "1.24E7",
+      "unit": "usd",
+      "tolerance": "+/-2% relative",
+      "cim_ref": {
+        "file": "01_CIM_Excerpt_Harborline.md",
+        "page": 18,
+        "verified": true
+      },
+      "mapping_note": null
+    },
+    {
+      "claim_id": "CLM-06",
+      "claim_text": "Days sales outstanding is stable at approximately 45 days.",
+      "metric_key": "dso_days",
+      "period": "FY2025",
+      "test_predicate": "Measure FY2025 days sales outstanding using collections and invoice aging records for the period.",
+      "test_type": "sql_and_document",
+      "tables": [
+        "v_collections"
+      ],
+      "documents": [],
+      "trusted_sources": [
+        "executed contracts",
+        "system tables"
+      ],
+      "sources_to_challenge": [
+        "cim"
+      ],
+      "claimed_value": "45.0",
+      "unit": "days",
+      "tolerance": "+/-2% relative",
+      "cim_ref": {
+        "file": "01_CIM_Excerpt_Harborline.md",
+        "page": 22,
+        "verified": true
+      },
+      "mapping_note": null
+    },
+    {
+      "claim_id": "CLM-07",
+      "claim_text": "Direct expansion into Europe is the primary growth vector, worth $6M ARR by FY2028.",
+      "metric_key": "emea_direct_arr_usd",
+      "period": "FY2028",
+      "test_predicate": "Measure ARR attributable to direct EMEA customers in FY2028, distinguishing direct from reseller or distribution arrangements and consolidating customers to the parent customer group where relevant.",
+      "test_type": "document",
+      "tables": [
+        "dim_customer",
+        "v_arr_month"
+      ],
+      "documents": [
+        "01_CIM_Excerpt_Harborline.md"
+      ],
+      "trusted_sources": [
+        "executed contracts",
+        "system tables"
+      ],
+      "sources_to_challenge": [
+        "cim"
+      ],
+      "claimed_value": "6000000.0",
+      "unit": "usd",
+      "tolerance": "+/-2% relative",
+      "cim_ref": {
+        "file": "01_CIM_Excerpt_Harborline.md",
+        "page": 31,
+        "verified": true
+      },
+      "mapping_note": null
+    },
+    {
+      "claim_id": "CLM-08",
+      "claim_text": "All customer contracts are freely assignable on a change of control.",
+      "metric_key": "contracts_with_coc_restriction",
+      "period": "FY2025",
+      "test_predicate": "Count active contracts in FY2025 where a change of control requires customer consent or gives the counterparty a termination right.",
+      "test_type": "document",
+      "tables": [
+        "dim_contract"
+      ],
+      "documents": [],
+      "trusted_sources": [
+        "executed contracts",
+        "system tables"
+      ],
+      "sources_to_challenge": [
+        "mgmt_contract_summary",
+        "dim_contract"
+      ],
+      "claimed_value": "0.0",
+      "unit": "count",
+      "tolerance": "exact",
+      "cim_ref": {
+        "file": "01_CIM_Excerpt_Harborline.md",
+        "page": 27,
+        "verified": true
+      },
+      "mapping_note": null
+    },
+    {
+      "claim_id": "CLM-09",
+      "claim_text": "Revenue grew at a 14% CAGR over FY2023-FY2025.",
+      "metric_key": "revenue_cagr_pct",
+      "period": "FY2023-FY2025",
+      "test_predicate": "Measure revenue CAGR across FY2023 through FY2025 using total revenue for the start and end fiscal years.",
+      "test_type": "sql",
+      "tables": [
+        "v_revenue_line"
+      ],
+      "documents": [
+        "01_CIM_Excerpt_Harborline.md"
+      ],
+      "trusted_sources": [
+        "executed contracts",
+        "system tables"
+      ],
+      "sources_to_challenge": [
+        "cim"
+      ],
+      "claimed_value": "14.0",
+      "unit": "percent",
+      "tolerance": "+/-0.5pp",
+      "cim_ref": {
+        "file": "01_CIM_Excerpt_Harborline.md",
+        "page": 9,
+        "verified": true
+      },
+      "mapping_note": null
+    },
+    {
+      "claim_id": "CLM-10",
+      "claim_text": "Top 10 customers have an average tenure of 6 years.",
+      "metric_key": "top10_avg_tenure_years",
+      "period": "FY2025",
+      "test_predicate": "Measure the average tenure in years of the top 10 FY2025 customers by revenue, consolidated to the parent customer group where relevant, using first contract or first order evidence.",
+      "test_type": "sql_and_document",
+      "tables": [
+        "v_revenue_line",
+        "dim_customer"
+      ],
+      "documents": [],
+      "trusted_sources": [
+        "executed contracts",
+        "system tables"
+      ],
+      "sources_to_challenge": [
+        "cim"
+      ],
+      "claimed_value": "6.0",
+      "unit": "years",
+      "tolerance": "+/-2% relative",
+      "cim_ref": {
+        "file": "01_CIM_Excerpt_Harborline.md",
+        "page": 13,
+        "verified": true
+      },
+      "mapping_note": null
+    },
+    {
+      "claim_id": "CLM-11",
+      "claim_text": "No contract contains most-favoured-nation pricing.",
+      "metric_key": "contracts_with_mfn",
+      "period": "FY2025",
+      "test_predicate": "Count active FY2025 contracts containing most-favoured-nation pricing, rate parity, or equivalent pricing protection clauses.",
+      "test_type": "document",
+      "tables": [
+        "dim_contract"
+      ],
+      "documents": [],
+      "trusted_sources": [
+        "executed contracts",
+        "system tables"
+      ],
+      "sources_to_challenge": [
+        "mgmt_contract_summary",
+        "dim_contract"
+      ],
+      "claimed_value": "0.0",
+      "unit": "count",
+      "tolerance": "exact",
+      "cim_ref": {
+        "file": "01_CIM_Excerpt_Harborline.md",
+        "page": 27,
+        "verified": true
+      },
+      "mapping_note": null
+    },
+    {
+      "claim_id": "CLM-12",
+      "claim_text": "Gross revenue retention is 97%.",
+      "metric_key": "gross_revenue_retention_pct",
+      "period": "FY2025",
+      "test_predicate": "Measure FY2025 gross revenue retention for the starting customer cohort, consolidated to the parent customer group where relevant, excluding expansion revenue.",
+      "test_type": "sql_and_document",
+      "tables": [
+        "v_arr_month",
+        "dim_customer"
+      ],
+      "documents": [],
+      "trusted_sources": [
+        "executed contracts",
+        "system tables"
+      ],
+      "sources_to_challenge": [
+        "cim"
+      ],
+      "claimed_value": "97.0",
+      "unit": "percent",
+      "tolerance": "+/-0.5pp",
+      "cim_ref": {
+        "file": "01_CIM_Excerpt_Harborline.md",
+        "page": 14,
+        "verified": true
+      },
+      "mapping_note": null
+    }
+  ]
+}
