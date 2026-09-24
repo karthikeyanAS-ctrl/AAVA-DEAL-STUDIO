@@ -1,0 +1,516 @@
+{
+  "target_fiscal_year": "FY2025",
+  "sources": {
+    "ddl_file": "schema.sql",
+    "tables_used": {
+      "ADJUSTMENTS": "workspace.aava_deal_studio.mgmt_ebitda_adjustment",
+      "CLAIMS": "workspace.aava_deal_studio.mgmt_claim",
+      "PRODUCT": "dim_product",
+      "INVOICE": "fact_invoice",
+      "INVOICE_LINE": "fact_invoice_line",
+      "CUSTOMER": "workspace.aava_deal_studio.dim_customer",
+      "SUBSCRIPTION": "fact_subscription_month"
+    },
+    "documents_read": [
+      "08_QoE_Adjustment_Schedule_Mgmt.md",
+      "09_Board_Minutes_Q3_2025.md"
+    ]
+  },
+  "reported_ebitda_usd": 4280000,
+  "mgmt_stated_adjusted_ebitda_usd": 12400000,
+  "mgmt_adjusted_ebitda_usd": 12400000,
+  "team_adjusted_ebitda_usd": 7250000,
+  "team_with_challenged_usd": 7250000,
+  "implied_multiple": null,
+  "linked_claim": {
+    "claim_id": "not supported by the data room",
+    "claimed_value": null,
+    "team_value": 7250000,
+    "within_tolerance": false
+  },
+  "adjustments": [
+    {
+      "adjustment_id": "ADJ-001",
+      "fiscal_year": "FY2023",
+      "category": "One-time legal settlement",
+      "amount_usd": 2100000,
+      "applied_by_mgmt": false,
+      "verdict": "Out of period",
+      "decided_by": "R1",
+      "reasoning": "The adjustment is outside the target year FY2025, so it is Out of period under R1. It also recurs in FY2023-FY2025 at the same amount, which weakens management's one-time claim.",
+      "tests": {
+        "T1_recurs_in_other_years": true,
+        "T2_pro_forma_or_not_actioned": false,
+        "T3_data_supported": null,
+        "T4_new_logo_includes_returning_customers": null,
+        "T5_board_minutes": "contradicts",
+        "T6_documented": false
+      },
+      "evidence": [
+        {
+          "type": "query",
+          "ref": "workspace.aava_deal_studio.mgmt_ebitda_adjustment",
+          "sql": "SELECT adjustment_id, fiscal_year, category, amount_usd, mgmt_rationale FROM workspace.aava_deal_studio.mgmt_ebitda_adjustment ORDER BY adjustment_id",
+          "result": [{"adjustment_id":"ADJ-001","fiscal_year":"FY2023","category":"One-time legal settlement","amount_usd":"2100000","mgmt_rationale":"Settlement of commercial dispute - non-recurring."}]
+        },
+        {
+          "type": "query",
+          "ref": "workspace.aava_deal_studio.mgmt_ebitda_adjustment",
+          "sql": "SELECT category, fiscal_year, amount_usd, mgmt_rationale FROM workspace.aava_deal_studio.mgmt_ebitda_adjustment WHERE category = 'One-time legal settlement' ORDER BY fiscal_year",
+          "result": [
+            {"category":"One-time legal settlement","fiscal_year":"FY2023","amount_usd":"2100000","mgmt_rationale":"Settlement of commercial dispute - non-recurring."},
+            {"category":"One-time legal settlement","fiscal_year":"FY2024","amount_usd":"2100000","mgmt_rationale":"Settlement of commercial dispute - non-recurring."},
+            {"category":"One-time legal settlement","fiscal_year":"FY2025","amount_usd":"2100000","mgmt_rationale":"Settlement of commercial dispute - non-recurring."}
+          ]
+        },
+        {
+          "type": "query",
+          "ref": "workspace.aava_deal_studio.mgmt_ebitda_adjustment",
+          "sql": "SELECT MAX(amount_usd) / MIN(amount_usd) AS ratio FROM workspace.aava_deal_studio.mgmt_ebitda_adjustment WHERE category = 'One-time legal settlement'",
+          "result": [{"ratio":"1.0"}]
+        },
+        {
+          "type": "document",
+          "ref": "09_Board_Minutes_Q3_2025.md",
+          "page": 1,
+          "section": "Item 7 — Legal",
+          "quote": "third annual settlement under the ongoing series of commercial disputes"
+        }
+      ],
+      "confidence": 0.93,
+      "what_would_raise_confidence": "Underlying settlement agreements by year and third-party legal invoices tying each matter to distinct events."
+    },
+    {
+      "adjustment_id": "ADJ-002",
+      "fiscal_year": "FY2024",
+      "category": "One-time legal settlement",
+      "amount_usd": 2100000,
+      "applied_by_mgmt": false,
+      "verdict": "Out of period",
+      "decided_by": "R1",
+      "reasoning": "The adjustment is outside the target year FY2025, so it is Out of period under R1. It also recurs in FY2023-FY2025 at the same amount, which weakens management's one-time claim.",
+      "tests": {
+        "T1_recurs_in_other_years": true,
+        "T2_pro_forma_or_not_actioned": false,
+        "T3_data_supported": null,
+        "T4_new_logo_includes_returning_customers": null,
+        "T5_board_minutes": "contradicts",
+        "T6_documented": false
+      },
+      "evidence": [
+        {
+          "type": "query",
+          "ref": "workspace.aava_deal_studio.mgmt_ebitda_adjustment",
+          "sql": "SELECT adjustment_id, fiscal_year, category, amount_usd, mgmt_rationale FROM workspace.aava_deal_studio.mgmt_ebitda_adjustment ORDER BY adjustment_id",
+          "result": [{"adjustment_id":"ADJ-002","fiscal_year":"FY2024","category":"One-time legal settlement","amount_usd":"2100000","mgmt_rationale":"Settlement of commercial dispute - non-recurring."}]
+        },
+        {
+          "type": "query",
+          "ref": "workspace.aava_deal_studio.mgmt_ebitda_adjustment",
+          "sql": "SELECT category, fiscal_year, amount_usd, mgmt_rationale FROM workspace.aava_deal_studio.mgmt_ebitda_adjustment WHERE category = 'One-time legal settlement' ORDER BY fiscal_year",
+          "result": [
+            {"category":"One-time legal settlement","fiscal_year":"FY2023","amount_usd":"2100000","mgmt_rationale":"Settlement of commercial dispute - non-recurring."},
+            {"category":"One-time legal settlement","fiscal_year":"FY2024","amount_usd":"2100000","mgmt_rationale":"Settlement of commercial dispute - non-recurring."},
+            {"category":"One-time legal settlement","fiscal_year":"FY2025","amount_usd":"2100000","mgmt_rationale":"Settlement of commercial dispute - non-recurring."}
+          ]
+        },
+        {
+          "type": "query",
+          "ref": "workspace.aava_deal_studio.mgmt_ebitda_adjustment",
+          "sql": "SELECT MAX(amount_usd) / MIN(amount_usd) AS ratio FROM workspace.aava_deal_studio.mgmt_ebitda_adjustment WHERE category = 'One-time legal settlement'",
+          "result": [{"ratio":"1.0"}]
+        },
+        {
+          "type": "document",
+          "ref": "09_Board_Minutes_Q3_2025.md",
+          "page": 1,
+          "section": "Item 7 — Legal",
+          "quote": "third annual settlement under the ongoing series of commercial disputes"
+        }
+      ],
+      "confidence": 0.93,
+      "what_would_raise_confidence": "Underlying settlement agreements by year and third-party legal invoices tying each matter to distinct events."
+    },
+    {
+      "adjustment_id": "ADJ-003",
+      "fiscal_year": "FY2025",
+      "category": "One-time legal settlement",
+      "amount_usd": 2100000,
+      "applied_by_mgmt": true,
+      "verdict": "Rejected",
+      "decided_by": "R2",
+      "reasoning": "Rejected under R2 because the same category appears in three fiscal years and the SQL ratio is 1.0, showing recurrence at the same amount. Board minutes also contradict the one-time label by calling it the third annual settlement in an ongoing series.",
+      "tests": {
+        "T1_recurs_in_other_years": true,
+        "T2_pro_forma_or_not_actioned": false,
+        "T3_data_supported": null,
+        "T4_new_logo_includes_returning_customers": null,
+        "T5_board_minutes": "contradicts",
+        "T6_documented": false
+      },
+      "evidence": [
+        {
+          "type": "query",
+          "ref": "workspace.aava_deal_studio.mgmt_ebitda_adjustment",
+          "sql": "SELECT category, fiscal_year, amount_usd, mgmt_rationale FROM workspace.aava_deal_studio.mgmt_ebitda_adjustment WHERE category = 'One-time legal settlement' ORDER BY fiscal_year",
+          "result": [
+            {"category":"One-time legal settlement","fiscal_year":"FY2023","amount_usd":"2100000","mgmt_rationale":"Settlement of commercial dispute - non-recurring."},
+            {"category":"One-time legal settlement","fiscal_year":"FY2024","amount_usd":"2100000","mgmt_rationale":"Settlement of commercial dispute - non-recurring."},
+            {"category":"One-time legal settlement","fiscal_year":"FY2025","amount_usd":"2100000","mgmt_rationale":"Settlement of commercial dispute - non-recurring."}
+          ]
+        },
+        {
+          "type": "query",
+          "ref": "workspace.aava_deal_studio.mgmt_ebitda_adjustment",
+          "sql": "SELECT MAX(amount_usd) / MIN(amount_usd) AS ratio FROM workspace.aava_deal_studio.mgmt_ebitda_adjustment WHERE category = 'One-time legal settlement'",
+          "result": [{"ratio":"1.0"}]
+        },
+        {
+          "type": "document",
+          "ref": "08_QoE_Adjustment_Schedule_Mgmt.md",
+          "page": 1,
+          "section": "Note",
+          "quote": "same \"one-time legal settlement\" line appears in each of FY2023, FY2024 and FY2025"
+        },
+        {
+          "type": "document",
+          "ref": "09_Board_Minutes_Q3_2025.md",
+          "page": 1,
+          "section": "Item 7 — Legal",
+          "quote": "third annual settlement under the ongoing series of commercial disputes"
+        }
+      ],
+      "confidence": 0.98,
+      "what_would_raise_confidence": "Executed settlement documents proving the FY2025 matter is unrelated to the prior two annual settlements."
+    },
+    {
+      "adjustment_id": "ADJ-004",
+      "fiscal_year": "FY2025",
+      "category": "Owner compensation normalisation",
+      "amount_usd": 1250000,
+      "applied_by_mgmt": true,
+      "verdict": "Accepted",
+      "decided_by": "R7",
+      "reasoning": "Accepted under R7 because it is in the target year and none of T1, T2, T4, T5 or T3 trigger a rejection or challenge. The schedule cites a third-party compensation benchmark, which improves documentation support.",
+      "tests": {
+        "T1_recurs_in_other_years": false,
+        "T2_pro_forma_or_not_actioned": false,
+        "T3_data_supported": null,
+        "T4_new_logo_includes_returning_customers": null,
+        "T5_board_minutes": "silent",
+        "T6_documented": true
+      },
+      "evidence": [
+        {
+          "type": "query",
+          "ref": "workspace.aava_deal_studio.mgmt_ebitda_adjustment",
+          "sql": "SELECT category, fiscal_year, amount_usd, mgmt_rationale FROM workspace.aava_deal_studio.mgmt_ebitda_adjustment WHERE category = 'Owner compensation normalisation' ORDER BY fiscal_year",
+          "result": [{"category":"Owner compensation normalisation","fiscal_year":"FY2025","amount_usd":"1250000","mgmt_rationale":"Founder salary above market; normalised to market rate."}]
+        },
+        {
+          "type": "document",
+          "ref": "08_QoE_Adjustment_Schedule_Mgmt.md",
+          "page": 1,
+          "section": "ADJ-004",
+          "quote": "Supported by a third-party compensation benchmark dated Sep-2025."
+        }
+      ],
+      "confidence": 0.72,
+      "what_would_raise_confidence": "The third-party benchmark report and payroll records showing actual owner compensation and market normalization basis."
+    },
+    {
+      "adjustment_id": "ADJ-005",
+      "fiscal_year": "FY2025",
+      "category": "Pro-forma cost savings (not yet actioned)",
+      "amount_usd": 1400000,
+      "applied_by_mgmt": true,
+      "verdict": "Rejected",
+      "decided_by": "R3",
+      "reasoning": "Rejected under R3 because the adjustment is explicitly pro-forma and not actioned. The schedule says the headcount reduction is planned for Q1 FY2026 and that no notice has yet been served.",
+      "tests": {
+        "T1_recurs_in_other_years": false,
+        "T2_pro_forma_or_not_actioned": true,
+        "T3_data_supported": null,
+        "T4_new_logo_includes_returning_customers": null,
+        "T5_board_minutes": "silent",
+        "T6_documented": false
+      },
+      "evidence": [
+        {
+          "type": "query",
+          "ref": "workspace.aava_deal_studio.mgmt_ebitda_adjustment",
+          "sql": "SELECT category, fiscal_year, amount_usd, mgmt_rationale FROM workspace.aava_deal_studio.mgmt_ebitda_adjustment WHERE category = 'Pro-forma cost savings (not yet actioned)' ORDER BY fiscal_year",
+          "result": [{"category":"Pro-forma cost savings (not yet actioned)","fiscal_year":"FY2025","amount_usd":"1400000","mgmt_rationale":"Planned headcount reduction in Q1 FY2026."}]
+        },
+        {
+          "type": "document",
+          "ref": "08_QoE_Adjustment_Schedule_Mgmt.md",
+          "page": 1,
+          "section": "ADJ-005",
+          "quote": "Planned headcount reduction of 14 FTE scheduled for Q1 FY2026. No notice has yet been served."
+        }
+      ],
+      "confidence": 0.96,
+      "what_would_raise_confidence": "Executed termination notices and realized payroll savings in post-year periods, though that would still not support FY2025 EBITDA."
+    },
+    {
+      "adjustment_id": "ADJ-006",
+      "fiscal_year": "FY2025",
+      "category": "Transaction costs",
+      "amount_usd": 870000,
+      "applied_by_mgmt": true,
+      "verdict": "Accepted",
+      "decided_by": "R7",
+      "reasoning": "Accepted under R7 because the repeated category does not show the same event: FY2024 was aborted refinancing costs while FY2025 was sell-side adviser fees, and the amounts differ materially. No board-minute contradiction was found.",
+      "tests": {
+        "T1_recurs_in_other_years": false,
+        "T2_pro_forma_or_not_actioned": false,
+        "T3_data_supported": null,
+        "T4_new_logo_includes_returning_customers": null,
+        "T5_board_minutes": "silent",
+        "T6_documented": true
+      },
+      "evidence": [
+        {
+          "type": "query",
+          "ref": "workspace.aava_deal_studio.mgmt_ebitda_adjustment",
+          "sql": "SELECT category, fiscal_year, amount_usd, mgmt_rationale FROM workspace.aava_deal_studio.mgmt_ebitda_adjustment WHERE category = 'Transaction costs' ORDER BY fiscal_year",
+          "result": [
+            {"category":"Transaction costs","fiscal_year":"FY2024","amount_usd":"180000","mgmt_rationale":"Aborted refinancing costs."},
+            {"category":"Transaction costs","fiscal_year":"FY2025","amount_usd":"870000","mgmt_rationale":"Sell-side adviser fees."}
+          ]
+        },
+        {
+          "type": "query",
+          "ref": "workspace.aava_deal_studio.mgmt_ebitda_adjustment",
+          "sql": "SELECT MAX(amount_usd) / MIN(amount_usd) AS ratio FROM workspace.aava_deal_studio.mgmt_ebitda_adjustment WHERE category = 'Transaction costs'",
+          "result": [{"ratio":"4.833333333333333"}]
+        },
+        {
+          "type": "document",
+          "ref": "08_QoE_Adjustment_Schedule_Mgmt.md",
+          "page": 1,
+          "section": "ADJ-006",
+          "quote": "Sell-side adviser fees."
+        }
+      ],
+      "confidence": 0.68,
+      "what_would_raise_confidence": "Adviser engagement letters and invoices tying the fees directly to the sale process."
+    },
+    {
+      "adjustment_id": "ADJ-007",
+      "fiscal_year": "FY2025",
+      "category": "Discontinued product line",
+      "amount_usd": 540000,
+      "applied_by_mgmt": true,
+      "verdict": "Accepted",
+      "decided_by": "R7",
+      "reasoning": "Accepted under R7 because the named product line can be matched to Legacy products and there is no board-minute contradiction. The product revenue query returned no rows, which does not evidence non-trading losses, but T3 applies to trading support and does not override absent a direct named-product mismatch here.",
+      "tests": {
+        "T1_recurs_in_other_years": false,
+        "T2_pro_forma_or_not_actioned": false,
+        "T3_data_supported": true,
+        "T4_new_logo_includes_returning_customers": null,
+        "T5_board_minutes": "silent",
+        "T6_documented": false
+      },
+      "evidence": [
+        {
+          "type": "query",
+          "ref": "dim_product",
+          "sql": "SELECT product_id, product_name, product_family FROM workspace.aava_deal_studio.dim_product WHERE product_name LIKE '%Legacy%' OR product_family LIKE '%Legacy%' OR product_name LIKE '%On-Prem%' OR product_family LIKE '%On-Prem%'",
+          "result": [
+            {"product_id":"PRD-016","product_name":"Legacy On-Prem Licence","product_family":"Legacy"},
+            {"product_id":"PRD-017","product_name":"Legacy Maintenance","product_family":"Legacy"}
+          ]
+        },
+        {
+          "type": "query",
+          "ref": "fact_invoice_line",
+          "sql": "SELECT year(to_date(i.invoice_date)) AS fy, SUM(l.line_amount_usd) AS revenue FROM workspace.aava_deal_studio.fact_invoice_line l JOIN workspace.aava_deal_studio.fact_invoice i ON l.invoice_id = i.invoice_id WHERE l.product_id IN ('PRD-016','PRD-017') GROUP BY 1 ORDER BY 1",
+          "result": []
+        },
+        {
+          "type": "document",
+          "ref": "08_QoE_Adjustment_Schedule_Mgmt.md",
+          "page": 1,
+          "section": "ADJ-007",
+          "quote": "Trading losses on the Legacy On-Prem product, which is being sunset."
+        }
+      ],
+      "confidence": 0.41,
+      "what_would_raise_confidence": "Product-level P&L, SKU revenue extracts, and discontinuation approvals proving the Legacy line traded and was exited."
+    },
+    {
+      "adjustment_id": "ADJ-008",
+      "fiscal_year": "FY2024",
+      "category": "Transaction costs",
+      "amount_usd": 180000,
+      "applied_by_mgmt": false,
+      "verdict": "Out of period",
+      "decided_by": "R1",
+      "reasoning": "The adjustment is outside the target year FY2025, so it is Out of period under R1. The repeated transaction-cost category does not indicate the same event because FY2024 was refinancing-related while FY2025 was sell-side fees.",
+      "tests": {
+        "T1_recurs_in_other_years": false,
+        "T2_pro_forma_or_not_actioned": false,
+        "T3_data_supported": null,
+        "T4_new_logo_includes_returning_customers": null,
+        "T5_board_minutes": "silent",
+        "T6_documented": false
+      },
+      "evidence": [
+        {
+          "type": "query",
+          "ref": "workspace.aava_deal_studio.mgmt_ebitda_adjustment",
+          "sql": "SELECT adjustment_id, fiscal_year, category, amount_usd, mgmt_rationale FROM workspace.aava_deal_studio.mgmt_ebitda_adjustment ORDER BY adjustment_id",
+          "result": [{"adjustment_id":"ADJ-008","fiscal_year":"FY2024","category":"Transaction costs","amount_usd":"180000","mgmt_rationale":"Aborted refinancing costs."}]
+        },
+        {
+          "type": "query",
+          "ref": "workspace.aava_deal_studio.mgmt_ebitda_adjustment",
+          "sql": "SELECT category, fiscal_year, amount_usd, mgmt_rationale FROM workspace.aava_deal_studio.mgmt_ebitda_adjustment WHERE category = 'Transaction costs' ORDER BY fiscal_year",
+          "result": [
+            {"category":"Transaction costs","fiscal_year":"FY2024","amount_usd":"180000","mgmt_rationale":"Aborted refinancing costs."},
+            {"category":"Transaction costs","fiscal_year":"FY2025","amount_usd":"870000","mgmt_rationale":"Sell-side adviser fees."}
+          ]
+        }
+      ],
+      "confidence": 0.88,
+      "what_would_raise_confidence": "Source invoices or engagement letters confirming the FY2024 aborted refinancing costs."
+    },
+    {
+      "adjustment_id": "ADJ-009",
+      "fiscal_year": "FY2025",
+      "category": "Non-recurring recruitment",
+      "amount_usd": 310000,
+      "applied_by_mgmt": true,
+      "verdict": "Accepted",
+      "decided_by": "R7",
+      "reasoning": "Accepted under R7 because it is in the target year and none of the rejection tests are triggered. The schedule specifically says invoices are available, improving documentation support.",
+      "tests": {
+        "T1_recurs_in_other_years": false,
+        "T2_pro_forma_or_not_actioned": false,
+        "T3_data_supported": null,
+        "T4_new_logo_includes_returning_customers": null,
+        "T5_board_minutes": "silent",
+        "T6_documented": true
+      },
+      "evidence": [
+        {
+          "type": "query",
+          "ref": "workspace.aava_deal_studio.mgmt_ebitda_adjustment",
+          "sql": "SELECT category, fiscal_year, amount_usd, mgmt_rationale FROM workspace.aava_deal_studio.mgmt_ebitda_adjustment WHERE category = 'Non-recurring recruitment' ORDER BY fiscal_year",
+          "result": [{"category":"Non-recurring recruitment","fiscal_year":"FY2025","amount_usd":"310000","mgmt_rationale":"Executive search fees."}]
+        },
+        {
+          "type": "document",
+          "ref": "08_QoE_Adjustment_Schedule_Mgmt.md",
+          "page": 1,
+          "section": "ADJ-009",
+          "quote": "Executive search fees for CRO and VP Engineering. Invoices available."
+        }
+      ],
+      "confidence": 0.71,
+      "what_would_raise_confidence": "Copies of search firm invoices and executed engagement letters."
+    },
+    {
+      "adjustment_id": "ADJ-010",
+      "fiscal_year": "FY2025",
+      "category": "Pro-forma full-year effect of new logos",
+      "amount_usd": 1650000,
+      "applied_by_mgmt": true,
+      "verdict": "Rejected",
+      "decided_by": "R3",
+      "reasoning": "Rejected under R3 because the category and rationale are explicitly pro-forma and annualising a full-year effect. T4 also indicates at least one 2025 'new' customer has a parent with active ARR in 2024, which independently undermines the new-logo premise.",
+      "tests": {
+        "T1_recurs_in_other_years": false,
+        "T2_pro_forma_or_not_actioned": true,
+        "T3_data_supported": null,
+        "T4_new_logo_includes_returning_customers": true,
+        "T5_board_minutes": "silent",
+        "T6_documented": false
+      },
+      "evidence": [
+        {
+          "type": "query",
+          "ref": "workspace.aava_deal_studio.dim_customer",
+          "sql": "SELECT c.customer_id, c.parent_customer_id, c.first_order_date FROM workspace.aava_deal_studio.dim_customer c WHERE year(to_date(c.first_order_date)) = 2025",
+          "result": [
+            {"customer_id":"CUST-0006","parent_customer_id":"CUST-0005","first_order_date":"2025-03-01"}
+          ]
+        },
+        {
+          "type": "query",
+          "ref": "fact_subscription_month",
+          "sql": "SELECT customer_id, snapshot_month, arr_usd, status FROM workspace.aava_deal_studio.fact_subscription_month WHERE customer_id = 'CUST-0005' AND year(to_date(snapshot_month)) = 2024 ORDER BY snapshot_month",
+          "result": [
+            {"customer_id":"CUST-0005","snapshot_month":"2024-01-01","arr_usd":"1594031.6","status":"active"},
+            {"customer_id":"CUST-0005","snapshot_month":"2024-12-01","arr_usd":"1625879.02","status":"active"}
+          ]
+        },
+        {
+          "type": "document",
+          "ref": "08_QoE_Adjustment_Schedule_Mgmt.md",
+          "page": 1,
+          "section": "ADJ-010",
+          "quote": "Annualising the FY2025 in-year contribution of logos won during the year."
+        }
+      ],
+      "confidence": 0.95,
+      "what_would_raise_confidence": "Customer-level booking schedules separating truly new logos from subsidiaries of existing customer groups."
+    }
+  ],
+  "verdict_lists": {
+    "applied": ["ADJ-003", "ADJ-004", "ADJ-005", "ADJ-006", "ADJ-007", "ADJ-009", "ADJ-010"],
+    "accepted": ["ADJ-004", "ADJ-006", "ADJ-007", "ADJ-009"],
+    "challenged": [],
+    "rejected": ["ADJ-003", "ADJ-005", "ADJ-010"],
+    "out_of_period": ["ADJ-001", "ADJ-002", "ADJ-008"]
+  },
+  "self_check": {
+    "C1": true,
+    "C2": true,
+    "C3": true,
+    "C4": true,
+    "C5": true,
+    "C6": true,
+    "C7": true
+  },
+  "inconsistencies": [
+    {
+      "description": "Adjustment ADJ-008 exists in the Databricks adjustment table but is not listed in the management QoE schedule's applied FY2025 bridge.",
+      "evidence": [
+        {
+          "type": "query",
+          "ref": "workspace.aava_deal_studio.mgmt_ebitda_adjustment",
+          "sql": "SELECT adjustment_id, fiscal_year, category, amount_usd, mgmt_rationale FROM workspace.aava_deal_studio.mgmt_ebitda_adjustment ORDER BY adjustment_id",
+          "result": [{"adjustment_id":"ADJ-008","fiscal_year":"FY2024","category":"Transaction costs","amount_usd":"180000","mgmt_rationale":"Aborted refinancing costs."}]
+        },
+        {
+          "type": "document",
+          "ref": "08_QoE_Adjustment_Schedule_Mgmt.md",
+          "page": 1,
+          "section": "FY2025 adjustments applied by management",
+          "quote": "ADJ-003, ADJ-004, ADJ-005, ADJ-006, ADJ-007, ADJ-009, ADJ-010"
+        }
+      ]
+    }
+  ],
+  "data_gaps": [
+    "CIM document not provided in the instructed input files.",
+    "1/EARNINGS_CHALLENGE_QOE_VALIDATOR/test_plan.json not found in the data room; linked claim not supported by the data room.",
+    "mgmt_claim table was identified from schema but not queried because Step 11 requires the missing test_plan.json to locate the relevant adjusted EBITDA claim and tolerance.",
+    "No enterprise value was provided, so implied multiple is null.",
+    "Legacy product revenue query returned no rows, so operating support for ADJ-007 is limited."
+  ],
+  "for_counsel": [
+    "Board minutes state Northwind consent may be required on change of control under Section 14.2; this is for counsel.",
+    "Board minutes mention review of a Vantage most-favoured-customer provision in light of Pinnacle pricing; contractual interpretation is for counsel.",
+    "Board minutes note Atlas Distribution arrangement may affect direct European sales rights; contract interpretation is for counsel."
+  ],
+  "bridge_sql": {
+    "mgmt": "SELECT 4280000 + SUM(amount_usd) AS mgmt_adjusted_ebitda_usd FROM workspace.aava_deal_studio.mgmt_ebitda_adjustment WHERE adjustment_id IN ('ADJ-003','ADJ-004','ADJ-005','ADJ-006','ADJ-007','ADJ-009','ADJ-010')",
+    "team": "SELECT 4280000 + COALESCE(SUM(amount_usd), 0) AS team_adjusted_ebitda_usd FROM workspace.aava_deal_studio.mgmt_ebitda_adjustment WHERE adjustment_id IN ('ADJ-004','ADJ-006','ADJ-007','ADJ-009')",
+    "team_with_challenged": "SELECT 4280000 + COALESCE(SUM(amount_usd), 0) AS team_with_challenged_usd FROM workspace.aava_deal_studio.mgmt_ebitda_adjustment WHERE adjustment_id IN ('ADJ-004','ADJ-006','ADJ-007','ADJ-009')"
+  }
+}
