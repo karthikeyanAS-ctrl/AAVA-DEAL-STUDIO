@@ -1,4 +1,7 @@
-CREATE TABLE "dim_customer" (
+catalog = workspace
+schema = aava_deal_studio
+
+CREATE TABLE workspace.aava_deal_studio.dim_customer" (
 "customer_id" TEXT,
   "customer_name" TEXT,
   "industry" TEXT,
