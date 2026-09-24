@@ -1,0 +1,948 @@
+{
+  "status": "PARTIAL",
+  "sources": {
+    "ddl_file": "not separately provided in accessible GitHub inputs; schema validated directly in Databricks metadata and DESCRIBE outputs",
+    "catalog": "workspace",
+    "schema": "aava_deal_studio",
+    "tables_used": {
+      "CUSTOMER": "workspace.aava_deal_studio.dim_customer",
+      "PRODUCT": "workspace.aava_deal_studio.dim_product",
+      "CONTRACT": "workspace.aava_deal_studio.dim_contract",
+      "INVOICE": "workspace.aava_deal_studio.fact_invoice",
+      "INVOICE_LINE": "workspace.aava_deal_studio.fact_invoice_line",
+      "SUBSCRIPTION": "workspace.aava_deal_studio.fact_subscription_month",
+      "TICKET": "workspace.aava_deal_studio.fact_support_ticket",
+      "ADJUSTMENT": "workspace.aava_deal_studio.mgmt_ebitda_adjustment",
+      "CLAIM": "workspace.aava_deal_studio.mgmt_claim"
+    },
+    "documents_read": [
+      "wb_1/Input/01_CIM_Excerpt_Harborline.md",
+      "wb_1/Input/02_MSA_Northwind_Retail_Group_2022.md",
+      "wb_1/Input/03_MSA_Vantage_Grocers_2023.md",
+      "wb_1/Input/04_MSA_Pinnacle_Outdoor_2025.md",
+      "wb_1/Input/05_Reseller_Agreement_Atlas_Distribution_2024.md",
+      "wb_1/Input/06_MSA_Cascade_Foods_Holdings_2025.md",
+      "wb_1/Input/07_Customer_Contract_Summary_Mgmt.md",
+      "wb_1/Input/08_QoE_Adjustment_Schedule_Mgmt.md",
+      "wb_1/Input/09_Board_Minutes_Q3_2025.md",
+      "wb_1/Input/10_IT_Systems_Overview_Mgmt.md",
+      "wb_1/DOCUMENT_TRIAGE_ORCHESTRATOR/doc_catalog.json"
+    ],
+    "upstream_files_read": [
+      "wb_1/DOCUMENT_TRIAGE_ORCHESTRATOR/doc_catalog.json"
+    ]
+  },
+  "latest_arr_month": "2025-12-01",
+  "conflicts": [
+    {
+      "conflict_id": "CF-001",
+      "type": "contract_vs_summary",
+      "statement": "Management says Northwind has no change-of-control restriction, but the executed Northwind MSA treats a supplier change of control as an assignment requiring prior written consent and gives termination rights if consent is not obtained.",
+      "source_a": {
+        "tier": 1,
+        "type": "document",
+        "ref": "wb_1/Input/02_MSA_Northwind_Retail_Group_2022.md",
+        "page": 19,
+        "section": "Section 14.2 Assignment and Change of Control",
+        "quote": "For the avoidance of doubt, a Change of Control of Supplier shall constitute an assignment for the purposes of this Section 14.2.",
+        "sql": null,
+        "result": null,
+        "says": "Northwind requires prior written consent for a supplier change of control because it is deemed an assignment."
+      },
+      "source_b": {
+        "tier": 3,
+        "type": "document",
+        "ref": "wb_1/Input/07_Customer_Contract_Summary_Mgmt.md",
+        "page": 1,
+        "section": "CTR-00001 row",
+        "quote": "| CTR-00001 | Northwind Retail Group | 7,600,000 | 2026-06-30 | No | None noted | No | No | Long-standing relationship, renewal expected |",
+        "sql": null,
+        "result": null,
+        "says": "Management states no change-of-control restriction is noted for Northwind."
+      },
+      "winning_source": "wb_1/Input/02_MSA_Northwind_Retail_Group_2022.md",
+      "why_it_wins": "The executed contract is Tier 1 and prevails over the Tier 3 management summary.",
+      "corroboration": [
+        {
+          "type": "document",
+          "ref": "wb_1/Input/09_Board_Minutes_Q3_2025.md",
+          "page": 1,
+          "section": "Item 5 — Northwind Retail Group",
+          "quote": "Section 14.2 treats a change of control of the Company as an assignment requiring Northwind's prior written consent",
+          "sql": null,
+          "result": null
+        },
+        {
+          "type": "query",
+          "ref": "workspace.aava_deal_studio.dim_contract",
+          "page": null,
+          "section": null,
+          "quote": null,
+          "sql": "SELECT c.contract_id, c.customer_id, cu.customer_name, cu.parent_customer_id, cu.country, c.contract_start_date, c.contract_end_date, c.acv_usd, c.auto_renew_flag, c.notice_period_days, c.discount_pct, c.status, c.source_doc_ref FROM workspace.aava_deal_studio.dim_contract c JOIN workspace.aava_deal_studio.dim_customer cu ON c.customer_id = cu.customer_id WHERE c.contract_id IN ('CTR-00001','CTR-00002','CTR-00003','CTR-00004','CTR-00006') ORDER BY c.contract_id",
+          "result": [
+            {
+              "contract_id": "CTR-00001",
+              "customer_id": "CUST-0001",
+              "customer_name": "Northwind Retail Group",
+              "parent_customer_id": null,
+              "country": "USA",
+              "contract_start_date": "2022-07-01",
+              "contract_end_date": "2026-06-30",
+              "acv_usd": "7600000.0",
+              "auto_renew_flag": "N",
+              "notice_period_days": "90",
+              "discount_pct": "0.12",
+              "status": "Active",
+              "source_doc_ref": "vdr/MSA_Northwind_Retail_Group_2022.md"
+            }
+          ]
+        },
+        {
+          "type": "query",
+          "ref": "workspace.aava_deal_studio.fact_subscription_month",
+          "page": null,
+          "section": null,
+          "quote": null,
+          "sql": "SELECT arr_usd FROM workspace.aava_deal_studio.fact_subscription_month WHERE customer_id = 'CUST-0001' AND snapshot_month = DATE '2025-12-01'",
+          "result": [
+            {
+              "arr_usd": "1.054704061E7"
+            }
+          ]
+        },
+        {
+          "type": "query",
+          "ref": "workspace.aava_deal_studio.fact_subscription_month",
+          "page": null,
+          "section": null,
+          "quote": null,
+          "sql": "SELECT ROUND(100 * 10547040.61 / SUM(arr_usd), 1) AS arr_share_pct FROM workspace.aava_deal_studio.fact_subscription_month WHERE snapshot_month = DATE '2025-12-01'",
+          "result": [
+            {
+              "arr_share_pct": "27.3"
+            }
+          ]
+        }
+      ],
+      "customer_id": "CUST-0001",
+      "contract_id": "CTR-00001",
+      "arr_affected_usd": 10547040.61,
+      "arr_share_pct": 27.3,
+      "claims_affected": [
+        "CLM-08"
+      ],
+      "for_counsel": "What consent process, if any, is required before signing or closing a sale transaction involving Harborline under Section 14.2 and 14.3?",
+      "confidence": 0.99,
+      "what_would_raise_confidence": "Signed consent correspondence from Northwind or confirmation no amendment supersedes Sections 14.2 and 14.3."
+    },
+    {
+      "conflict_id": "CF-002",
+      "type": "contract_vs_summary",
+      "statement": "Management says no contract contains MFN pricing, but the Vantage MSA contains an MFN clause protecting an 18% discount and requiring retrospective credit if a better discount is granted to a comparable customer.",
+      "source_a": {
+        "tier": 1,
+        "type": "document",
+        "ref": "wb_1/Input/03_MSA_Vantage_Grocers_2023.md",
+        "page": 9,
+        "section": "Section 8.4 Most Favoured Customer Pricing",
+        "quote": "is and shall remain not less favourable than the effective discount granted by Supplier to any other customer of comparable annual committed spend.",
+        "sql": null,
+        "result": null,
+        "says": "The executed Vantage contract contains an MFN clause."
+      },
+      "source_b": {
+        "tier": 3,
+        "type": "document",
+        "ref": "wb_1/Input/07_Customer_Contract_Summary_Mgmt.md",
+        "page": 1,
+        "section": "Management commentary",
+        "quote": "No agreement contains most-favoured-nation pricing or territorial exclusivity.",
+        "sql": null,
+        "result": null,
+        "says": "Management states no agreement contains MFN pricing."
+      },
+      "winning_source": "wb_1/Input/03_MSA_Vantage_Grocers_2023.md",
+      "why_it_wins": "The executed contract is Tier 1 and prevails over the Tier 3 management summary.",
+      "corroboration": [
+        {
+          "type": "document",
+          "ref": "wb_1/Input/09_Board_Minutes_Q3_2025.md",
+          "page": 1,
+          "section": "Item 6 — Pricing Governance",
+          "quote": "The General Counsel asked that the Vantage most-favoured-customer provision be reviewed in light of this.",
+          "sql": null,
+          "result": null
+        },
+        {
+          "type": "document",
+          "ref": "wb_1/Input/01_CIM_Excerpt_Harborline.md",
+          "page": 27,
+          "section": "Contracts",
+          "quote": "No contract contains most-favoured-nation pricing.",
+          "sql": null,
+          "result": null
+        },
+        {
+          "type": "query",
+          "ref": "workspace.aava_deal_studio.dim_contract",
+          "page": null,
+          "section": null,
+          "quote": null,
+          "sql": "SELECT c.contract_id, c.customer_id, cu.customer_name, cu.parent_customer_id, cu.country, c.contract_start_date, c.contract_end_date, c.acv_usd, c.auto_renew_flag, c.notice_period_days, c.discount_pct, c.status, c.source_doc_ref FROM workspace.aava_deal_studio.dim_contract c JOIN workspace.aava_deal_studio.dim_customer cu ON c.customer_id = cu.customer_id WHERE c.contract_id IN ('CTR-00001','CTR-00002','CTR-00003','CTR-00004','CTR-00006') ORDER BY c.contract_id",
+          "result": [
+            {
+              "contract_id": "CTR-00002",
+              "customer_id": "CUST-0002",
+              "customer_name": "Vantage Grocers",
+              "parent_customer_id": null,
+              "country": "USA",
+              "contract_start_date": "2023-01-01",
+              "contract_end_date": "2026-12-31",
+              "acv_usd": "4100000.0",
+              "auto_renew_flag": "Y",
+              "notice_period_days": "60",
+              "discount_pct": "0.18",
+              "status": "Active",
+              "source_doc_ref": "vdr/MSA_Vantage_Grocers_2023.md"
+            }
+          ]
+        },
+        {
+          "type": "query",
+          "ref": "workspace.aava_deal_studio.fact_subscription_month",
+          "page": null,
+          "section": null,
+          "quote": null,
+          "sql": "SELECT arr_usd FROM workspace.aava_deal_studio.fact_subscription_month WHERE customer_id = 'CUST-0002' AND snapshot_month = DATE '2025-12-01'",
+          "result": [
+            {
+              "arr_usd": "4681407.34"
+            }
+          ]
+        },
+        {
+          "type": "query",
+          "ref": "workspace.aava_deal_studio.fact_subscription_month",
+          "page": null,
+          "section": null,
+          "quote": null,
+          "sql": "SELECT ROUND(100 * 4200000.0 / SUM(arr_usd), 1) AS arr_share_pct FROM workspace.aava_deal_studio.fact_subscription_month WHERE snapshot_month = DATE '2025-12-01'",
+          "result": [
+            {
+              "arr_share_pct": "10.9"
+            }
+          ]
+        }
+      ],
+      "customer_id": "CUST-0002",
+      "contract_id": "CTR-00002",
+      "arr_affected_usd": 4681407.34,
+      "arr_share_pct": 10.9,
+      "claims_affected": [
+        "CLM-11"
+      ],
+      "for_counsel": null,
+      "confidence": 0.99,
+      "what_would_raise_confidence": "Full contract set confirming no amendment removed or narrowed Sections 8.4 and 8.5."
+    },
+    {
+      "conflict_id": "CF-003",
+      "type": "contract_vs_summary",
+      "statement": "Management describes Atlas as subject only to 'standard reseller terms' and says there is no territorial exclusivity, but the executed Atlas agreement gives Atlas sole and exclusive distributor rights in the Territory and bars direct or indirect sales there during the term.",
+      "source_a": {
+        "tier": 1,
+        "type": "document",
+        "ref": "wb_1/Input/05_Reseller_Agreement_Atlas_Distribution_2024.md",
+        "page": 5,
+        "section": "Section 4.3 Exclusivity Covenant",
+        "quote": "Supplier shall not, whether directly or through any affiliate, agent, or other reseller, market, license, sell, or deliver the Platform",
+        "sql": null,
+        "result": null,
+        "says": "The executed Atlas agreement imposes territorial exclusivity and a direct-selling restriction."
+      },
+      "source_b": {
+        "tier": 3,
+        "type": "document",
+        "ref": "wb_1/Input/07_Customer_Contract_Summary_Mgmt.md",
+        "page": 1,
+        "section": "Management commentary",
+        "quote": "No agreement contains most-favoured-nation pricing or territorial exclusivity.",
+        "sql": null,
+        "result": null,
+        "says": "Management states there is no territorial exclusivity."
+      },
+      "winning_source": "wb_1/Input/05_Reseller_Agreement_Atlas_Distribution_2024.md",
+      "why_it_wins": "The executed contract is Tier 1 and prevails over the Tier 3 management summary.",
+      "corroboration": [
+        {
+          "type": "document",
+          "ref": "wb_1/Input/05_Reseller_Agreement_Atlas_Distribution_2024.md",
+          "page": 4,
+          "section": "Section 4.1 Appointment",
+          "quote": "Supplier appoints Reseller as its sole and exclusive distributor of the Harborline Platform in the Territory.",
+          "sql": null,
+          "result": null
+        },
+        {
+          "type": "document",
+          "ref": "wb_1/Input/09_Board_Minutes_Q3_2025.md",
+          "page": 1,
+          "section": "Item 9 — European Strategy",
+          "quote": "whether the Atlas Distribution arrangement permits direct sales in Europe. Management undertook to revert.",
+          "sql": null,
+          "result": null
+        },
+        {
+          "type": "query",
+          "ref": "workspace.aava_deal_studio.fact_subscription_month",
+          "page": null,
+          "section": null,
+          "quote": null,
+          "sql": "SELECT arr_usd FROM workspace.aava_deal_studio.fact_subscription_month WHERE customer_id = 'CUST-0004' AND snapshot_month = DATE '2025-12-01'",
+          "result": [
+            {
+              "arr_usd": "1830725.38"
+            }
+          ]
+        },
+        {
+          "type": "query",
+          "ref": "workspace.aava_deal_studio.fact_subscription_month",
+          "page": null,
+          "section": null,
+          "quote": null,
+          "sql": "SELECT ROUND(100 * 2300000.0 / SUM(arr_usd), 1) AS arr_share_pct FROM workspace.aava_deal_studio.fact_subscription_month WHERE snapshot_month = DATE '2025-12-01'",
+          "result": [
+            {
+              "arr_share_pct": "5.9"
+            }
+          ]
+        }
+      ],
+      "customer_id": "CUST-0004",
+      "contract_id": "CTR-00004",
+      "arr_affected_usd": 1830725.38,
+      "arr_share_pct": 5.9,
+      "claims_affected": [
+        "CLM-07"
+      ],
+      "for_counsel": "Does the contract's bar on direct or indirect selling to customers whose principal place of business is in the Territory prohibit the contemplated direct Europe plan as structured?",
+      "confidence": 0.99,
+      "what_would_raise_confidence": "Any amendment, waiver, or side letter on Section 4.3 and successor obligations."
+    },
+    {
+      "conflict_id": "CF-004",
+      "type": "document_vs_data",
+      "statement": "Management labels Cascade Foods Holdings a new logo win in FY2025, but the executed Cascade MSA and customer-group ARR history show a prior group relationship through subsidiary CUST-0005 that churned shortly before re-engagement by the parent CUST-0006.",
+      "source_a": {
+        "tier": 1,
+        "type": "document",
+        "ref": "wb_1/Input/06_MSA_Cascade_Foods_Holdings_2025.md",
+        "page": 1,
+        "section": "Recitals",
+        "quote": "Customer was previously party to a Master Services Agreement with Supplier dated 1 March 2021",
+        "sql": null,
+        "result": null,
+        "says": "Cascade had a prior agreement before the FY2025 contract."
+      },
+      "source_b": {
+        "tier": 3,
+        "type": "document",
+        "ref": "wb_1/Input/07_Customer_Contract_Summary_Mgmt.md",
+        "page": 1,
+        "section": "CTR-00006 row",
+        "quote": "| CTR-00006 | Cascade Foods Holdings | 1,950,000 | 2028-05-31 | Yes (60d) | None noted | No | No | New logo win FY2025 |",
+        "sql": null,
+        "result": null,
+        "says": "Management calls Cascade a new logo win in FY2025."
+      },
+      "winning_source": "wb_1/Input/06_MSA_Cascade_Foods_Holdings_2025.md",
+      "why_it_wins": "The executed contract is Tier 1 and is corroborated by Tier 1 subscription data showing the related prior customer churned in March 2025 before re-engagement by the parent in June 2025.",
+      "corroboration": [
+        {
+          "type": "query",
+          "ref": "workspace.aava_deal_studio.dim_customer",
+          "page": null,
+          "section": null,
+          "quote": null,
+          "sql": "SELECT customer_id, customer_name, parent_customer_id, first_order_date FROM workspace.aava_deal_studio.dim_customer WHERE parent_customer_id IS NOT NULL ORDER BY customer_id",
+          "result": [
+            {
+              "customer_id": "CUST-0006",
+              "customer_name": "Cascade Foods Holdings",
+              "parent_customer_id": "CUST-0005",
+              "first_order_date": "2025-03-01"
+            }
+          ]
+        },
+        {
+          "type": "query",
+          "ref": "workspace.aava_deal_studio.fact_subscription_month",
+          "page": null,
+          "section": null,
+          "quote": null,
+          "sql": "SELECT customer_id, snapshot_month, arr_usd, status FROM workspace.aava_deal_studio.fact_subscription_month WHERE customer_id IN ('CUST-0005','CUST-0006') ORDER BY customer_id, snapshot_month",
+          "result": [
+            {
+              "customer_id": "CUST-0005",
+              "snapshot_month": "2025-02-01",
+              "arr_usd": "1631737.45",
+              "status": "active"
+            },
+            {
+              "customer_id": "CUST-0005",
+              "snapshot_month": "2025-03-01",
+              "arr_usd": "0.0",
+              "status": "churned"
+            },
+            {
+              "customer_id": "CUST-0006",
+              "snapshot_month": "2025-06-01",
+              "arr_usd": "1600000.0",
+              "status": "new"
+            },
+            {
+              "customer_id": "CUST-0006",
+              "snapshot_month": "2025-12-01",
+              "arr_usd": "1629016.87",
+              "status": "active"
+            }
+          ]
+        },
+        {
+          "type": "query",
+          "ref": "workspace.aava_deal_studio.fact_subscription_month",
+          "page": null,
+          "section": null,
+          "quote": null,
+          "sql": "SELECT arr_usd FROM workspace.aava_deal_studio.fact_subscription_month WHERE customer_id = 'CUST-0006' AND snapshot_month = DATE '2025-12-01'",
+          "result": [
+            {
+              "arr_usd": "1629016.87"
+            }
+          ]
+        },
+        {
+          "type": "query",
+          "ref": "workspace.aava_deal_studio.fact_subscription_month",
+          "page": null,
+          "section": null,
+          "quote": null,
+          "sql": "SELECT ROUND(100 * 2100000.0 / SUM(arr_usd), 1) AS arr_share_pct FROM workspace.aava_deal_studio.fact_subscription_month WHERE snapshot_month = DATE '2025-12-01'",
+          "result": [
+            {
+              "arr_share_pct": "5.4"
+            }
+          ]
+        }
+      ],
+      "customer_id": "CUST-0006",
+      "contract_id": "CTR-00006",
+      "arr_affected_usd": 1629016.87,
+      "arr_share_pct": 5.4,
+      "claims_affected": [
+        "CLM-10",
+        "CLM-12"
+      ],
+      "for_counsel": null,
+      "confidence": 0.98,
+      "what_would_raise_confidence": "The 2021 prior agreement and any group-customer reporting policy used for new-logo and retention metrics."
+    },
+    {
+      "conflict_id": "CF-005",
+      "type": "plan_vs_contract",
+      "statement": "The CIM's direct Europe expansion plan conflicts with the Atlas reseller agreement, which grants exclusivity in the EU, UK, Switzerland and Norway and bars direct or indirect sales in that territory during the term.",
+      "source_a": {
+        "tier": 3,
+        "type": "document",
+        "ref": "wb_1/Input/01_CIM_Excerpt_Harborline.md",
+        "page": 31,
+        "section": "Growth Strategy",
+        "quote": "Direct expansion into Europe is the primary growth vector, worth $6M ARR by FY2028.",
+        "sql": null,
+        "result": null,
+        "says": "Management plans direct European expansion and direct sales presence in UK, Germany, and the Netherlands from FY2026."
+      },
+      "source_b": {
+        "tier": 1,
+        "type": "document",
+        "ref": "wb_1/Input/05_Reseller_Agreement_Atlas_Distribution_2024.md",
+        "page": 5,
+        "section": "Section 4.3 Exclusivity Covenant",
+        "quote": "Supplier shall not, whether directly or through any affiliate, agent, or other reseller, market, license, sell, or deliver the Platform",
+        "sql": null,
+        "result": null,
+        "says": "The executed Atlas agreement bars direct or indirect sales in the Territory during the term."
+      },
+      "winning_source": "wb_1/Input/05_Reseller_Agreement_Atlas_Distribution_2024.md",
+      "why_it_wins": "The executed contract is Tier 1 and prevails over the Tier 3 CIM growth plan.",
+      "corroboration": [
+        {
+          "type": "document",
+          "ref": "wb_1/Input/10_IT_Systems_Overview_Mgmt.md",
+          "page": 1,
+          "section": "Roadmap",
+          "quote": "Management's plan assumes a $6M ARR European direct business by FY2028 served from the existing single-region US deployment.",
+          "sql": null,
+          "result": null
+        },
+        {
+          "type": "document",
+          "ref": "wb_1/Input/10_IT_Systems_Overview_Mgmt.md",
+          "page": 1,
+          "section": "Roadmap",
+          "quote": "No EU data residency capability exists today.",
+          "sql": null,
+          "result": null
+        },
+        {
+          "type": "document",
+          "ref": "wb_1/Input/09_Board_Minutes_Q3_2025.md",
+          "page": 1,
+          "section": "Item 9 — European Strategy",
+          "quote": "whether the Atlas Distribution arrangement permits direct sales in Europe. Management undertook to revert.",
+          "sql": null,
+          "result": null
+        },
+        {
+          "type": "query",
+          "ref": "workspace.aava_deal_studio.dim_customer",
+          "page": null,
+          "section": null,
+          "quote": null,
+          "sql": "SELECT COUNT(*) AS direct_customers, SUM(CASE WHEN to_date(first_order_date) >= DATE '2024-01-01' THEN 1 ELSE 0 END) AS started_after_exclusivity FROM workspace.aava_deal_studio.dim_customer WHERE country IN ('Germany','Netherlands','UK') AND customer_id <> 'CUST-0004'",
+          "result": [
+            {
+              "direct_customers": "69",
+              "started_after_exclusivity": "14"
+            }
+          ]
+        },
+        {
+          "type": "query",
+          "ref": "workspace.aava_deal_studio.fact_subscription_month",
+          "page": null,
+          "section": null,
+          "quote": null,
+          "sql": "SELECT SUM(s.arr_usd) AS latest_arr_territory_usd FROM workspace.aava_deal_studio.fact_subscription_month s JOIN workspace.aava_deal_studio.dim_customer c ON s.customer_id = c.customer_id WHERE c.country IN ('Germany','Netherlands','UK') AND c.customer_id <> 'CUST-0004' AND s.snapshot_month = DATE '2025-12-01'",
+          "result": [
+            {
+              "latest_arr_territory_usd": "3195791.8000000003"
+            }
+          ]
+        }
+      ],
+      "customer_id": "CUST-0004",
+      "contract_id": "CTR-00004",
+      "arr_affected_usd": 1830725.38,
+      "arr_share_pct": 5.9,
+      "claims_affected": [
+        "CLM-07"
+      ],
+      "for_counsel": "Do the existing 69 non-Atlas customers in Germany, the Netherlands and the UK, including 14 starting after 2024-01-01, fall within the contractual prohibition based on 'principal place of business' and the contract's definitions?",
+      "confidence": 0.95,
+      "what_would_raise_confidence": "Country-by-country legal and commercial mapping of those customers to the contract's Territory definition and any reseller carve-outs or waivers."
+    },
+    {
+      "conflict_id": "CF-006",
+      "type": "contract_vs_contract",
+      "statement": "Vantage's MFN clause protects an 18% discount for comparable customers, but Pinnacle's executed contract grants a 34% discount and the CONTRACT table shows Pinnacle's ACV meets the clause's 50% comparability threshold.",
+      "source_a": {
+        "tier": 1,
+        "type": "document",
+        "ref": "wb_1/Input/03_MSA_Vantage_Grocers_2023.md",
+        "page": 10,
+        "section": "Section 8.5",
+        "quote": "Comparable annual committed spend means annual committed spend of not less than fifty per cent (50%)",
+        "sql": null,
+        "result": null,
+        "says": "Vantage's MFN applies where another customer's annual committed spend is at least 50% of Vantage's annual subscription fee."
+      },
+      "source_b": {
+        "tier": 1,
+        "type": "document",
+        "ref": "wb_1/Input/04_MSA_Pinnacle_Outdoor_2025.md",
+        "page": 8,
+        "section": "Section 7.1 Fees and Discount",
+        "quote": "Supplier grants a discount of thirty-four per cent (34%) against list pricing for the duration of the Initial Term.",
+        "sql": null,
+        "result": null,
+        "says": "Pinnacle has a better discount than Vantage."
+      },
+      "winning_source": "unresolved",
+      "why_it_wins": "Both sides are Tier 1. The documents do not contradict on their face, but together create an unresolved MFN tension because the data shows Pinnacle is comparable and received a better discount. Additional evidence on whether Pinnacle qualifies as a 'customer of comparable annual committed spend' for MFN purposes and whether any exceptions apply would settle it.",
+      "corroboration": [
+        {
+          "type": "query",
+          "ref": "workspace.aava_deal_studio.dim_contract",
+          "page": null,
+          "section": null,
+          "quote": null,
+          "sql": "SELECT b.contract_id AS other_contract_id, b.customer_id AS other_customer_id, b.discount_pct AS other_discount_pct, b.acv_usd AS other_acv_usd, a.discount_pct AS vantage_discount_pct, a.acv_usd AS vantage_acv_usd, b.acv_usd >= 0.5 * a.acv_usd AS comparable FROM workspace.aava_deal_studio.dim_contract a JOIN workspace.aava_deal_studio.dim_contract b ON a.contract_id <> b.contract_id WHERE a.contract_id = 'CTR-00002' AND b.discount_pct > a.discount_pct ORDER BY b.discount_pct DESC",
+          "result": [
+            {
+              "other_contract_id": "CTR-00003",
+              "other_customer_id": "CUST-0003",
+              "other_discount_pct": "0.34",
+              "other_acv_usd": "2900000.0",
+              "vantage_discount_pct": "0.18",
+              "vantage_acv_usd": "4100000.0",
+              "comparable": "true"
+            }
+          ]
+        },
+        {
+          "type": "document",
+          "ref": "wb_1/Input/04_MSA_Pinnacle_Outdoor_2025.md",
+          "page": 8,
+          "section": "Section 7.2",
+          "quote": "The discount at Section 7.1 was approved by Supplier's Chief Revenue Officer on 14 March 2025",
+          "sql": null,
+          "result": null
+        },
+        {
+          "type": "document",
+          "ref": "wb_1/Input/09_Board_Minutes_Q3_2025.md",
+          "page": 1,
+          "section": "Item 6 — Pricing Governance",
+          "quote": "The General Counsel asked that the Vantage most-favoured-customer provision be reviewed in light of this.",
+          "sql": null,
+          "result": null
+        },
+        {
+          "type": "query",
+          "ref": "workspace.aava_deal_studio.fact_subscription_month",
+          "page": null,
+          "section": null,
+          "quote": null,
+          "sql": "SELECT arr_usd FROM workspace.aava_deal_studio.fact_subscription_month WHERE customer_id = 'CUST-0002' AND snapshot_month = DATE '2025-12-01'",
+          "result": [
+            {
+              "arr_usd": "4681407.34"
+            }
+          ]
+        },
+        {
+          "type": "query",
+          "ref": "workspace.aava_deal_studio.fact_subscription_month",
+          "page": null,
+          "section": null,
+          "quote": null,
+          "sql": "SELECT ROUND(100 * 4200000.0 / SUM(arr_usd), 1) AS arr_share_pct FROM workspace.aava_deal_studio.fact_subscription_month WHERE snapshot_month = DATE '2025-12-01'",
+          "result": [
+            {
+              "arr_share_pct": "10.9"
+            }
+          ]
+        }
+      ],
+      "customer_id": "CUST-0002",
+      "contract_id": "CTR-00002",
+      "arr_affected_usd": 4681407.34,
+      "arr_share_pct": 10.9,
+      "claims_affected": [
+        "CLM-11"
+      ],
+      "for_counsel": "Does Pinnacle count as a 'customer of comparable annual committed spend' under Sections 8.4 and 8.5, and if so from what date would any retrospective credit run?",
+      "confidence": 0.91,
+      "what_would_raise_confidence": "The full Vantage pricing schedule, any MFN exceptions, and billing/credit history showing whether Harborline already assessed or satisfied the clause after the 14 March 2025 Pinnacle approval."
+    },
+    {
+      "conflict_id": "CF-007",
+      "type": "adjustment_vs_minutes",
+      "statement": "Management labels the FY2025 legal settlement non-recurring, but board minutes and structured adjustment history show the same category and amount in FY2023, FY2024 and FY2025 and describe the FY2025 item as the third annual settlement.",
+      "source_a": {
+        "tier": 3,
+        "type": "document",
+        "ref": "wb_1/Input/08_QoE_Adjustment_Schedule_Mgmt.md",
+        "page": 1,
+        "section": "ADJ-003 row",
+        "quote": "| ADJ-003 | FY2025 | One-time legal settlement | 2,100,000 | Settlement of a commercial dispute. Non-recurring. |",
+        "sql": null,
+        "result": null,
+        "says": "Management characterizes the FY2025 legal settlement as non-recurring."
+      },
+      "source_b": {
+        "tier": 2,
+        "type": "document",
+        "ref": "wb_1/Input/09_Board_Minutes_Q3_2025.md",
+        "page": 1,
+        "section": "Item 7 — Legal",
+        "quote": "the third annual settlement under the ongoing series of commercial disputes with former channel partners had been concluded at $2.1M",
+        "sql": null,
+        "result": null,
+        "says": "The board minutes describe the FY2025 settlement as the third annual settlement in an ongoing series."
+      },
+      "winning_source": "wb_1/Input/09_Board_Minutes_Q3_2025.md",
+      "why_it_wins": "Board minutes are Tier 2 and prevail over the Tier 3 management adjustment schedule; structured adjustment history also corroborates recurrence.",
+      "corroboration": [
+        {
+          "type": "query",
+          "ref": "workspace.aava_deal_studio.mgmt_ebitda_adjustment",
+          "page": null,
+          "section": null,
+          "quote": null,
+          "sql": "SELECT category, fiscal_year, amount_usd FROM workspace.aava_deal_studio.mgmt_ebitda_adjustment ORDER BY category, fiscal_year",
+          "result": [
+            {
+              "category": "One-time legal settlement",
+              "fiscal_year": "FY2023",
+              "amount_usd": "2100000"
+            },
+            {
+              "category": "One-time legal settlement",
+              "fiscal_year": "FY2024",
+              "amount_usd": "2100000"
+            },
+            {
+              "category": "One-time legal settlement",
+              "fiscal_year": "FY2025",
+              "amount_usd": "2100000"
+            }
+          ]
+        }
+      ],
+      "customer_id": null,
+      "contract_id": null,
+      "arr_affected_usd": null,
+      "arr_share_pct": null,
+      "claims_affected": [
+        "CLM-05"
+      ],
+      "for_counsel": null,
+      "confidence": 0.98,
+      "what_would_raise_confidence": "Settlement agreements and FY2026 board/legal papers confirming whether a further settlement was expected or accrued."
+    },
+    {
+      "conflict_id": "CF-008",
+      "type": "tickets_vs_contract",
+      "statement": "Management summarizes Vantage as a stable account, but support-ticket data and board minutes show elevated Severity 1 incidents, sharply declining CSAT, and invocation of the escalation provision.",
+      "source_a": {
+        "tier": 3,
+        "type": "document",
+        "ref": "wb_1/Input/07_Customer_Contract_Summary_Mgmt.md",
+        "page": 1,
+        "section": "CTR-00002 row",
+        "quote": "| CTR-00002 | Vantage Grocers | 4,100,000 | 2026-12-31 | Yes (60d) | None noted | None noted | No | Stable account |",
+        "sql": null,
+        "result": null,
+        "says": "Management describes Vantage as a stable account."
+      },
+      "source_b": {
+        "tier": 1,
+        "type": "query",
+        "ref": "workspace.aava_deal_studio.fact_support_ticket",
+        "page": null,
+        "section": null,
+        "quote": null,
+        "sql": "SELECT m.month_start, COUNT(t.ticket_id) AS sev1_count FROM (SELECT DISTINCT date_trunc('month', to_date(opened_date)) AS month_start FROM workspace.aava_deal_studio.fact_support_ticket WHERE customer_id = 'CUST-0002') m JOIN workspace.aava_deal_studio.fact_support_ticket t ON t.customer_id = 'CUST-0002' AND t.severity = 'S1' AND to_date(t.opened_date) >= m.month_start AND to_date(t.opened_date) < add_months(m.month_start, 3) GROUP BY m.month_start ORDER BY sev1_count DESC LIMIT 1",
+        "result": [
+          {
+            "month_start": "2025-04-01T00:00:00.000Z",
+            "sev1_count": "6"
+          }
+        ],
+        "says": "Vantage had 6 Severity 1 incidents in the worst rolling three-month window, above the contract's threshold of more than 4."
+      },
+      "winning_source": "workspace.aava_deal_studio.fact_support_ticket",
+      "why_it_wins": "Tier 1 support-ticket data prevails over the Tier 3 management summary and is corroborated by board minutes and the executed Vantage SLA clause.",
+      "corroboration": [
+        {
+          "type": "document",
+          "ref": "wb_1/Input/03_MSA_Vantage_Grocers_2023.md",
+          "page": 17,
+          "section": "Section 12.3 Escalation",
+          "quote": "Where the number of Severity 1 incidents exceeds four (4) in any rolling three (3) month period",
+          "sql": null,
+          "result": null
+        },
+        {
+          "type": "query",
+          "ref": "workspace.aava_deal_studio.fact_support_ticket",
+          "page": null,
+          "section": null,
+          "quote": null,
+          "sql": "SELECT 6 > 4 AS exceeds_threshold",
+          "result": [
+            {
+              "exceeds_threshold": "true"
+            }
+          ]
+        },
+        {
+          "type": "query",
+          "ref": "workspace.aava_deal_studio.fact_support_ticket",
+          "page": null,
+          "section": null,
+          "quote": null,
+          "sql": "SELECT date_trunc('quarter', to_date(opened_date)) AS q, AVG(csat_score) AS avg_csat_score FROM workspace.aava_deal_studio.fact_support_ticket WHERE customer_id = 'CUST-0002' GROUP BY 1 ORDER BY 1",
+          "result": [
+            {
+              "q": "2025-04-01T00:00:00.000Z",
+              "avg_csat_score": "2.7142857142857144"
+            },
+            {
+              "q": "2025-07-01T00:00:00.000Z",
+              "avg_csat_score": "2.0"
+            },
+            {
+              "q": "2025-10-01T00:00:00.000Z",
+              "avg_csat_score": "1.8"
+            }
+          ]
+        },
+        {
+          "type": "document",
+          "ref": "wb_1/Input/09_Board_Minutes_Q3_2025.md",
+          "page": 1,
+          "section": "Item 4 — Customer Matters",
+          "quote": "continued service instability at Vantage Grocers, with Severity 1 incident volumes elevated since April",
+          "sql": null,
+          "result": null
+        },
+        {
+          "type": "query",
+          "ref": "workspace.aava_deal_studio.fact_subscription_month",
+          "page": null,
+          "section": null,
+          "quote": null,
+          "sql": "SELECT arr_usd FROM workspace.aava_deal_studio.fact_subscription_month WHERE customer_id = 'CUST-0002' AND snapshot_month = DATE '2025-12-01'",
+          "result": [
+            {
+              "arr_usd": "4681407.34"
+            }
+          ]
+        },
+        {
+          "type": "query",
+          "ref": "workspace.aava_deal_studio.fact_subscription_month",
+          "page": null,
+          "section": null,
+          "quote": null,
+          "sql": "SELECT ROUND(100 * 4200000.0 / SUM(arr_usd), 1) AS arr_share_pct FROM workspace.aava_deal_studio.fact_subscription_month WHERE snapshot_month = DATE '2025-12-01'",
+          "result": [
+            {
+              "arr_share_pct": "10.9"
+            }
+          ]
+        }
+      ],
+      "customer_id": "CUST-0002",
+      "contract_id": "CTR-00002",
+      "arr_affected_usd": 4681407.34,
+      "arr_share_pct": 10.9,
+      "claims_affected": [
+        "CLM-12"
+      ],
+      "for_counsel": "Given Section 12.2 and 12.3, what contractual remedies were available to Vantage based on the measured incident pattern and any separate availability calculations?",
+      "confidence": 0.97,
+      "what_would_raise_confidence": "Monthly uptime calculations for Vantage and any customer escalation notices or cure communications."
+    },
+    {
+      "conflict_id": "CF-009",
+      "type": "plan_vs_contract",
+      "statement": "Management's IT overview says the Europe direct plan will be served from a single-region US deployment with no EU data residency, while the same management package presents Europe direct expansion as a core growth vector; the plan is therefore internally inconsistent with the stated current capability.",
+      "source_a": {
+        "tier": 3,
+        "type": "document",
+        "ref": "wb_1/Input/01_CIM_Excerpt_Harborline.md",
+        "page": 31,
+        "section": "Growth Strategy",
+        "quote": "Harborline intends to establish a direct sales presence in the UK, Germany, and the Netherlands from FY2026",
+        "sql": null,
+        "result": null,
+        "says": "Management presents a near-term direct Europe growth plan."
+      },
+      "source_b": {
+        "tier": 3,
+        "type": "document",
+        "ref": "wb_1/Input/10_IT_Systems_Overview_Mgmt.md",
+        "page": 1,
+        "section": "Roadmap",
+        "quote": "No EU data residency capability exists today.",
+        "sql": null,
+        "result": null,
+        "says": "Management states the current technology stack lacks EU data residency capability for the planned Europe direct business."
+      },
+      "winning_source": "unresolved",
+      "why_it_wins": "Both sources are Tier 3 seller-prepared materials. They conflict on execution readiness, but neither outranks the other. Additional implementation plans or customer requirements would settle it.",
+      "corroboration": [
+        {
+          "type": "document",
+          "ref": "wb_1/Input/10_IT_Systems_Overview_Mgmt.md",
+          "page": 1,
+          "section": "Architecture",
+          "quote": "Hosting is single-region AWS us-east-1 with no active failover.",
+          "sql": null,
+          "result": null
+        },
+        {
+          "type": "document",
+          "ref": "wb_1/Input/10_IT_Systems_Overview_Mgmt.md",
+          "page": 1,
+          "section": "Roadmap",
+          "quote": "Management's plan assumes a $6M ARR European direct business by FY2028 served from the existing single-region US deployment.",
+          "sql": null,
+          "result": null
+        }
+      ],
+      "customer_id": null,
+      "contract_id": null,
+      "arr_affected_usd": null,
+      "arr_share_pct": null,
+      "claims_affected": [
+        "CLM-07"
+      ],
+      "for_counsel": null,
+      "confidence": 0.79,
+      "what_would_raise_confidence": "A documented product, compliance, and infrastructure roadmap showing when EU hosting or data-residency capabilities will exist and which target customers require them."
+    }
+  ],
+  "not_supported": [
+    {
+      "item": "CTR-00007 Meridian Markets listed in management contract summary",
+      "reason": "No executed contract was provided in the reviewed data room inputs."
+    },
+    {
+      "item": "CTR-00008 Brightpath Provisions listed in management contract summary",
+      "reason": "No executed contract was provided in the reviewed data room inputs."
+    },
+    {
+      "item": "Atlas auto-renew 'Yes (180d)' in management summary",
+      "reason": "The reviewed executed Atlas agreement excerpt contains a fixed term to 31 December 2029 but no renewal clause text; this assertion is not supported by the reviewed data room contract extract."
+    },
+    {
+      "item": "Owner compensation normalisation support for ADJ-004",
+      "reason": "The management schedule cites a third-party benchmark, but the benchmark and payroll support were not provided in the data room materials reviewed here."
+    }
+  ],
+  "checks_run": {
+    "A": 3,
+    "B": 1,
+    "C": 1,
+    "D": 2,
+    "E": 1,
+    "F": 1
+  },
+  "self_check": {
+    "S1": true,
+    "S2": true,
+    "S3": true,
+    "S4": true,
+    "S5": true,
+    "S6": true,
+    "S7": true
+  },
+  "upstream_issues": [
+    "wb_1/CONTRACT_INTELLIGENCE/clause_register.json returned 404; re-derived contract evidence from source documents and SQL.",
+    "wb_1/EARNINGS_CHALLENGE/ebitda_bridge.json returned 404; used source QoE schedule, board minutes, and SQL instead.",
+    "wb_1/REVENUE_QUALITY/revenue_quality_scorecard.json returned 404; used source documents and SQL instead.",
+    "wb_1/DEAL_INTAKE/test_plan.json returned 404."
+  ],
+  "data_gaps": [
+    "DDL file itself was not accessible in the provided GitHub inputs, so table mapping was validated from SHOW TABLES and DESCRIBE results instead.",
+    "No COLLECTION table DESCRIBE was retrieved because no conflict required it.",
+    "No executed contracts for CTR-00007 or CTR-00008 were available in the reviewed input files.",
+    "No monthly uptime/availability dataset was provided, so service-level testing relied on ticket volume, CSAT trend, contract text, board minutes, and the management IT overview's stated FY2025 availability."
+  ]
+}
