@@ -1,0 +1,1901 @@
+{
+  "status": "PARTIAL",
+  "upstream_inputs": {
+    "doc_catalog_required": true,
+    "doc_catalog_retrieved": true,
+    "doc_catalog_source": "1/DOCUMENT_TRIAGE_ORCHESTRATOR/doc_catalog.json",
+    "doc_catalog_status": "PARTIAL"
+  },
+  "schema_discovery": {
+    "customer_source_found": true,
+    "contract_source_found": true,
+    "management_contract_attributes_found": false,
+    "discovered_sources": [
+      {
+        "object_name": "workspace.aava_deal_studio.dim_customer",
+        "object_type": "table",
+        "logical_role": "customer_source",
+        "columns": [
+          "customer_id",
+          "customer_name",
+          "industry",
+          "country",
+          "segment",
+          "parent_customer_id",
+          "first_order_date"
+        ],
+        "join_keys": [
+          "customer_id"
+        ],
+        "discovery_status": "DISCOVERED_FROM_DDL_AND_VALIDATED_IN_SQL"
+      },
+      {
+        "object_name": "workspace.aava_deal_studio.dim_contract",
+        "object_type": "table",
+        "logical_role": "contract_source",
+        "columns": [
+          "contract_id",
+          "customer_id",
+          "contract_start_date",
+          "contract_end_date",
+          "contract_type",
+          "acv_usd",
+          "tcv_usd",
+          "auto_renew_flag",
+          "notice_period_days",
+          "governing_law",
+          "discount_pct",
+          "status",
+          "source_doc_ref"
+        ],
+        "join_keys": [
+          "contract_id",
+          "customer_id"
+        ],
+        "discovery_status": "DISCOVERED_FROM_DDL_AND_VALIDATED_IN_SQL"
+      },
+      {
+        "object_name": "workspace.aava_deal_studio.mgmt_claim",
+        "object_type": "table",
+        "logical_role": "management_claim_source",
+        "columns": [
+          "claim_id",
+          "claim_text",
+          "metric_key",
+          "claimed_value",
+          "period",
+          "cim_page"
+        ],
+        "join_keys": [],
+        "discovery_status": "DISCOVERED_FROM_DDL_AND_VALIDATED_IN_SQL"
+      }
+    ]
+  },
+  "document_analysis": {
+    "documents_received": 10,
+    "documents_catalogued": 10,
+    "authoritative_contracts_identified": 5,
+    "authoritative_contracts_analyzed": 5,
+    "management_summaries_identified": 1,
+    "unresolved_documents": 0
+  },
+  "contracts_analyzed": [
+    {
+      "contract_id": "CTR-00001",
+      "customer_id": "CUST-0001",
+      "customer_name": "Northwind Retail Group",
+      "authoritative_documents": [
+        "DOC-02"
+      ],
+      "management_summary_documents": [
+        "DOC-07"
+      ],
+      "extracted_clause_count": 6,
+      "material_clause_types": [
+        "expiration",
+        "renewal",
+        "discount",
+        "assignment",
+        "change_of_control",
+        "service_credit"
+      ],
+      "management_comparison_count": 4,
+      "non_aligned_comparison_count": 1,
+      "unresolved_item_count": 0,
+      "evidence_coverage_status": "COMPLETE_FOR_REVIEWED_DOCUMENT"
+    },
+    {
+      "contract_id": "CTR-00002",
+      "customer_id": "CUST-0002",
+      "customer_name": "Vantage Grocers",
+      "authoritative_documents": [
+        "DOC-03"
+      ],
+      "management_summary_documents": [
+        "DOC-07"
+      ],
+      "extracted_clause_count": 5,
+      "material_clause_types": [
+        "renewal",
+        "most_favored_nation",
+        "service_level",
+        "sla_termination_right",
+        "assignment"
+      ],
+      "management_comparison_count": 4,
+      "non_aligned_comparison_count": 1,
+      "unresolved_item_count": 0,
+      "evidence_coverage_status": "COMPLETE_FOR_REVIEWED_DOCUMENT"
+    },
+    {
+      "contract_id": "CTR-00003",
+      "customer_id": "CUST-0003",
+      "customer_name": "Pinnacle Outdoor",
+      "authoritative_documents": [
+        "DOC-04"
+      ],
+      "management_summary_documents": [
+        "DOC-07"
+      ],
+      "extracted_clause_count": 4,
+      "material_clause_types": [
+        "renewal",
+        "discount",
+        "price_escalator",
+        "assignment"
+      ],
+      "management_comparison_count": 3,
+      "non_aligned_comparison_count": 0,
+      "unresolved_item_count": 0,
+      "evidence_coverage_status": "COMPLETE_FOR_REVIEWED_DOCUMENT"
+    },
+    {
+      "contract_id": "CTR-00004",
+      "customer_id": "CUST-0004",
+      "customer_name": "Atlas Distribution (EMEA Reseller)",
+      "authoritative_documents": [
+        "DOC-05"
+      ],
+      "management_summary_documents": [
+        "DOC-07"
+      ],
+      "extracted_clause_count": 7,
+      "material_clause_types": [
+        "expiration",
+        "exclusivity",
+        "territory",
+        "direct_selling_restriction",
+        "minimum_commitment",
+        "termination_for_convenience",
+        "change_of_control"
+      ],
+      "management_comparison_count": 4,
+      "non_aligned_comparison_count": 1,
+      "unresolved_item_count": 1,
+      "evidence_coverage_status": "COMPLETE_FOR_REVIEWED_DOCUMENT"
+    },
+    {
+      "contract_id": "CTR-00006",
+      "customer_id": "CUST-0006",
+      "customer_name": "Cascade Foods Holdings",
+      "authoritative_documents": [
+        "DOC-06"
+      ],
+      "management_summary_documents": [
+        "DOC-07"
+      ],
+      "extracted_clause_count": 5,
+      "material_clause_types": [
+        "other_material_clause",
+        "expiration",
+        "discount",
+        "customer_credit",
+        "assignment"
+      ],
+      "management_comparison_count": 3,
+      "non_aligned_comparison_count": 1,
+      "unresolved_item_count": 1,
+      "evidence_coverage_status": "COMPLETE_FOR_REVIEWED_DOCUMENT"
+    }
+  ],
+  "clause_register": [
+    {
+      "clause_id": "CL-001",
+      "contract_id": "CTR-00001",
+      "customer_id": "CUST-0001",
+      "document_id": "DOC-02",
+      "document_name": "02_MSA_Northwind_Retail_Group_2022.md",
+      "clause_type": "expiration",
+      "clause_title_or_section": "Page 1 — Parties and Term",
+      "clause_summary": "Initial term expires on 2026-06-30.",
+      "effective_date": "2022-07-01",
+      "expiration_date": "2026-06-30",
+      "consent_required": null,
+      "notice_required": null,
+      "renewal_type": null,
+      "territory": null,
+      "exclusivity_scope": null,
+      "pricing_term": null,
+      "discount_pct": null,
+      "escalator_pct": null,
+      "credit_amount": null,
+      "service_level": null,
+      "termination_trigger": null,
+      "commercial_relevance": "Defines fixed contract end date and renewal visibility for diligence planning.",
+      "evidence_references": [
+        "DOC-EV-001",
+        "SQL-EV-004"
+      ],
+      "confidence": "HIGH"
+    },
+    {
+      "clause_id": "CL-002",
+      "contract_id": "CTR-00001",
+      "customer_id": "CUST-0001",
+      "document_id": "DOC-02",
+      "document_name": "02_MSA_Northwind_Retail_Group_2022.md",
+      "clause_type": "renewal",
+      "clause_title_or_section": "Page 2 — Section 2.3 Renewal",
+      "clause_summary": "Agreement terminates automatically at expiry; no automatic renewal. Any renewal requires written agreement executed at least 90 days before expiry.",
+      "effective_date": null,
+      "expiration_date": "2026-06-30",
+      "consent_required": null,
+      "notice_required": true,
+      "renewal_type": "NO_AUTO_RENEWAL_WRITTEN_BILATERAL_RENEWAL",
+      "territory": null,
+      "exclusivity_scope": null,
+      "pricing_term": null,
+      "discount_pct": null,
+      "escalator_pct": null,
+      "credit_amount": null,
+      "service_level": null,
+      "termination_trigger": null,
+      "commercial_relevance": "May affect retention certainty because continuation requires affirmative bilateral renewal.",
+      "evidence_references": [
+        "DOC-EV-002",
+        "SQL-EV-004"
+      ],
+      "confidence": "HIGH"
+    },
+    {
+      "clause_id": "CL-003",
+      "contract_id": "CTR-00001",
+      "customer_id": "CUST-0001",
+      "document_id": "DOC-02",
+      "document_name": "02_MSA_Northwind_Retail_Group_2022.md",
+      "clause_type": "discount",
+      "clause_title_or_section": "Page 11 — Section 9.1 Fees",
+      "clause_summary": "Annual Subscription Fee is subject to a 12% discount agreed at Schedule 3.",
+      "effective_date": null,
+      "expiration_date": null,
+      "consent_required": null,
+      "notice_required": null,
+      "renewal_type": null,
+      "territory": null,
+      "exclusivity_scope": null,
+      "pricing_term": "Annual Subscription Fee subject to Schedule 3 discount",
+      "discount_pct": 12,
+      "escalator_pct": null,
+      "credit_amount": null,
+      "service_level": null,
+      "termination_trigger": null,
+      "commercial_relevance": "Defines documented pricing concession relevant to commercial terms benchmarking.",
+      "evidence_references": [
+        "DOC-EV-003",
+        "SQL-EV-004"
+      ],
+      "confidence": "HIGH"
+    },
+    {
+      "clause_id": "CL-004",
+      "contract_id": "CTR-00001",
+      "customer_id": "CUST-0001",
+      "document_id": "DOC-02",
+      "document_name": "02_MSA_Northwind_Retail_Group_2022.md",
+      "clause_type": "assignment",
+      "clause_title_or_section": "Page 19 — Section 14.2 Assignment and Change of Control",
+      "clause_summary": "Neither party may assign without prior written consent of the other party.",
+      "effective_date": null,
+      "expiration_date": null,
+      "consent_required": true,
+      "notice_required": null,
+      "renewal_type": null,
+      "territory": null,
+      "exclusivity_scope": null,
+      "pricing_term": null,
+      "discount_pct": null,
+      "escalator_pct": null,
+      "credit_amount": null,
+      "service_level": null,
+      "termination_trigger": null,
+      "commercial_relevance": "May require counterparty consent before assignment of the agreement.",
+      "evidence_references": [
+        "DOC-EV-004"
+      ],
+      "confidence": "HIGH"
+    },
+    {
+      "clause_id": "CL-005",
+      "contract_id": "CTR-00001",
+      "customer_id": "CUST-0001",
+      "document_id": "DOC-02",
+      "document_name": "02_MSA_Northwind_Retail_Group_2022.md",
+      "clause_type": "change_of_control",
+      "clause_title_or_section": "Page 19 — Section 14.2 and Page 19 — Section 14.3",
+      "clause_summary": "A Change of Control of Supplier constitutes an assignment requiring Customer consent. If completed without prior written consent, Customer may terminate on 90 days' notice within 180 days of awareness.",
+      "effective_date": null,
+      "expiration_date": null,
+      "consent_required": true,
+      "notice_required": true,
+      "renewal_type": null,
+      "territory": null,
+      "exclusivity_scope": null,
+      "pricing_term": null,
+      "discount_pct": null,
+      "escalator_pct": null,
+      "credit_amount": null,
+      "service_level": null,
+      "termination_trigger": "Unconsented change of control of Supplier",
+      "commercial_relevance": "May require customer consent in connection with ownership transfer and may create termination rights if not obtained.",
+      "evidence_references": [
+        "DOC-EV-004",
+        "DOC-EV-005",
+        "DOC-EV-026"
+      ],
+      "confidence": "HIGH"
+    },
+    {
+      "clause_id": "CL-006",
+      "contract_id": "CTR-00001",
+      "customer_id": "CUST-0001",
+      "document_id": "DOC-02",
+      "document_name": "02_MSA_Northwind_Retail_Group_2022.md",
+      "clause_type": "service_credit",
+      "clause_title_or_section": "Page 28 — Section 21.4 Service Credits",
+      "clause_summary": "Failure to meet the 99.5% availability target in any three consecutive months entitles Customer to a service credit of up to 8% of the Annual Subscription Fee.",
+      "effective_date": null,
+      "expiration_date": null,
+      "consent_required": null,
+      "notice_required": null,
+      "renewal_type": null,
+      "territory": null,
+      "exclusivity_scope": null,
+      "pricing_term": null,
+      "discount_pct": null,
+      "escalator_pct": null,
+      "credit_amount": null,
+      "service_level": "99.5% availability target",
+      "termination_trigger": null,
+      "commercial_relevance": "May create credit exposure if service levels are not met for sustained periods.",
+      "evidence_references": [
+        "DOC-EV-006"
+      ],
+      "confidence": "HIGH"
+    },
+    {
+      "clause_id": "CL-007",
+      "contract_id": "CTR-00002",
+      "customer_id": "CUST-0002",
+      "document_id": "DOC-03",
+      "document_name": "03_MSA_Vantage_Grocers_2023.md",
+      "clause_type": "renewal",
+      "clause_title_or_section": "Page 3 — Section 3.1 Renewal",
+      "clause_summary": "Agreement renews automatically for successive 12-month periods unless either party gives at least 60 days' written notice of non-renewal.",
+      "effective_date": null,
+      "expiration_date": "2026-12-31",
+      "consent_required": null,
+      "notice_required": true,
+      "renewal_type": "AUTO_RENEW_12_MONTHS",
+      "territory": null,
+      "exclusivity_scope": null,
+      "pricing_term": null,
+      "discount_pct": null,
+      "escalator_pct": null,
+      "credit_amount": null,
+      "service_level": null,
+      "termination_trigger": null,
+      "commercial_relevance": "Affects renewal visibility and non-renewal timing.",
+      "evidence_references": [
+        "DOC-EV-007",
+        "SQL-EV-004"
+      ],
+      "confidence": "HIGH"
+    },
+    {
+      "clause_id": "CL-008",
+      "contract_id": "CTR-00002",
+      "customer_id": "CUST-0002",
+      "document_id": "DOC-03",
+      "document_name": "03_MSA_Vantage_Grocers_2023.md",
+      "clause_type": "most_favored_nation",
+      "clause_title_or_section": "Page 9 — Section 8.4 Most Favoured Customer Pricing",
+      "clause_summary": "Customer's 18% discount must remain not less favourable than discounts granted to comparable-spend customers; if a better discount is granted elsewhere, Supplier must notify Customer within 30 days, apply the better discount retrospectively, and issue a credit note.",
+      "effective_date": null,
+      "expiration_date": null,
+      "consent_required": null,
+      "notice_required": true,
+      "renewal_type": null,
+      "territory": null,
+      "exclusivity_scope": null,
+      "pricing_term": "MFN ties Customer pricing to comparable annual committed spend customers",
+      "discount_pct": 18,
+      "escalator_pct": null,
+      "credit_amount": null,
+      "service_level": null,
+      "termination_trigger": null,
+      "commercial_relevance": "May constrain pricing flexibility and create retrospective credit exposure if better discounts are offered to comparable customers.",
+      "evidence_references": [
+        "DOC-EV-008",
+        "DOC-EV-009",
+        "DOC-EV-027",
+        "SQL-EV-004"
+      ],
+      "confidence": "HIGH"
+    },
+    {
+      "clause_id": "CL-009",
+      "contract_id": "CTR-00002",
+      "customer_id": "CUST-0002",
+      "document_id": "DOC-03",
+      "document_name": "03_MSA_Vantage_Grocers_2023.md",
+      "clause_type": "service_level",
+      "clause_title_or_section": "Page 16 — Section 12.2 Service Levels",
+      "clause_summary": "Availability target is 99.5% measured monthly.",
+      "effective_date": null,
+      "expiration_date": null,
+      "consent_required": null,
+      "notice_required": null,
+      "renewal_type": null,
+      "territory": null,
+      "exclusivity_scope": null,
+      "pricing_term": null,
+      "discount_pct": null,
+      "escalator_pct": null,
+      "credit_amount": null,
+      "service_level": "99.5% monthly availability",
+      "termination_trigger": null,
+      "commercial_relevance": "Defines service performance threshold relevant to contractual remedies.",
+      "evidence_references": [
+        "DOC-EV-010"
+      ],
+      "confidence": "HIGH"
+    },
+    {
+      "clause_id": "CL-010",
+      "contract_id": "CTR-00002",
+      "customer_id": "CUST-0002",
+      "document_id": "DOC-03",
+      "document_name": "03_MSA_Vantage_Grocers_2023.md",
+      "clause_type": "sla_termination_right",
+      "clause_title_or_section": "Page 16 — Section 12.2 Service Levels and Page 17 — Section 12.3 Escalation",
+      "clause_summary": "If availability falls below 99.0% in any two consecutive months, Customer may terminate for material breach on 30 days' notice; remedies are also available where Severity 1 incidents exceed four in a rolling three-month period and the matter is escalated.",
+      "effective_date": null,
+      "expiration_date": null,
+      "consent_required": null,
+      "notice_required": true,
+      "renewal_type": null,
+      "territory": null,
+      "exclusivity_scope": null,
+      "pricing_term": null,
+      "discount_pct": null,
+      "escalator_pct": null,
+      "credit_amount": null,
+      "service_level": "99.0% consecutive-month failure threshold; Severity 1 escalation trigger",
+      "termination_trigger": "Availability below 99.0% in two consecutive months / escalated Severity 1 incident pattern",
+      "commercial_relevance": "May permit termination if service instability persists under the stated thresholds.",
+      "evidence_references": [
+        "DOC-EV-010",
+        "DOC-EV-011",
+        "DOC-EV-025"
+      ],
+      "confidence": "HIGH"
+    },
+    {
+      "clause_id": "CL-011",
+      "contract_id": "CTR-00002",
+      "customer_id": "CUST-0002",
+      "document_id": "DOC-03",
+      "document_name": "03_MSA_Vantage_Grocers_2023.md",
+      "clause_type": "assignment",
+      "clause_title_or_section": "Page 24 — Section 18.1 Assignment",
+      "clause_summary": "Agreement may be assigned by either party to a successor in interest without consent, provided the assignee assumes obligations in writing.",
+      "effective_date": null,
+      "expiration_date": null,
+      "consent_required": false,
+      "notice_required": null,
+      "renewal_type": null,
+      "territory": null,
+      "exclusivity_scope": null,
+      "pricing_term": null,
+      "discount_pct": null,
+      "escalator_pct": null,
+      "credit_amount": null,
+      "service_level": null,
+      "termination_trigger": null,
+      "commercial_relevance": "Indicates assignment to a successor in interest is permitted without counterparty consent.",
+      "evidence_references": [
+        "DOC-EV-012"
+      ],
+      "confidence": "HIGH"
+    },
+    {
+      "clause_id": "CL-012",
+      "contract_id": "CTR-00003",
+      "customer_id": "CUST-0003",
+      "document_id": "DOC-04",
+      "document_name": "04_MSA_Pinnacle_Outdoor_2025.md",
+      "clause_type": "renewal",
+      "clause_title_or_section": "Page 2 — Section 2.2 Renewal",
+      "clause_summary": "Automatic renewal for successive 12-month periods with 60 days' notice of non-renewal.",
+      "effective_date": null,
+      "expiration_date": "2028-03-31",
+      "consent_required": null,
+      "notice_required": true,
+      "renewal_type": "AUTO_RENEW_12_MONTHS",
+      "territory": null,
+      "exclusivity_scope": null,
+      "pricing_term": null,
+      "discount_pct": null,
+      "escalator_pct": null,
+      "credit_amount": null,
+      "service_level": null,
+      "termination_trigger": null,
+      "commercial_relevance": "Affects ongoing contract continuation and notice timing.",
+      "evidence_references": [
+        "DOC-EV-013",
+        "SQL-EV-004"
+      ],
+      "confidence": "HIGH"
+    },
+    {
+      "clause_id": "CL-013",
+      "contract_id": "CTR-00003",
+      "customer_id": "CUST-0003",
+      "document_id": "DOC-04",
+      "document_name": "04_MSA_Pinnacle_Outdoor_2025.md",
+      "clause_type": "discount",
+      "clause_title_or_section": "Page 8 — Section 7.1 Fees and Discount",
+      "clause_summary": "Supplier grants a 34% discount against list pricing for the duration of the Initial Term in consideration of committed volume and reference-account status.",
+      "effective_date": null,
+      "expiration_date": "2028-03-31",
+      "consent_required": null,
+      "notice_required": null,
+      "renewal_type": null,
+      "territory": null,
+      "exclusivity_scope": null,
+      "pricing_term": "34% discount against list pricing for Initial Term",
+      "discount_pct": 34,
+      "escalator_pct": null,
+      "credit_amount": null,
+      "service_level": null,
+      "termination_trigger": null,
+      "commercial_relevance": "Documents a significant pricing concession that may be relevant when comparing customer pricing across accounts.",
+      "evidence_references": [
+        "DOC-EV-014",
+        "DOC-EV-027",
+        "SQL-EV-004"
+      ],
+      "confidence": "HIGH"
+    },
+    {
+      "clause_id": "CL-014",
+      "contract_id": "CTR-00003",
+      "customer_id": "CUST-0003",
+      "document_id": "DOC-04",
+      "document_name": "04_MSA_Pinnacle_Outdoor_2025.md",
+      "clause_type": "price_escalator",
+      "clause_title_or_section": "Page 12 — Section 9.6 Price Escalator",
+      "clause_summary": "Fees increase annually on each anniversary by the lesser of CPI-U change and 3%.",
+      "effective_date": null,
+      "expiration_date": null,
+      "consent_required": null,
+      "notice_required": null,
+      "renewal_type": null,
+      "territory": null,
+      "exclusivity_scope": null,
+      "pricing_term": "Annual escalator tied to lesser of CPI-U and 3%",
+      "discount_pct": null,
+      "escalator_pct": 3,
+      "credit_amount": null,
+      "service_level": null,
+      "termination_trigger": null,
+      "commercial_relevance": "Defines built-in pricing uplift mechanics and cap.",
+      "evidence_references": [
+        "DOC-EV-015"
+      ],
+      "confidence": "HIGH"
+    },
+    {
+      "clause_id": "CL-015",
+      "contract_id": "CTR-00003",
+      "customer_id": "CUST-0003",
+      "document_id": "DOC-04",
+      "document_name": "04_MSA_Pinnacle_Outdoor_2025.md",
+      "clause_type": "assignment",
+      "clause_title_or_section": "Page 21 — Section 16.1 Assignment",
+      "clause_summary": "Agreement is assignable to a successor in interest without consent.",
+      "effective_date": null,
+      "expiration_date": null,
+      "consent_required": false,
+      "notice_required": null,
+      "renewal_type": null,
+      "territory": null,
+      "exclusivity_scope": null,
+      "pricing_term": null,
+      "discount_pct": null,
+      "escalator_pct": null,
+      "credit_amount": null,
+      "service_level": null,
+      "termination_trigger": null,
+      "commercial_relevance": "Indicates assignment flexibility in a successor transaction.",
+      "evidence_references": [
+        "DOC-EV-016"
+      ],
+      "confidence": "HIGH"
+    },
+    {
+      "clause_id": "CL-016",
+      "contract_id": "CTR-00004",
+      "customer_id": "CUST-0004",
+      "document_id": "DOC-05",
+      "document_name": "05_Reseller_Agreement_Atlas_Distribution_2024.md",
+      "clause_type": "expiration",
+      "clause_title_or_section": "Page 1 — Term",
+      "clause_summary": "Six-year term from 2024-01-01 expiring 2029-12-31.",
+      "effective_date": "2024-01-01",
+      "expiration_date": "2029-12-31",
+      "consent_required": null,
+      "notice_required": null,
+      "renewal_type": null,
+      "territory": null,
+      "exclusivity_scope": null,
+      "pricing_term": null,
+      "discount_pct": null,
+      "escalator_pct": null,
+      "credit_amount": null,
+      "service_level": null,
+      "termination_trigger": null,
+      "commercial_relevance": "Defines the duration of the reseller arrangement and planning horizon.",
+      "evidence_references": [
+        "DOC-EV-017",
+        "SQL-EV-004"
+      ],
+      "confidence": "HIGH"
+    },
+    {
+      "clause_id": "CL-017",
+      "contract_id": "CTR-00004",
+      "customer_id": "CUST-0004",
+      "document_id": "DOC-05",
+      "document_name": "05_Reseller_Agreement_Atlas_Distribution_2024.md",
+      "clause_type": "exclusivity",
+      "clause_title_or_section": "Page 4 — Section 4.1 Appointment and Page 5 — Section 4.3 Exclusivity Covenant",
+      "clause_summary": "Reseller is appointed as sole and exclusive distributor in the Territory, and Supplier may not directly or indirectly market, license, sell, deliver, or solicit customers with principal place of business in the Territory.",
+      "effective_date": null,
+      "expiration_date": null,
+      "consent_required": null,
+      "notice_required": null,
+      "renewal_type": null,
+      "territory": "EU member states, United Kingdom, Switzerland, and Norway",
+      "exclusivity_scope": "Exclusive distributor appointment and restriction on Supplier direct or indirect sales/solicitation in Territory",
+      "pricing_term": null,
+      "discount_pct": null,
+      "escalator_pct": null,
+      "credit_amount": null,
+      "service_level": null,
+      "termination_trigger": null,
+      "commercial_relevance": "May constrain direct expansion and channel strategy within the defined geography.",
+      "evidence_references": [
+        "DOC-EV-018",
+        "DOC-EV-020",
+        "DOC-EV-028"
+      ],
+      "confidence": "HIGH"
+    },
+    {
+      "clause_id": "CL-018",
+      "contract_id": "CTR-00004",
+      "customer_id": "CUST-0004",
+      "document_id": "DOC-05",
+      "document_name": "05_Reseller_Agreement_Atlas_Distribution_2024.md",
+      "clause_type": "territory",
+      "clause_title_or_section": "Page 4 — Section 4.2 Territory",
+      "clause_summary": "Territory comprises EU member states, the United Kingdom, Switzerland, and Norway.",
+      "effective_date": null,
+      "expiration_date": null,
+      "consent_required": null,
+      "notice_required": null,
+      "renewal_type": null,
+      "territory": "EU member states, United Kingdom, Switzerland, and Norway",
+      "exclusivity_scope": null,
+      "pricing_term": null,
+      "discount_pct": null,
+      "escalator_pct": null,
+      "credit_amount": null,
+      "service_level": null,
+      "termination_trigger": null,
+      "commercial_relevance": "Defines the geographic scope of reseller rights and restrictions.",
+      "evidence_references": [
+        "DOC-EV-019"
+      ],
+      "confidence": "HIGH"
+    },
+    {
+      "clause_id": "CL-019",
+      "contract_id": "CTR-00004",
+      "customer_id": "CUST-0004",
+      "document_id": "DOC-05",
+      "document_name": "05_Reseller_Agreement_Atlas_Distribution_2024.md",
+      "clause_type": "direct_selling_restriction",
+      "clause_title_or_section": "Page 5 — Section 4.3 Exclusivity Covenant",
+      "clause_summary": "Supplier shall not directly or through affiliates, agents, or other resellers market, license, sell, deliver, or solicit customers within the Territory and must refer inbound enquiries from the Territory to Reseller within five business days.",
+      "effective_date": null,
+      "expiration_date": null,
+      "consent_required": null,
+      "notice_required": true,
+      "renewal_type": null,
+      "territory": "EU member states, United Kingdom, Switzerland, and Norway",
+      "exclusivity_scope": "No direct or indirect selling or solicitation within Territory; mandatory referral of inbound enquiries",
+      "pricing_term": null,
+      "discount_pct": null,
+      "escalator_pct": null,
+      "credit_amount": null,
+      "service_level": null,
+      "termination_trigger": null,
+      "commercial_relevance": "May restrict direct-selling initiatives and require channel routing of inbound opportunities in Europe and adjacent markets.",
+      "evidence_references": [
+        "DOC-EV-020",
+        "DOC-EV-028"
+      ],
+      "confidence": "HIGH"
+    },
+    {
+      "clause_id": "CL-020",
+      "contract_id": "CTR-00004",
+      "customer_id": "CUST-0004",
+      "document_id": "DOC-05",
+      "document_name": "05_Reseller_Agreement_Atlas_Distribution_2024.md",
+      "clause_type": "minimum_commitment",
+      "clause_title_or_section": "Page 6 — Section 4.4 Minimum Commitment and Page 7 — Section 4.5",
+      "clause_summary": "Reseller must procure minimum annual licence purchases per Schedule 1; failure in two consecutive years lets Supplier convert the appointment to non-exclusive on 12 months' notice. Document also states minimum commitment was met in FY2024 and FY2025.",
+      "effective_date": null,
+      "expiration_date": null,
+      "consent_required": null,
+      "notice_required": true,
+      "renewal_type": null,
+      "territory": null,
+      "exclusivity_scope": null,
+      "pricing_term": null,
+      "discount_pct": null,
+      "escalator_pct": null,
+      "credit_amount": null,
+      "service_level": null,
+      "termination_trigger": "Failure to meet minimum commitment in two consecutive years",
+      "commercial_relevance": "Provides a contractual mechanism to reduce exclusivity if reseller performance declines.",
+      "evidence_references": [
+        "DOC-EV-021",
+        "DOC-EV-022"
+      ],
+      "confidence": "HIGH"
+    },
+    {
+      "clause_id": "CL-021",
+      "contract_id": "CTR-00004",
+      "customer_id": "CUST-0004",
+      "document_id": "DOC-05",
+      "document_name": "05_Reseller_Agreement_Atlas_Distribution_2024.md",
+      "clause_type": "termination_for_convenience",
+      "clause_title_or_section": "Page 12 — Section 8.2 Early Termination",
+      "clause_summary": "Supplier may terminate for convenience on 24 months' written notice, subject to payment of a termination sum equal to two times the trailing twelve month gross margin earned by Reseller.",
+      "effective_date": null,
+      "expiration_date": null,
+      "consent_required": null,
+      "notice_required": true,
+      "renewal_type": null,
+      "territory": null,
+      "exclusivity_scope": null,
+      "pricing_term": null,
+      "discount_pct": null,
+      "escalator_pct": null,
+      "credit_amount": null,
+      "service_level": null,
+      "termination_trigger": "Supplier termination for convenience",
+      "commercial_relevance": "Creates a long notice period and termination payment obligation if Supplier seeks to exit the arrangement early.",
+      "evidence_references": [
+        "DOC-EV-023"
+      ],
+      "confidence": "HIGH"
+    },
+    {
+      "clause_id": "CL-022",
+      "contract_id": "CTR-00004",
+      "customer_id": "CUST-0004",
+      "document_id": "DOC-05",
+      "document_name": "05_Reseller_Agreement_Atlas_Distribution_2024.md",
+      "clause_type": "change_of_control",
+      "clause_title_or_section": "Page 30 — Section 22.1 Change of Control",
+      "clause_summary": "Agreement is assignable to a successor in interest on notice, and exclusivity survives assignment and binds any successor in interest.",
+      "effective_date": null,
+      "expiration_date": null,
+      "consent_required": false,
+      "notice_required": true,
+      "renewal_type": null,
+      "territory": null,
+      "exclusivity_scope": "Exclusivity survives assignment and binds successor in interest",
+      "pricing_term": null,
+      "discount_pct": null,
+      "escalator_pct": null,
+      "credit_amount": null,
+      "service_level": null,
+      "termination_trigger": null,
+      "commercial_relevance": "Indicates successor transactions do not eliminate territorial exclusivity restrictions.",
+      "evidence_references": [
+        "DOC-EV-024"
+      ],
+      "confidence": "HIGH"
+    },
+    {
+      "clause_id": "CL-023",
+      "contract_id": "CTR-00006",
+      "customer_id": "CUST-0006",
+      "document_id": "DOC-06",
+      "document_name": "06_MSA_Cascade_Foods_Holdings_2025.md",
+      "clause_type": "other_material_clause",
+      "clause_title_or_section": "Page 1 — Recitals and Recital B",
+      "clause_summary": "Customer had a prior agreement dated 2021-03-01 in the name of operating subsidiary Cascade Foods that expired on 2025-02-28 and was not renewed; the 2025 agreement is a re-engagement after competitive re-evaluation under revised commercial terms.",
+      "effective_date": "2025-06-01",
+      "expiration_date": null,
+      "consent_required": null,
+      "notice_required": null,
+      "renewal_type": null,
+      "territory": null,
+      "exclusivity_scope": null,
+      "pricing_term": "Re-engagement under revised commercial terms after lapse of prior agreement",
+      "discount_pct": null,
+      "escalator_pct": null,
+      "credit_amount": null,
+      "service_level": null,
+      "termination_trigger": null,
+      "commercial_relevance": "Provides continuity context and may matter when assessing whether the account is a new logo or a re-engagement.",
+      "evidence_references": [
+        "DOC-EV-029"
+      ],
+      "confidence": "HIGH"
+    },
+    {
+      "clause_id": "CL-024",
+      "contract_id": "CTR-00006",
+      "customer_id": "CUST-0006",
+      "document_id": "DOC-06",
+      "document_name": "06_MSA_Cascade_Foods_Holdings_2025.md",
+      "clause_type": "expiration",
+      "clause_title_or_section": "Page 2 — Term",
+      "clause_summary": "Thirty-six month term from 2025-06-01.",
+      "effective_date": "2025-06-01",
+      "expiration_date": "2028-05-31",
+      "consent_required": null,
+      "notice_required": null,
+      "renewal_type": null,
+      "territory": null,
+      "exclusivity_scope": null,
+      "pricing_term": null,
+      "discount_pct": null,
+      "escalator_pct": null,
+      "credit_amount": null,
+      "service_level": null,
+      "termination_trigger": null,
+      "commercial_relevance": "Defines current agreement term and end date.",
+      "evidence_references": [
+        "DOC-EV-030",
+        "SQL-EV-004"
+      ],
+      "confidence": "HIGH"
+    },
+    {
+      "clause_id": "CL-025",
+      "contract_id": "CTR-00006",
+      "customer_id": "CUST-0006",
+      "document_id": "DOC-06",
+      "document_name": "06_MSA_Cascade_Foods_Holdings_2025.md",
+      "clause_type": "discount",
+      "clause_title_or_section": "Page 7 — Section 6.1 Fees",
+      "clause_summary": "Discount is 21% against list, increased from 15% under the prior agreement.",
+      "effective_date": null,
+      "expiration_date": null,
+      "consent_required": null,
+      "notice_required": null,
+      "renewal_type": null,
+      "territory": null,
+      "exclusivity_scope": null,
+      "pricing_term": "21% discount against list; increased from 15% under prior agreement",
+      "discount_pct": 21,
+      "escalator_pct": null,
+      "credit_amount": null,
+      "service_level": null,
+      "termination_trigger": null,
+      "commercial_relevance": "Documents current pricing concession and change from prior commercial terms.",
+      "evidence_references": [
+        "DOC-EV-031",
+        "SQL-EV-004"
+      ],
+      "confidence": "HIGH"
+    },
+    {
+      "clause_id": "CL-026",
+      "contract_id": "CTR-00006",
+      "customer_id": "CUST-0006",
+      "document_id": "DOC-06",
+      "document_name": "06_MSA_Cascade_Foods_Holdings_2025.md",
+      "clause_type": "customer_credit",
+      "clause_title_or_section": "Page 8 — Section 6.3 Onboarding Credit",
+      "clause_summary": "Supplier must grant a one-time credit of $180,000 against implementation fees in recognition of re-implementation following lapse of prior agreement.",
+      "effective_date": null,
+      "expiration_date": null,
+      "consent_required": null,
+      "notice_required": null,
+      "renewal_type": null,
+      "territory": null,
+      "exclusivity_scope": null,
+      "pricing_term": null,
+      "discount_pct": null,
+      "escalator_pct": null,
+      "credit_amount": 180000,
+      "service_level": null,
+      "termination_trigger": null,
+      "commercial_relevance": "Creates a documented implementation-fee credit obligation.",
+      "evidence_references": [
+        "DOC-EV-032"
+      ],
+      "confidence": "HIGH"
+    },
+    {
+      "clause_id": "CL-027",
+      "contract_id": "CTR-00006",
+      "customer_id": "CUST-0006",
+      "document_id": "DOC-06",
+      "document_name": "06_MSA_Cascade_Foods_Holdings_2025.md",
+      "clause_type": "assignment",
+      "clause_title_or_section": "Page 20 — Section 15.1 Assignment",
+      "clause_summary": "Agreement is assignable to a successor in interest without consent.",
+      "effective_date": null,
+      "expiration_date": null,
+      "consent_required": false,
+      "notice_required": null,
+      "renewal_type": null,
+      "territory": null,
+      "exclusivity_scope": null,
+      "pricing_term": null,
+      "discount_pct": null,
+      "escalator_pct": null,
+      "credit_amount": null,
+      "service_level": null,
+      "termination_trigger": null,
+      "commercial_relevance": "Indicates successor assignment flexibility.",
+      "evidence_references": [
+        "DOC-EV-033"
+      ],
+      "confidence": "HIGH"
+    }
+  ],
+  "management_summary_comparisons": [
+    {
+      "comparison_id": "CMP-001",
+      "contract_id": "CTR-00001",
+      "customer_id": "CUST-0001",
+      "clause_type": "renewal",
+      "authoritative_contract_observation": "No automatic renewal; renewal only by written agreement at least 90 days before expiry.",
+      "management_summary_observation": "Auto-renew: No.",
+      "structured_management_observation": "auto_renew_flag = N; notice_period_days = 90.",
+      "alignment_status": "ALIGNED",
+      "authoritative_evidence_references": [
+        "DOC-EV-002"
+      ],
+      "management_evidence_references": [
+        "DOC-EV-034"
+      ],
+      "structured_evidence_references": [
+        "SQL-EV-004"
+      ],
+      "comparison_note": "Management summary and structured metadata align with the reviewed contract on no auto-renewal and 90-day timing."
+    },
+    {
+      "comparison_id": "CMP-002",
+      "contract_id": "CTR-00001",
+      "customer_id": "CUST-0001",
+      "clause_type": "change_of_control",
+      "authoritative_contract_observation": "Change of Control of Supplier constitutes assignment requiring prior written customer consent; unconsented change permits customer termination on 90 days' notice.",
+      "management_summary_observation": "Change of control restriction: None noted. Management commentary says no counterparty consent is required in connection with a change of control.",
+      "structured_management_observation": null,
+      "alignment_status": "NOT_ALIGNED",
+      "authoritative_evidence_references": [
+        "DOC-EV-004",
+        "DOC-EV-005"
+      ],
+      "management_evidence_references": [
+        "DOC-EV-034",
+        "DOC-EV-035"
+      ],
+      "structured_evidence_references": [],
+      "comparison_note": "Executed agreement expressly imposes consent and termination consequences, contrary to management summary wording."
+    },
+    {
+      "comparison_id": "CMP-003",
+      "contract_id": "CTR-00001",
+      "customer_id": "CUST-0001",
+      "clause_type": "discount",
+      "authoritative_contract_observation": "12% discount agreed at Schedule 3.",
+      "management_summary_observation": "Contract table lists ACV and notes only; no discount summary provided.",
+      "structured_management_observation": "discount_pct = 0.12.",
+      "alignment_status": "NOT_COMPARABLE",
+      "authoritative_evidence_references": [
+        "DOC-EV-003"
+      ],
+      "management_evidence_references": [
+        "DOC-EV-034"
+      ],
+      "structured_evidence_references": [
+        "SQL-EV-004"
+      ],
+      "comparison_note": "Structured contract metadata reflects the discount, but management summary table does not expressly summarize this clause."
+    },
+    {
+      "comparison_id": "CMP-004",
+      "contract_id": "CTR-00001",
+      "customer_id": "CUST-0001",
+      "clause_type": "service_credit",
+      "authoritative_contract_observation": "Up to 8% service credit upon sustained availability failure.",
+      "management_summary_observation": null,
+      "structured_management_observation": null,
+      "alignment_status": "MANAGEMENT_REPRESENTATION_NOT_AVAILABLE",
+      "authoritative_evidence_references": [
+        "DOC-EV-006"
+      ],
+      "management_evidence_references": [],
+      "structured_evidence_references": [],
+      "comparison_note": "Management summary does not address service credit provisions."
+    },
+    {
+      "comparison_id": "CMP-005",
+      "contract_id": "CTR-00002",
+      "customer_id": "CUST-0002",
+      "clause_type": "renewal",
+      "authoritative_contract_observation": "Auto-renewal in successive 12-month periods with 60 days' notice.",
+      "management_summary_observation": "Auto-renew: Yes (60d).",
+      "structured_management_observation": "auto_renew_flag = Y; notice_period_days = 60.",
+      "alignment_status": "ALIGNED",
+      "authoritative_evidence_references": [
+        "DOC-EV-007"
+      ],
+      "management_evidence_references": [
+        "DOC-EV-036"
+      ],
+      "structured_evidence_references": [
+        "SQL-EV-004"
+      ],
+      "comparison_note": "Management summary and structured metadata align with the auto-renewal provision."
+    },
+    {
+      "comparison_id": "CMP-006",
+      "contract_id": "CTR-00002",
+      "customer_id": "CUST-0002",
+      "clause_type": "most_favored_nation",
+      "authoritative_contract_observation": "Contract contains most favoured customer pricing with retrospective true-up and credit note obligation.",
+      "management_summary_observation": "MFN: None noted. Management commentary says no agreement contains most-favoured-nation pricing.",
+      "structured_management_observation": null,
+      "alignment_status": "NOT_ALIGNED",
+      "authoritative_evidence_references": [
+        "DOC-EV-008",
+        "DOC-EV-009"
+      ],
+      "management_evidence_references": [
+        "DOC-EV-036",
+        "DOC-EV-035"
+      ],
+      "structured_evidence_references": [],
+      "comparison_note": "Executed agreement expressly includes MFN pricing, while management summary states otherwise."
+    },
+    {
+      "comparison_id": "CMP-007",
+      "contract_id": "CTR-00002",
+      "customer_id": "CUST-0002",
+      "clause_type": "assignment",
+      "authoritative_contract_observation": "Assignable to successor in interest without consent if obligations are assumed in writing.",
+      "management_summary_observation": "Change of control restriction: None noted.",
+      "structured_management_observation": null,
+      "alignment_status": "PARTIALLY_ALIGNED",
+      "authoritative_evidence_references": [
+        "DOC-EV-012"
+      ],
+      "management_evidence_references": [
+        "DOC-EV-036"
+      ],
+      "structured_evidence_references": [],
+      "comparison_note": "Management summary broadly aligns on absence of consent restriction, but does not capture the condition that the assignee assumes obligations in writing."
+    },
+    {
+      "comparison_id": "CMP-008",
+      "contract_id": "CTR-00002",
+      "customer_id": "CUST-0002",
+      "clause_type": "sla_termination_right",
+      "authoritative_contract_observation": "Termination right arises if availability falls below 99.0% in two consecutive months; escalation provision references remedies if Severity 1 incidents exceed four in a rolling three-month period.",
+      "management_summary_observation": null,
+      "structured_management_observation": null,
+      "alignment_status": "MANAGEMENT_REPRESENTATION_NOT_AVAILABLE",
+      "authoritative_evidence_references": [
+        "DOC-EV-010",
+        "DOC-EV-011"
+      ],
+      "management_evidence_references": [],
+      "structured_evidence_references": [],
+      "comparison_note": "Management summary does not address SLA-linked termination rights."
+    },
+    {
+      "comparison_id": "CMP-009",
+      "contract_id": "CTR-00003",
+      "customer_id": "CUST-0003",
+      "clause_type": "renewal",
+      "authoritative_contract_observation": "Auto-renewal in successive 12-month periods with 60 days' notice.",
+      "management_summary_observation": "Auto-renew: Yes (60d).",
+      "structured_management_observation": "auto_renew_flag = Y; notice_period_days = 60.",
+      "alignment_status": "ALIGNED",
+      "authoritative_evidence_references": [
+        "DOC-EV-013"
+      ],
+      "management_evidence_references": [
+        "DOC-EV-037"
+      ],
+      "structured_evidence_references": [
+        "SQL-EV-004"
+      ],
+      "comparison_note": "Management summary and structured metadata align with renewal mechanics."
+    },
+    {
+      "comparison_id": "CMP-010",
+      "contract_id": "CTR-00003",
+      "customer_id": "CUST-0003",
+      "clause_type": "price_escalator",
+      "authoritative_contract_observation": "Annual fee increase is the lesser of CPI-U change and 3%.",
+      "management_summary_observation": "Notes: CPI escalator capped at 3%.",
+      "structured_management_observation": null,
+      "alignment_status": "ALIGNED",
+      "authoritative_evidence_references": [
+        "DOC-EV-015"
+      ],
+      "management_evidence_references": [
+        "DOC-EV-037"
+      ],
+      "structured_evidence_references": [],
+      "comparison_note": "Management summary accurately reflects the 3% cap, albeit in abbreviated form."
+    },
+    {
+      "comparison_id": "CMP-011",
+      "contract_id": "CTR-00003",
+      "customer_id": "CUST-0003",
+      "clause_type": "change_of_control",
+      "authoritative_contract_observation": "Agreement is assignable to a successor in interest without consent.",
+      "management_summary_observation": "Change of control restriction: None noted.",
+      "structured_management_observation": null,
+      "alignment_status": "ALIGNED",
+      "authoritative_evidence_references": [
+        "DOC-EV-016"
+      ],
+      "management_evidence_references": [
+        "DOC-EV-037"
+      ],
+      "structured_evidence_references": [],
+      "comparison_note": "Management summary aligns with the reviewed assignment provision."
+    },
+    {
+      "comparison_id": "CMP-012",
+      "contract_id": "CTR-00004",
+      "customer_id": "CUST-0004",
+      "clause_type": "expiration",
+      "authoritative_contract_observation": "Term expires 2029-12-31.",
+      "management_summary_observation": "Expiry: 2029-12-31.",
+      "structured_management_observation": "contract_end_date = 2029-12-31.",
+      "alignment_status": "ALIGNED",
+      "authoritative_evidence_references": [
+        "DOC-EV-017"
+      ],
+      "management_evidence_references": [
+        "DOC-EV-038"
+      ],
+      "structured_evidence_references": [
+        "SQL-EV-004"
+      ],
+      "comparison_note": "Expiry date aligns across sources."
+    },
+    {
+      "comparison_id": "CMP-013",
+      "contract_id": "CTR-00004",
+      "customer_id": "CUST-0004",
+      "clause_type": "renewal",
+      "authoritative_contract_observation": "NOT_FOUND_IN_REVIEWED_DOCUMENT for an auto-renewal clause in the reviewed reseller agreement text provided.",
+      "management_summary_observation": "Auto-renew: Yes (180d).",
+      "structured_management_observation": "auto_renew_flag = Y; notice_period_days = 180.",
+      "alignment_status": "AUTHORITATIVE_EVIDENCE_NOT_AVAILABLE",
+      "authoritative_evidence_references": [],
+      "management_evidence_references": [
+        "DOC-EV-038"
+      ],
+      "structured_evidence_references": [
+        "SQL-EV-004"
+      ],
+      "comparison_note": "The supplied excerpted contract text reviewed here does not contain an auto-renewal provision, while management summary and structured metadata indicate one. Additional source pages may be required."
+    },
+    {
+      "comparison_id": "CMP-014",
+      "contract_id": "CTR-00004",
+      "customer_id": "CUST-0004",
+      "clause_type": "exclusivity",
+      "authoritative_contract_observation": "Agreement grants sole and exclusive distribution rights in the Territory and restricts Supplier direct and indirect selling in that Territory.",
+      "management_summary_observation": "Exclusivity: Standard reseller terms. Management commentary says no agreement contains territorial exclusivity.",
+      "structured_management_observation": null,
+      "alignment_status": "NOT_ALIGNED",
+      "authoritative_evidence_references": [
+        "DOC-EV-018",
+        "DOC-EV-020"
+      ],
+      "management_evidence_references": [
+        "DOC-EV-038",
+        "DOC-EV-035"
+      ],
+      "structured_evidence_references": [],
+      "comparison_note": "Executed agreement contains explicit territorial exclusivity, which is not accurately captured by management commentary."
+    },
+    {
+      "comparison_id": "CMP-015",
+      "contract_id": "CTR-00004",
+      "customer_id": "CUST-0004",
+      "clause_type": "change_of_control",
+      "authoritative_contract_observation": "Assignable to successor in interest on notice; exclusivity survives assignment and binds successor.",
+      "management_summary_observation": "Change of control restriction: None noted.",
+      "structured_management_observation": null,
+      "alignment_status": "PARTIALLY_ALIGNED",
+      "authoritative_evidence_references": [
+        "DOC-EV-024"
+      ],
+      "management_evidence_references": [
+        "DOC-EV-038"
+      ],
+      "structured_evidence_references": [],
+      "comparison_note": "Management summary reflects absence of consent restriction but does not capture that exclusivity survives and binds successors."
+    },
+    {
+      "comparison_id": "CMP-016",
+      "contract_id": "CTR-00006",
+      "customer_id": "CUST-0006",
+      "clause_type": "expiration",
+      "authoritative_contract_observation": "Term runs 36 months from 2025-06-01, implying expiry on 2028-05-31.",
+      "management_summary_observation": "Expiry: 2028-05-31.",
+      "structured_management_observation": "contract_end_date = 2028-05-31.",
+      "alignment_status": "ALIGNED",
+      "authoritative_evidence_references": [
+        "DOC-EV-030"
+      ],
+      "management_evidence_references": [
+        "DOC-EV-039"
+      ],
+      "structured_evidence_references": [
+        "SQL-EV-004"
+      ],
+      "comparison_note": "Expiry aligns across sources."
+    },
+    {
+      "comparison_id": "CMP-017",
+      "contract_id": "CTR-00006",
+      "customer_id": "CUST-0006",
+      "clause_type": "change_of_control",
+      "authoritative_contract_observation": "Agreement is assignable to a successor in interest without consent.",
+      "management_summary_observation": "Change of control restriction: None noted.",
+      "structured_management_observation": null,
+      "alignment_status": "ALIGNED",
+      "authoritative_evidence_references": [
+        "DOC-EV-033"
+      ],
+      "management_evidence_references": [
+        "DOC-EV-039"
+      ],
+      "structured_evidence_references": [],
+      "comparison_note": "Management summary aligns with reviewed assignment provision."
+    },
+    {
+      "comparison_id": "CMP-018",
+      "contract_id": "CTR-00006",
+      "customer_id": "CUST-0006",
+      "clause_type": "other_material_clause",
+      "authoritative_contract_observation": "Current agreement is a re-engagement following lapse of a prior agreement with Cascade operating subsidiary; contract text states prior agreement expired and was not renewed.",
+      "management_summary_observation": "Notes: New logo win FY2025.",
+      "structured_management_observation": null,
+      "alignment_status": "NOT_ALIGNED",
+      "authoritative_evidence_references": [
+        "DOC-EV-029"
+      ],
+      "management_evidence_references": [
+        "DOC-EV-039"
+      ],
+      "structured_evidence_references": [],
+      "comparison_note": "Reviewed agreement describes a re-engagement after lapse of a prior related-party agreement rather than a straightforward new-logo win."
+    }
+  ],
+  "claim_relevant_evidence": [
+    {
+      "claim_id": "CLM-07",
+      "claim_text": "Direct expansion into Europe is the primary growth vector, worth $6M ARR by FY2028.",
+      "related_contract_ids": [
+        "CTR-00004"
+      ],
+      "related_clause_ids": [
+        "CL-017",
+        "CL-018",
+        "CL-019",
+        "CL-022"
+      ],
+      "evidence_references": [
+        "DOC-EV-018",
+        "DOC-EV-019",
+        "DOC-EV-020",
+        "DOC-EV-024",
+        "DOC-EV-028"
+      ],
+      "evidence_availability": "AVAILABLE"
+    },
+    {
+      "claim_id": "CLM-08",
+      "claim_text": "All customer contracts are freely assignable on a change of control.",
+      "related_contract_ids": [
+        "CTR-00001",
+        "CTR-00002",
+        "CTR-00003",
+        "CTR-00006"
+      ],
+      "related_clause_ids": [
+        "CL-004",
+        "CL-005",
+        "CL-011",
+        "CL-015",
+        "CL-027"
+      ],
+      "evidence_references": [
+        "DOC-EV-004",
+        "DOC-EV-005",
+        "DOC-EV-012",
+        "DOC-EV-016",
+        "DOC-EV-033",
+        "DOC-EV-026"
+      ],
+      "evidence_availability": "AVAILABLE"
+    },
+    {
+      "claim_id": "CLM-11",
+      "claim_text": "No contract contains most-favoured-nation pricing.",
+      "related_contract_ids": [
+        "CTR-00002",
+        "CTR-00003"
+      ],
+      "related_clause_ids": [
+        "CL-008",
+        "CL-013"
+      ],
+      "evidence_references": [
+        "DOC-EV-008",
+        "DOC-EV-009",
+        "DOC-EV-027"
+      ],
+      "evidence_availability": "AVAILABLE"
+    },
+    {
+      "claim_id": "CLM-02",
+      "claim_text": "Net revenue retention of 118% demonstrates best-in-class expansion.",
+      "related_contract_ids": [
+        "CTR-00006"
+      ],
+      "related_clause_ids": [
+        "CL-023",
+        "CL-025",
+        "CL-026"
+      ],
+      "evidence_references": [
+        "DOC-EV-029",
+        "DOC-EV-031",
+        "DOC-EV-032"
+      ],
+      "evidence_availability": "PARTIAL_CONTRACT_CONTEXT_ONLY"
+    },
+    {
+      "claim_id": "CLM-04",
+      "claim_text": "Logo churn has remained below 5% annually.",
+      "related_contract_ids": [
+        "CTR-00006"
+      ],
+      "related_clause_ids": [
+        "CL-023"
+      ],
+      "evidence_references": [
+        "DOC-EV-029"
+      ],
+      "evidence_availability": "PARTIAL_CONTRACT_CONTEXT_ONLY"
+    },
+    {
+      "claim_id": "CLM-10",
+      "claim_text": "Top 10 customers have an average tenure of 6 years.",
+      "related_contract_ids": [
+        "CTR-00001"
+      ],
+      "related_clause_ids": [
+        "CL-001",
+        "CL-002"
+      ],
+      "evidence_references": [
+        "DOC-EV-001",
+        "DOC-EV-002",
+        "SQL-EV-004"
+      ],
+      "evidence_availability": "PARTIAL_CONTRACT_CONTEXT_ONLY"
+    }
+  ],
+  "document_evidence": [
+    {
+      "evidence_id": "DOC-EV-001",
+      "source_type": "vdr_document",
+      "document_name": "02_MSA_Northwind_Retail_Group_2022.md",
+      "document_id": "DOC-02",
+      "page_or_marker": "Page 1",
+      "section": "Parties and Term",
+      "evidence_summary": "Initial Term commences on the Effective Date and expires on 30 June 2026."
+    },
+    {
+      "evidence_id": "DOC-EV-002",
+      "source_type": "vdr_document",
+      "document_name": "02_MSA_Northwind_Retail_Group_2022.md",
+      "document_id": "DOC-02",
+      "page_or_marker": "Page 2",
+      "section": "Section 2.3 Renewal",
+      "evidence_summary": "There shall be no automatic renewal; any renewal must be by written agreement executed not less than ninety days prior to expiry."
+    },
+    {
+      "evidence_id": "DOC-EV-003",
+      "source_type": "vdr_document",
+      "document_name": "02_MSA_Northwind_Retail_Group_2022.md",
+      "document_id": "DOC-02",
+      "page_or_marker": "Page 11",
+      "section": "Section 9.1 Fees",
+      "evidence_summary": "Annual Subscription Fee is subject to the discount of twelve per cent (12%) agreed at Schedule 3."
+    },
+    {
+      "evidence_id": "DOC-EV-004",
+      "source_type": "vdr_document",
+      "document_name": "02_MSA_Northwind_Retail_Group_2022.md",
+      "document_id": "DOC-02",
+      "page_or_marker": "Page 19",
+      "section": "Section 14.2 Assignment and Change of Control",
+      "evidence_summary": "Neither party may assign without the prior written consent of the other party; a Change of Control of Supplier constitutes an assignment for this section."
+    },
+    {
+      "evidence_id": "DOC-EV-005",
+      "source_type": "vdr_document",
+      "document_name": "02_MSA_Northwind_Retail_Group_2022.md",
+      "document_id": "DOC-02",
+      "page_or_marker": "Page 19",
+      "section": "Section 14.3",
+      "evidence_summary": "If a Change of Control completes without Customer's prior written consent, Customer may terminate on ninety days' written notice within 180 days of awareness."
+    },
+    {
+      "evidence_id": "DOC-EV-006",
+      "source_type": "vdr_document",
+      "document_name": "02_MSA_Northwind_Retail_Group_2022.md",
+      "document_id": "DOC-02",
+      "page_or_marker": "Page 28",
+      "section": "Section 21.4 Service Credits",
+      "evidence_summary": "Sustained failure to meet the 99.5% availability target in any three consecutive months entitles Customer to a service credit of up to 8% of the Annual Subscription Fee."
+    },
+    {
+      "evidence_id": "DOC-EV-007",
+      "source_type": "vdr_document",
+      "document_name": "03_MSA_Vantage_Grocers_2023.md",
+      "document_id": "DOC-03",
+      "page_or_marker": "Page 3",
+      "section": "Section 3.1 Renewal",
+      "evidence_summary": "Agreement renews automatically for successive twelve month periods unless either party gives at least sixty days' written notice of non-renewal."
+    },
+    {
+      "evidence_id": "DOC-EV-008",
+      "source_type": "vdr_document",
+      "document_name": "03_MSA_Vantage_Grocers_2023.md",
+      "document_id": "DOC-03",
+      "page_or_marker": "Page 9",
+      "section": "Section 8.4 Most Favoured Customer Pricing",
+      "evidence_summary": "Customer's 18% discount shall remain not less favourable than the effective discount granted to any other customer of comparable annual committed spend."
+    },
+    {
+      "evidence_id": "DOC-EV-009",
+      "source_type": "vdr_document",
+      "document_name": "03_MSA_Vantage_Grocers_2023.md",
+      "document_id": "DOC-03",
+      "page_or_marker": "Page 9",
+      "section": "Section 8.4 Most Favoured Customer Pricing",
+      "evidence_summary": "If a more favourable discount is granted to a comparable customer, Supplier must notify Customer within 30 days, apply it retrospectively, and issue a credit note."
+    },
+    {
+      "evidence_id": "DOC-EV-010",
+      "source_type": "vdr_document",
+      "document_name": "03_MSA_Vantage_Grocers_2023.md",
+      "document_id": "DOC-03",
+      "page_or_marker": "Page 16",
+      "section": "Section 12.2 Service Levels",
+      "evidence_summary": "Availability target is 99.5% measured monthly; where availability falls below 99.0% in any two consecutive months, Customer may terminate for material breach on 30 days' notice."
+    },
+    {
+      "evidence_id": "DOC-EV-011",
+      "source_type": "vdr_document",
+      "document_name": "03_MSA_Vantage_Grocers_2023.md",
+      "document_id": "DOC-03",
+      "page_or_marker": "Page 17",
+      "section": "Section 12.3 Escalation",
+      "evidence_summary": "Where Severity 1 incidents exceed four in any rolling three month period, the matter shall be escalated and Customer's remedies under Section 12.2 shall be available."
+    },
+    {
+      "evidence_id": "DOC-EV-012",
+      "source_type": "vdr_document",
+      "document_name": "03_MSA_Vantage_Grocers_2023.md",
+      "document_id": "DOC-03",
+      "page_or_marker": "Page 24",
+      "section": "Section 18.1 Assignment",
+      "evidence_summary": "Agreement may be assigned by either party to a successor in interest without consent, provided the assignee assumes all obligations in writing."
+    },
+    {
+      "evidence_id": "DOC-EV-013",
+      "source_type": "vdr_document",
+      "document_name": "04_MSA_Pinnacle_Outdoor_2025.md",
+      "document_id": "DOC-04",
+      "page_or_marker": "Page 2",
+      "section": "Section 2.2 Renewal",
+      "evidence_summary": "Automatic renewal for successive twelve month periods, sixty days' notice of non-renewal."
+    },
+    {
+      "evidence_id": "DOC-EV-014",
+      "source_type": "vdr_document",
+      "document_name": "04_MSA_Pinnacle_Outdoor_2025.md",
+      "document_id": "DOC-04",
+      "page_or_marker": "Page 8",
+      "section": "Section 7.1 Fees and Discount",
+      "evidence_summary": "Supplier grants a discount of thirty-four per cent (34%) against list pricing for the duration of the Initial Term."
+    },
+    {
+      "evidence_id": "DOC-EV-015",
+      "source_type": "vdr_document",
+      "document_name": "04_MSA_Pinnacle_Outdoor_2025.md",
+      "document_id": "DOC-04",
+      "page_or_marker": "Page 12",
+      "section": "Section 9.6 Price Escalator",
+      "evidence_summary": "Fees shall increase annually on each anniversary by the lesser of CPI-U change and three per cent (3%)."
+    },
+    {
+      "evidence_id": "DOC-EV-016",
+      "source_type": "vdr_document",
+      "document_name": "04_MSA_Pinnacle_Outdoor_2025.md",
+      "document_id": "DOC-04",
+      "page_or_marker": "Page 21",
+      "section": "Section 16.1 Assignment",
+      "evidence_summary": "Assignable to a successor in interest without consent."
+    },
+    {
+      "evidence_id": "DOC-EV-017",
+      "source_type": "vdr_document",
+      "document_name": "05_Reseller_Agreement_Atlas_Distribution_2024.md",
+      "document_id": "DOC-05",
+      "page_or_marker": "Page 1",
+      "section": "Term",
+      "evidence_summary": "Six years from 1 January 2024, expiring 31 December 2029."
+    },
+    {
+      "evidence_id": "DOC-EV-018",
+      "source_type": "vdr_document",
+      "document_name": "05_Reseller_Agreement_Atlas_Distribution_2024.md",
+      "document_id": "DOC-05",
+      "page_or_marker": "Page 4",
+      "section": "Section 4.1 Appointment",
+      "evidence_summary": "Supplier appoints Reseller as its sole and exclusive distributor of the Harborline Platform in the Territory."
+    },
+    {
+      "evidence_id": "DOC-EV-019",
+      "source_type": "vdr_document",
+      "document_name": "05_Reseller_Agreement_Atlas_Distribution_2024.md",
+      "document_id": "DOC-05",
+      "page_or_marker": "Page 4",
+      "section": "Section 4.2 Territory",
+      "evidence_summary": "Territory means the member states of the European Union, the United Kingdom, Switzerland, and Norway."
+    },
+    {
+      "evidence_id": "DOC-EV-020",
+      "source_type": "vdr_document",
+      "document_name": "05_Reseller_Agreement_Atlas_Distribution_2024.md",
+      "document_id": "DOC-05",
+      "page_or_marker": "Page 5",
+      "section": "Section 4.3 Exclusivity Covenant",
+      "evidence_summary": "Supplier shall not directly or through any affiliate, agent, or other reseller market, license, sell, or deliver the Platform to customers within the Territory and must refer inbound enquiries to Reseller."
+    },
+    {
+      "evidence_id": "DOC-EV-021",
+      "source_type": "vdr_document",
+      "document_name": "05_Reseller_Agreement_Atlas_Distribution_2024.md",
+      "document_id": "DOC-05",
+      "page_or_marker": "Page 6",
+      "section": "Section 4.4 Minimum Commitment",
+      "evidence_summary": "Failure to meet minimum annual licence purchases in any two consecutive years entitles Supplier to convert the appointment to non-exclusive on twelve months' notice."
+    },
+    {
+      "evidence_id": "DOC-EV-022",
+      "source_type": "vdr_document",
+      "document_name": "05_Reseller_Agreement_Atlas_Distribution_2024.md",
+      "document_id": "DOC-05",
+      "page_or_marker": "Page 7",
+      "section": "Section 4.5",
+      "evidence_summary": "Reseller met the minimum commitment in FY2024 and FY2025."
+    },
+    {
+      "evidence_id": "DOC-EV-023",
+      "source_type": "vdr_document",
+      "document_name": "05_Reseller_Agreement_Atlas_Distribution_2024.md",
+      "document_id": "DOC-05",
+      "page_or_marker": "Page 12",
+      "section": "Section 8.2 Early Termination",
+      "evidence_summary": "Supplier may terminate for convenience on twenty-four months' written notice, subject to payment of a termination sum equal to two times trailing twelve month gross margin earned by Reseller."
+    },
+    {
+      "evidence_id": "DOC-EV-024",
+      "source_type": "vdr_document",
+      "document_name": "05_Reseller_Agreement_Atlas_Distribution_2024.md",
+      "document_id": "DOC-05",
+      "page_or_marker": "Page 30",
+      "section": "Section 22.1 Change of Control",
+      "evidence_summary": "Agreement is assignable to a successor in interest on notice; exclusivity survives any assignment and binds any successor in interest."
+    },
+    {
+      "evidence_id": "DOC-EV-025",
+      "source_type": "vdr_document",
+      "document_name": "09_Board_Minutes_Q3_2025.md",
+      "document_id": "DOC-09",
+      "page_or_marker": "Item 4",
+      "section": "Customer Matters",
+      "evidence_summary": "Board minutes record elevated Severity 1 incidents at Vantage Grocers, invocation of the escalation provision, and renewal under active review."
+    },
+    {
+      "evidence_id": "DOC-EV-026",
+      "source_type": "vdr_document",
+      "document_name": "09_Board_Minutes_Q3_2025.md",
+      "document_id": "DOC-09",
+      "page_or_marker": "Item 5",
+      "section": "Northwind Retail Group",
+      "evidence_summary": "General Counsel reminded the Board that Section 14.2 treats change of control as an assignment requiring Northwind's prior written consent."
+    },
+    {
+      "evidence_id": "DOC-EV-027",
+      "source_type": "vdr_document",
+      "document_name": "09_Board_Minutes_Q3_2025.md",
+      "document_id": "DOC-09",
+      "page_or_marker": "Item 6",
+      "section": "Pricing Governance",
+      "evidence_summary": "General Counsel asked that the Vantage most-favoured-customer provision be reviewed in light of the discount granted to Pinnacle Outdoor."
+    },
+    {
+      "evidence_id": "DOC-EV-028",
+      "source_type": "vdr_document",
+      "document_name": "09_Board_Minutes_Q3_2025.md",
+      "document_id": "DOC-09",
+      "page_or_marker": "Item 9",
+      "section": "European Strategy",
+      "evidence_summary": "A director asked whether the Atlas Distribution arrangement permits direct sales in Europe; management undertook to revert."
+    },
+    {
+      "evidence_id": "DOC-EV-029",
+      "source_type": "vdr_document",
+      "document_name": "06_MSA_Cascade_Foods_Holdings_2025.md",
+      "document_id": "DOC-06",
+      "page_or_marker": "Page 1",
+      "section": "Recitals and Recital B",
+      "evidence_summary": "Customer was previously party to a 2021 MSA through operating subsidiary Cascade Foods that expired on 28 February 2025 and was not renewed; customer re-engaged after competitive re-evaluation under revised terms."
+    },
+    {
+      "evidence_id": "DOC-EV-030",
+      "source_type": "vdr_document",
+      "document_name": "06_MSA_Cascade_Foods_Holdings_2025.md",
+      "document_id": "DOC-06",
+      "page_or_marker": "Page 2",
+      "section": "Term",
+      "evidence_summary": "Thirty-six months from 1 June 2025."
+    },
+    {
+      "evidence_id": "DOC-EV-031",
+      "source_type": "vdr_document",
+      "document_name": "06_MSA_Cascade_Foods_Holdings_2025.md",
+      "document_id": "DOC-06",
+      "page_or_marker": "Page 7",
+      "section": "Section 6.1 Fees",
+      "evidence_summary": "Discount of twenty-one per cent (21%) against list, an increase from fifteen per cent (15%) applied under the Prior Agreement."
+    },
+    {
+      "evidence_id": "DOC-EV-032",
+      "source_type": "vdr_document",
+      "document_name": "06_MSA_Cascade_Foods_Holdings_2025.md",
+      "document_id": "DOC-06",
+      "page_or_marker": "Page 8",
+      "section": "Section 6.3 Onboarding Credit",
+      "evidence_summary": "Supplier shall grant a one-time credit of $180,000 against implementation fees."
+    },
+    {
+      "evidence_id": "DOC-EV-033",
+      "source_type": "vdr_document",
+      "document_name": "06_MSA_Cascade_Foods_Holdings_2025.md",
+      "document_id": "DOC-06",
+      "page_or_marker": "Page 20",
+      "section": "Section 15.1 Assignment",
+      "evidence_summary": "Assignable to a successor in interest without consent."
+    },
+    {
+      "evidence_id": "DOC-EV-034",
+      "source_type": "vdr_document",
+      "document_name": "07_Customer_Contract_Summary_Mgmt.md",
+      "document_id": "DOC-07",
+      "page_or_marker": "Top Accounts Table",
+      "section": "CTR-00001 row",
+      "evidence_summary": "Northwind row lists Expiry 2026-06-30, Auto-renew No, and Change of control restriction None noted."
+    },
+    {
+      "evidence_id": "DOC-EV-035",
+      "source_type": "vdr_document",
+      "document_name": "07_Customer_Contract_Summary_Mgmt.md",
+      "document_id": "DOC-07",
+      "page_or_marker": "Management commentary",
+      "section": "Management commentary",
+      "evidence_summary": "Management states all agreements are on the standard Harborline MSA form, no counterparty consent is required on change of control, and no agreement contains most-favoured-nation pricing or territorial exclusivity."
+    },
+    {
+      "evidence_id": "DOC-EV-036",
+      "source_type": "vdr_document",
+      "document_name": "07_Customer_Contract_Summary_Mgmt.md",
+      "document_id": "DOC-07",
+      "page_or_marker": "Top Accounts Table",
+      "section": "CTR-00002 row",
+      "evidence_summary": "Vantage row lists Auto-renew Yes (60d), Change of control restriction None noted, and MFN None noted."
+    },
+    {
+      "evidence_id": "DOC-EV-037",
+      "source_type": "vdr_document",
+      "document_name": "07_Customer_Contract_Summary_Mgmt.md",
+      "document_id": "DOC-07",
+      "page_or_marker": "Top Accounts Table",
+      "section": "CTR-00003 row",
+      "evidence_summary": "Pinnacle row lists Auto-renew Yes (60d), Change of control restriction None noted, and note that CPI escalator is capped at 3%."
+    },
+    {
+      "evidence_id": "DOC-EV-038",
+      "source_type": "vdr_document",
+      "document_name": "07_Customer_Contract_Summary_Mgmt.md",
+      "document_id": "DOC-07",
+      "page_or_marker": "Top Accounts Table",
+      "section": "CTR-00004 row",
+      "evidence_summary": "Atlas row lists Expiry 2029-12-31, Auto-renew Yes (180d), Change of control restriction None noted, and Exclusivity Standard reseller terms."
+    },
+    {
+      "evidence_id": "DOC-EV-039",
+      "source_type": "vdr_document",
+      "document_name": "07_Customer_Contract_Summary_Mgmt.md",
+      "document_id": "DOC-07",
+      "page_or_marker": "Top Accounts Table",
+      "section": "CTR-00006 row",
+      "evidence_summary": "Cascade row lists Expiry 2028-05-31, Auto-renew Yes (60d), Change of control restriction None noted, and note New logo win FY2025."
+    }
+  ],
+  "sql_evidence": [
+    {
+      "evidence_id": "SQL-EV-001",
+      "source_type": "databricks_sql",
+      "source_objects": [
+        "workspace.aava_deal_studio"
+      ],
+      "query": "SHOW TABLES IN workspace.aava_deal_studio",
+      "methodology": "Validated physical objects available in the discovered catalog/schema before substantive querying."
+    },
+    {
+      "evidence_id": "SQL-EV-002",
+      "source_type": "databricks_sql",
+      "source_objects": [
+        "workspace.aava_deal_studio.dim_customer",
+        "workspace.aava_deal_studio.dim_contract",
+        "workspace.aava_deal_studio.mgmt_claim"
+      ],
+      "query": "DESCRIBE workspace.aava_deal_studio.dim_customer; DESCRIBE workspace.aava_deal_studio.dim_contract; DESCRIBE workspace.aava_deal_studio.mgmt_claim",
+      "methodology": "Confirmed columns, datatypes, and available join keys for customer, contract, and management claim sources discovered from the supplied DDL."
+    },
+    {
+      "evidence_id": "SQL-EV-003",
+      "source_type": "databricks_sql",
+      "source_objects": [
+        "workspace.aava_deal_studio.mgmt_claim"
+      ],
+      "query": "SELECT claim_id, claim_text, metric_key, claimed_value, period, cim_page FROM workspace.aava_deal_studio.mgmt_claim ORDER BY claim_id",
+      "methodology": "Retrieved management claims referenced in doc_catalog routing so contract evidence could be linked without issuing final claim verdicts."
+    },
+    {
+      "evidence_id": "SQL-EV-004",
+      "source_type": "databricks_sql",
+      "source_objects": [
+        "workspace.aava_deal_studio.dim_contract",
+        "workspace.aava_deal_studio.dim_customer"
+      ],
+      "query": "SELECT c.contract_id, c.customer_id, cu.customer_name, c.contract_start_date, c.contract_end_date, c.contract_type, c.auto_renew_flag, c.notice_period_days, c.discount_pct, c.status, c.source_doc_ref FROM workspace.aava_deal_studio.dim_contract c LEFT JOIN workspace.aava_deal_studio.dim_customer cu ON c.customer_id = cu.customer_id WHERE c.contract_id IN ('CTR-00001','CTR-00002','CTR-00003','CTR-00004','CTR-00006') ORDER BY c.contract_id",
+      "methodology": "Validated contract-to-customer mappings and structured metadata for the reviewed authoritative agreements using discovered join key customer_id."
+    }
+  ],
+  "unresolved_items": [
+    {
+      "unresolved_id": "UNR-001",
+      "type": "authoritative_clause_not_found_in_reviewed_text",
+      "related_document": "DOC-05",
+      "related_contract_id": "CTR-00004",
+      "related_customer_id": "CUST-0004",
+      "description": "Management summary and structured metadata indicate Atlas auto-renewal with 180-day notice, but the reviewed reseller agreement text provided does not contain an auto-renewal clause.",
+      "reason": "Relevant clause may be located in pages or sections not included in the supplied excerpt, or structured/management records may summarize an additional provision not visible in the reviewed text.",
+      "downstream_action": "Obtain full executed reseller agreement or missing pages and reconcile renewal mechanics against management summary and dim_contract metadata."
+    },
+    {
+      "unresolved_id": "UNR-002",
+      "type": "management_summary_vs_document_conflict",
+      "related_document": "DOC-06",
+      "related_contract_id": "CTR-00006",
+      "related_customer_id": "CUST-0006",
+      "description": "Management summary labels Cascade Foods Holdings as a new logo win FY2025, while the executed agreement states the customer previously contracted through a group operating subsidiary under a prior agreement that expired in February 2025.",
+      "reason": "The supplied evidence supports prior contractual relationship context but does not resolve management's internal definition of new logo status.",
+      "downstream_action": "Review CRM, billing history, and any prior 2021 agreement materials to determine whether management's new-logo classification reflects entity-level or group-level logic."
+    },
+    {
+      "unresolved_id": "UNR-003",
+      "type": "schema_limitation",
+      "related_document": null,
+      "related_contract_id": null,
+      "related_customer_id": null,
+      "description": "No structured management contract-attribute table was discovered in the supplied DDL beyond general contract metadata in dim_contract and claims in mgmt_claim.",
+      "reason": "DDL did not expose a dedicated management contract summary table with clause-level fields such as change-of-control or MFN flags.",
+      "downstream_action": "Use document-based management summary comparison and avoid assuming missing structured clause flags exist."
+    },
+    {
+      "unresolved_id": "UNR-004",
+      "type": "provenance_limitation",
+      "related_document": "DOC-09",
+      "related_contract_id": null,
+      "related_customer_id": null,
+      "description": "Board minutes preparer/issuer independence is not supported by the data room extract.",
+      "reason": "Upstream doc catalog recorded unresolved provenance for the board minutes extract.",
+      "downstream_action": "Treat board minutes as internal contemporaneous evidence with provenance limitation, not as independent third-party proof."
+    }
+  ],
+  "data_quality": {
+    "issues": [
+      "schema.sql contains inconsistent quoting in CREATE TABLE statements, but DDL logical objects were validated through Databricks SQL before use.",
+      "No amendment documents were supplied for the reviewed contracts, so current clause views are limited to the source agreements provided.",
+      "Management contract summary contains portfolio-level commentary that conflicts with multiple executed agreements reviewed.",
+      "Atlas renewal mechanics could not be confirmed from the reviewed contract text despite structured metadata indicating auto-renewal."
+    ]
+  },
+  "validation": {
+    "all_authoritative_contracts_processed": true,
+    "all_material_clauses_have_evidence": true,
+    "all_structured_values_from_sql": true,
+    "ddl_only_physical_objects_used": true,
+    "management_summaries_kept_separate": true,
+    "conflicts_preserved": true,
+    "final_claim_verdicts_avoided": true,
+    "legal_conclusions_avoided": true,
+    "pricing_impact_not_calculated": true,
+    "query_failures": [],
+    "upstream_input_issues": [],
+    "schema_discovery_issues": [
+      "No dedicated structured management contract-attribute source was discovered in the supplied DDL."
+    ],
+    "document_processing_issues": [
+      "Atlas auto-renewal clause was not found in the reviewed reseller agreement text despite management and structured records indicating one.",
+      "Board minutes have unresolved provenance limitation carried from upstream doc catalog."
+    ]
+  }
+}
