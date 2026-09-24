@@ -1,0 +1,287 @@
+{
+  "status": "PARTIAL",
+  "upstream_inputs": {
+    "test_plan_required": true,
+    "test_plan_retrieved": false,
+    "test_plan_source": null
+  },
+  "documents_discovered": 10,
+  "documents_catalogued": 10,
+  "schema_discovery": {
+    "entity_source_found": true,
+    "contract_source_found": true,
+    "claim_source_found": true,
+    "document_reference_field_found": true
+  },
+  "documents": [
+    {
+      "doc_id": "DOC-001",
+      "file": "01_CIM_Excerpt_Harborline.md",
+      "title": "Harborline Systems, Inc. — Confidential Information Memorandum (Excerpt)",
+      "document_date": "2025-11-14",
+      "doc_type": "cim",
+      "prepared_by": "Sell-side adviser (fictional)",
+      "independent": false,
+      "counterparty": null,
+      "customer_id": null,
+      "contract_id": null,
+      "page_marker_style": "page",
+      "summarises": [],
+      "relevant_claims": [
+        "CLM-01",
+        "CLM-02",
+        "CLM-03",
+        "CLM-04",
+        "CLM-05",
+        "CLM-06",
+        "CLM-07",
+        "CLM-08",
+        "CLM-09",
+        "CLM-10",
+        "CLM-11",
+        "CLM-12"
+      ],
+      "triage_summary": "Seller marketing excerpt stating management representations on growth, revenue quality, retention, adjusted EBITDA, working capital, contracts, and growth strategy. Useful as the source of management claims and for tracing where those claims were made, but not independent proof of the underlying assertions."
+    },
+    {
+      "doc_id": "DOC-002",
+      "file": "02_MSA_Northwind_Retail_Group_2022.md",
+      "title": "MASTER SERVICES AGREEMENT",
+      "document_date": "2022-07-01",
+      "doc_type": "executed_contract",
+      "prepared_by": "contracting parties",
+      "independent": true,
+      "counterparty": "Northwind Retail Group, Inc.",
+      "customer_id": "CUST-0001",
+      "contract_id": "CTR-00001",
+      "page_marker_style": "page",
+      "summarises": [],
+      "relevant_claims": [
+        "CLM-08"
+      ],
+      "triage_summary": "Original customer master services agreement for Northwind Retail Group setting out term, renewal, fee discount, assignment/change-of-control restrictions, liability, and service-credit terms. Strong source document for downstream contract diligence and for testing change-of-control representations."
+    },
+    {
+      "doc_id": "DOC-003",
+      "file": "03_MSA_Vantage_Grocers_2023.md",
+      "title": "MASTER SERVICES AGREEMENT",
+      "document_date": "2023-01-01",
+      "doc_type": "executed_contract",
+      "prepared_by": "contracting parties",
+      "independent": true,
+      "counterparty": "Vantage Grocers LLC",
+      "customer_id": "CUST-0002",
+      "contract_id": "CTR-00002",
+      "page_marker_style": "page",
+      "summarises": [],
+      "relevant_claims": [
+        "CLM-08",
+        "CLM-11"
+      ],
+      "triage_summary": "Original customer master services agreement for Vantage Grocers covering renewal, MFN pricing, service-level remedies, and assignment. Strong contract evidence for downstream review of most-favoured-customer exposure, renewal dynamics, and assignability."
+    },
+    {
+      "doc_id": "DOC-004",
+      "file": "04_MSA_Pinnacle_Outdoor_2025.md",
+      "title": "MASTER SERVICES AGREEMENT",
+      "document_date": "2025-04-01",
+      "doc_type": "executed_contract",
+      "prepared_by": "contracting parties",
+      "independent": true,
+      "counterparty": "Pinnacle Outdoor Brands, Inc.",
+      "customer_id": "CUST-0003",
+      "contract_id": "CTR-00003",
+      "page_marker_style": "page",
+      "summarises": [],
+      "relevant_claims": [
+        "CLM-11"
+      ],
+      "triage_summary": "Original customer master services agreement for Pinnacle Outdoor with pricing discount, escalator, renewal, and assignment provisions. Useful for contract diligence and for assessing whether strategic pricing concessions may interact with other contractual pricing commitments elsewhere in the portfolio."
+    },
+    {
+      "doc_id": "DOC-005",
+      "file": "05_Reseller_Agreement_Atlas_Distribution_2024.md",
+      "title": "RESELLER AND DISTRIBUTION AGREEMENT",
+      "document_date": "2024-01-01",
+      "doc_type": "executed_contract",
+      "prepared_by": "contracting parties",
+      "independent": true,
+      "counterparty": "Atlas Distribution GmbH",
+      "customer_id": null,
+      "contract_id": "CTR-00004",
+      "page_marker_style": "page",
+      "summarises": [],
+      "relevant_claims": [
+        "CLM-07"
+      ],
+      "triage_summary": "Original reseller and distribution agreement granting Atlas exclusive territorial rights in Europe and related termination and assignment provisions. Important primary evidence for downstream review of channel restrictions and compatibility with the stated European direct expansion plan."
+    },
+    {
+      "doc_id": "DOC-006",
+      "file": "06_MSA_Cascade_Foods_Holdings_2025.md",
+      "title": "MASTER SERVICES AGREEMENT",
+      "document_date": "2025-06-01",
+      "doc_type": "executed_contract",
+      "prepared_by": "contracting parties",
+      "independent": true,
+      "counterparty": "Cascade Foods Holdings LLC",
+      "customer_id": "CUST-0006",
+      "contract_id": "CTR-00006",
+      "page_marker_style": "page",
+      "summarises": [],
+      "relevant_claims": [
+        "CLM-02",
+        "CLM-04"
+      ],
+      "triage_summary": "Original customer master services agreement for Cascade Foods Holdings documenting re-engagement after lapse of a prior agreement, revised discount, onboarding credit, and assignment terms. Relevant primary evidence for downstream assessment of customer continuity, churn/retention framing, and contract economics."
+    },
+    {
+      "doc_id": "DOC-007",
+      "file": "07_Customer_Contract_Summary_Mgmt.md",
+      "title": "Customer Contract Summary — Top Accounts",
+      "document_date": "2025-11-02",
+      "doc_type": "management_summary",
+      "prepared_by": "Harborline Systems - Office of the CFO",
+      "independent": false,
+      "counterparty": null,
+      "customer_id": null,
+      "contract_id": null,
+      "page_marker_style": "none",
+      "summarises": [
+        "02_MSA_Northwind_Retail_Group_2022.md",
+        "03_MSA_Vantage_Grocers_2023.md",
+        "04_MSA_Pinnacle_Outdoor_2025.md",
+        "05_Reseller_Agreement_Atlas_Distribution_2024.md",
+        "06_MSA_Cascade_Foods_Holdings_2025.md"
+      ],
+      "relevant_claims": [
+        "CLM-08",
+        "CLM-11"
+      ],
+      "triage_summary": "Management-prepared summary of top customer and channel contracts with commentary on expiry, auto-renewal, change-of-control, MFN, and exclusivity terms. Useful as a routing aid and statement of management position, but should be checked against the underlying executed agreements."
+    },
+    {
+      "doc_id": "DOC-008",
+      "file": "08_QoE_Adjustment_Schedule_Mgmt.md",
+      "title": "Adjusted EBITDA Bridge — Management View",
+      "document_date": "2025-11-08",
+      "doc_type": "qoe_schedule",
+      "prepared_by": "Harborline Systems - Office of the CFO",
+      "independent": false,
+      "counterparty": null,
+      "customer_id": null,
+      "contract_id": null,
+      "page_marker_style": "item",
+      "summarises": [],
+      "relevant_claims": [
+        "CLM-05"
+      ],
+      "triage_summary": "Management-prepared adjusted EBITDA bridge listing reported EBITDA, proposed add-backs, and management rationales. Useful for earnings challenge work as the source of management's adjustment case, but not independent support for those adjustments."
+    },
+    {
+      "doc_id": "DOC-009",
+      "file": "09_Board_Minutes_Q3_2025.md",
+      "title": "Board of Directors — Minutes (Extract), 22 October 2025",
+      "document_date": "2025-10-22",
+      "doc_type": "board_minutes",
+      "prepared_by": "not supported by the data room",
+      "independent": null,
+      "counterparty": null,
+      "customer_id": null,
+      "contract_id": null,
+      "page_marker_style": "item",
+      "summarises": [],
+      "relevant_claims": [
+        "CLM-05",
+        "CLM-06",
+        "CLM-07",
+        "CLM-08",
+        "CLM-11"
+      ],
+      "triage_summary": "Board minutes extract documenting management and board discussion of customer issues, contract consent requirements, MFN review, recurring legal settlements, European strategy, and collections pressure. Useful as internal contemporaneous evidence that may support or challenge management representations made elsewhere."
+    },
+    {
+      "doc_id": "DOC-010",
+      "file": "10_IT_Systems_Overview_Mgmt.md",
+      "title": "IT and Data Systems Overview",
+      "document_date": "2025-10-30",
+      "doc_type": "it_overview",
+      "prepared_by": "Harborline Systems - CTO Office",
+      "independent": false,
+      "counterparty": null,
+      "customer_id": null,
+      "contract_id": null,
+      "page_marker_style": "item",
+      "summarises": [],
+      "relevant_claims": [
+        "CLM-07"
+      ],
+      "triage_summary": "Management-prepared IT and data systems overview describing architecture, reporting limitations, availability performance, security posture, and technical constraints. Relevant for technical diligence and for assessing feasibility of stated growth plans that depend on current systems."
+    }
+  ],
+  "validation": {
+    "all_documents_catalogued": true,
+    "customer_mappings_resolved": 4,
+    "contract_mappings_resolved": 5,
+    "unresolved_customer_mappings": [
+      {
+        "file": "05_Reseller_Agreement_Atlas_Distribution_2024.md",
+        "counterparty": "Atlas Distribution GmbH",
+        "reason": "No verified customer/entity record returned from the DDL-discovered customer source for this counterparty, although the contract table references customer_id CUST-0004."
+      }
+    ],
+    "unresolved_contract_mappings": [],
+    "unresolved_provenance": [
+      {
+        "file": "09_Board_Minutes_Q3_2025.md",
+        "reason": "Preparer/issuer not explicitly stated in the extract, so provenance independence cannot be determined reliably from the data room excerpt alone."
+      }
+    ],
+    "unresolved_document_types": [],
+    "unresolved_claim_mappings": [
+      {
+        "file": "02_MSA_Northwind_Retail_Group_2022.md",
+        "reason": "Claim relevance derived from fallback structured management claims because upstream test_plan.json was not retrieved."
+      },
+      {
+        "file": "03_MSA_Vantage_Grocers_2023.md",
+        "reason": "Claim relevance derived from fallback structured management claims because upstream test_plan.json was not retrieved."
+      },
+      {
+        "file": "04_MSA_Pinnacle_Outdoor_2025.md",
+        "reason": "Claim relevance derived from fallback structured management claims because upstream test_plan.json was not retrieved."
+      },
+      {
+        "file": "05_Reseller_Agreement_Atlas_Distribution_2024.md",
+        "reason": "Claim relevance derived from fallback structured management claims because upstream test_plan.json was not retrieved."
+      },
+      {
+        "file": "06_MSA_Cascade_Foods_Holdings_2025.md",
+        "reason": "Claim relevance derived from fallback structured management claims because upstream test_plan.json was not retrieved."
+      },
+      {
+        "file": "07_Customer_Contract_Summary_Mgmt.md",
+        "reason": "Claim relevance derived from fallback structured management claims because upstream test_plan.json was not retrieved."
+      },
+      {
+        "file": "08_QoE_Adjustment_Schedule_Mgmt.md",
+        "reason": "Claim relevance derived from fallback structured management claims because upstream test_plan.json was not retrieved."
+      },
+      {
+        "file": "09_Board_Minutes_Q3_2025.md",
+        "reason": "Claim relevance derived from fallback structured management claims because upstream test_plan.json was not retrieved."
+      },
+      {
+        "file": "10_IT_Systems_Overview_Mgmt.md",
+        "reason": "Claim relevance derived from fallback structured management claims because upstream test_plan.json was not retrieved."
+      }
+    ],
+    "schema_discovery_issues": [],
+    "upstream_input_issues": [
+      {
+        "artifact": "test_plan.json",
+        "issue": "GitHub reader returned 404 Not Found for the expected upstream artifact when queried from the supplied GitHub input file set."
+      }
+    ]
+  }
+}
