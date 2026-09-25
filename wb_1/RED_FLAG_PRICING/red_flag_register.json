@@ -1,0 +1,741 @@
+[
+  {
+    "finding_id": "RF-001",
+    "title": "Recurring legal settlement adjustment is unsupported as non-recurring; management Adjusted EBITDA overstates price basis",
+    "category": "Earnings",
+    "severity": "Critical",
+    "confidence": 0.97,
+    "arr_at_risk_usd": null,
+    "ev_impact_usd": -25200000,
+    "ev_impact_turns": -2.03,
+    "finding": "The FY2025 management bridge adds back a $2.1M 'One-time legal settlement' to EBITDA, but board minutes describe the FY2025 item as the third annual settlement in an ongoing series and the structured adjustment history shows the same category and amount in FY2023, FY2024 and FY2025. On the stated M1 method, EV impact is $-25.2M, calculated as the unsupported $2.1M add-back multiplied by the 12.0x entry multiple from deal settings.",
+    "contradicts_claim": "CLM-05",
+    "evidence": [
+      {
+        "type": "document",
+        "ref": "vdr/09_Board_Minutes_Q3_2025.md",
+        "page": 1,
+        "section": "Item 7 — Legal",
+        "quote": "the third annual settlement under the ongoing series of commercial disputes"
+      },
+      {
+        "type": "query",
+        "ref": "workspace.aava_deal_studio.mgmt_ebitda_adjustment",
+        "sql": "SELECT category, fiscal_year, amount_usd FROM workspace.aava_deal_studio.mgmt_ebitda_adjustment ORDER BY category, fiscal_year",
+        "result": [
+          {"category": "One-time legal settlement", "fiscal_year": "FY2023", "amount_usd": "2100000"},
+          {"category": "One-time legal settlement", "fiscal_year": "FY2024", "amount_usd": "2100000"},
+          {"category": "One-time legal settlement", "fiscal_year": "FY2025", "amount_usd": "2100000"}
+        ]
+      },
+      {
+        "type": "query",
+        "ref": "workspace.aava_deal_studio.mgmt_ebitda_adjustment",
+        "sql": "SELECT ROUND(-1 * 2100000.0 * 12.0, 0) AS ev_impact_usd",
+        "result": [{"ev_impact_usd": -25200000}]
+      },
+      {
+        "type": "query",
+        "ref": "workspace.aava_deal_studio.mgmt_ebitda_adjustment",
+        "sql": "SELECT ROUND(-25200000 / 12400000.0, 2) AS ev_impact_turns",
+        "result": [{"ev_impact_turns": -2.03}]
+      }
+    ],
+    "mitigation": "Remove ADJ-003 from the price basis unless seller produces executed settlement documents showing the FY2025 item is outside the recurring run-rate.",
+    "spa_protection": "price reduction",
+    "reviewer_status": "pending_escalation",
+    "what_would_raise_confidence": "Executed settlement agreements, legal invoices, and FY2026 board/legal papers showing whether another settlement was expected or accrued.",
+    "related_claims": ["CLM-05"],
+    "source_conflicts": ["CF-007"],
+    "customer_id": null,
+    "contract_id": null,
+    "share_of_arr_pct": null,
+    "escrow_suggestion_usd": null,
+    "ev_method": "M1",
+    "ev_method_explained": "M1 Earnings: EV impact equals negative unsupported adjustment amount times the 12.0x entry multiple from deal settings.",
+    "assumptions": {"entry_multiple": 12.0, "contribution_margin": null, "loss_probability": null, "source": "deal settings"},
+    "severity_rule": "S1",
+    "priced_in": null,
+    "for_counsel": null
+  },
+  {
+    "finding_id": "RF-002",
+    "title": "Northwind can withhold change-of-control consent and terminate; management summary says no restriction",
+    "category": "Contract",
+    "severity": "Critical",
+    "confidence": 0.99,
+    "arr_at_risk_usd": 10547040.61,
+    "ev_impact_usd": -17719028,
+    "ev_impact_turns": -1.43,
+    "finding": "The executed Northwind MSA treats a supplier change of control as an assignment requiring prior written consent, and allows termination if the transaction completes without consent. The same contract also expires three months after the 31 March 2026 close with no automatic renewal. On the stated M2 method, EV impact is $-17.7M, calculated in SQL as ARR at risk of $10.55M times 40% contribution margin times 35% loss probability times the 12.0x entry multiple; escrow suggestion equals the full ARR at risk.",
+    "contradicts_claim": "CLM-08",
+    "evidence": [
+      {
+        "type": "document",
+        "ref": "vdr/02_MSA_Northwind_Retail_Group_2022.md",
+        "page": 19,
+        "section": "Section 14.2 Assignment and Change of Control",
+        "quote": "Change of Control of Supplier shall constitute an assignment for the purposes of this Section 14.2."
+      },
+      {
+        "type": "document",
+        "ref": "vdr/02_MSA_Northwind_Retail_Group_2022.md",
+        "page": 19,
+        "section": "Section 14.3",
+        "quote": "Customer may terminate this Agreement on ninety (90) days' written notice"
+      },
+      {
+        "type": "document",
+        "ref": "vdr/07_Customer_Contract_Summary_Mgmt.md",
+        "page": 1,
+        "section": "Customer Contract Summary — Top Accounts",
+        "quote": "| CTR-00001 | Northwind Retail Group | 7,600,000 | 2026-06-30 | No | None noted | No | No | Long-standing relationship, renewal expected |"
+      },
+      {
+        "type": "query",
+        "ref": "workspace.aava_deal_studio.fact_subscription_month",
+        "sql": "SELECT arr_usd FROM workspace.aava_deal_studio.fact_subscription_month WHERE customer_id = 'CUST-0001' AND to_date(snapshot_month) = DATE '2025-12-01'",
+        "result": [{"arr_usd": 10547040.61}]
+      },
+      {
+        "type": "query",
+        "ref": "workspace.aava_deal_studio.fact_subscription_month",
+        "sql": "SELECT ROUND(100 * 10547040.61 / 38662136.43, 1) AS share_of_arr_pct",
+        "result": [{"share_of_arr_pct": 27.3}]
+      },
+      {
+        "type": "query",
+        "ref": "workspace.aava_deal_studio.dim_contract",
+        "sql": "SELECT months_between(to_date('2026-06-30'), to_date('2026-03-31')) AS months_after_close",
+        "result": [{"months_after_close": 3.0}]
+      },
+      {
+        "type": "query",
+        "ref": "workspace.aava_deal_studio.fact_subscription_month",
+        "sql": "SELECT ROUND(-1 * 10547040.61 * 0.40 * 0.35 * 12.0, 0) AS ev_impact_usd",
+        "result": [{"ev_impact_usd": -17719028}]
+      },
+      {
+        "type": "query",
+        "ref": "workspace.aava_deal_studio.fact_subscription_month",
+        "sql": "SELECT ROUND(-17719028 / 12400000.0, 2) AS ev_impact_turns",
+        "result": [{"ev_impact_turns": -1.43}]
+      }
+    ],
+    "mitigation": "Obtain Northwind written consent before signing or closing and begin renewal discussions immediately because the contract expires within 12 months of close.",
+    "spa_protection": "condition precedent",
+    "reviewer_status": "pending_escalation",
+    "what_would_raise_confidence": "Signed consent correspondence from Northwind or confirmation no amendment supersedes Sections 14.2 and 14.3.",
+    "related_claims": ["CLM-08"],
+    "source_conflicts": ["CF-001"],
+    "customer_id": "CUST-0001",
+    "contract_id": "CTR-00001",
+    "share_of_arr_pct": 27.3,
+    "escrow_suggestion_usd": 10547040.61,
+    "ev_method": "M2",
+    "ev_method_explained": "M2 Contract ARR at risk: EV impact equals negative ARR at risk times 40% contribution margin times 35% loss probability times the 12.0x entry multiple; probability selected because consent is needed on change of control and termination right exists if consent is not given, with expiry also within 12 months of close.",
+    "assumptions": {"entry_multiple": 12.0, "contribution_margin": 0.4, "loss_probability": 0.35, "source": "deal settings"},
+    "severity_rule": "S1",
+    "priced_in": null,
+    "for_counsel": "What consent process, if any, is required before signing or closing a sale transaction involving Harborline under Section 14.2 and 14.3?"
+  },
+  {
+    "finding_id": "RF-003",
+    "title": "Planned FY2026 headcount savings are unactioned pro-forma and should not be in FY2025 EBITDA",
+    "category": "Earnings",
+    "severity": "Critical",
+    "confidence": 0.98,
+    "arr_at_risk_usd": null,
+    "ev_impact_usd": -16800000,
+    "ev_impact_turns": -1.35,
+    "finding": "Management's QoE schedule says the $1.4M cost-savings adjustment relates to a planned 14 FTE reduction scheduled for Q1 FY2026 and states that no notice has yet been served. That evidence makes the item prospective rather than embedded in FY2025 earnings. On the stated M1 method, EV impact is $-16.8M, calculated as the unsupported $1.4M add-back multiplied by the 12.0x entry multiple from deal settings.",
+    "contradicts_claim": "CLM-05",
+    "evidence": [
+      {
+        "type": "document",
+        "ref": "vdr/08_QoE_Adjustment_Schedule_Mgmt.md",
+        "page": 1,
+        "section": "ADJ-005 row",
+        "quote": "Planned headcount reduction of 14 FTE scheduled for Q1 FY2026. No notice has yet been served."
+      },
+      {
+        "type": "query",
+        "ref": "workspace.aava_deal_studio.mgmt_ebitda_adjustment",
+        "sql": "SELECT adjustment_id, fiscal_year, category, amount_usd FROM workspace.aava_deal_studio.mgmt_ebitda_adjustment WHERE adjustment_id = 'ADJ-005'",
+        "result": [{"adjustment_id": "ADJ-005", "fiscal_year": "FY2025", "category": "Pro-forma cost savings (not yet actioned)", "amount_usd": 1400000}]
+      },
+      {
+        "type": "query",
+        "ref": "workspace.aava_deal_studio.mgmt_ebitda_adjustment",
+        "sql": "SELECT ROUND(-1 * 1400000.0 * 12.0, 0) AS ev_impact_usd",
+        "result": [{"ev_impact_usd": -16800000}]
+      },
+      {
+        "type": "query",
+        "ref": "workspace.aava_deal_studio.mgmt_ebitda_adjustment",
+        "sql": "SELECT ROUND(-16800000 / 12400000.0, 2) AS ev_impact_turns",
+        "result": [{"ev_impact_turns": -1.35}]
+      }
+    ],
+    "mitigation": "Exclude ADJ-005 from the price basis unless restructuring has been approved, noticed, and evidenced as implemented before close.",
+    "spa_protection": "price reduction",
+    "reviewer_status": "pending_escalation",
+    "what_would_raise_confidence": "Board-approved restructuring plan, employee notices, severance calculations, and post-period payroll evidence demonstrating actual implementation and savings realization.",
+    "related_claims": ["CLM-05"],
+    "source_conflicts": [],
+    "customer_id": null,
+    "contract_id": null,
+    "share_of_arr_pct": null,
+    "escrow_suggestion_usd": null,
+    "ev_method": "M1",
+    "ev_method_explained": "M1 Earnings: EV impact equals negative unsupported adjustment amount times the 12.0x entry multiple from deal settings.",
+    "assumptions": {"entry_multiple": 12.0, "contribution_margin": null, "loss_probability": null, "source": "deal settings"},
+    "severity_rule": "S1",
+    "priced_in": null,
+    "for_counsel": null
+  },
+  {
+    "finding_id": "RF-004",
+    "title": "Owner compensation normalisation lacks payroll and benchmark support",
+    "category": "Earnings",
+    "severity": "Critical",
+    "confidence": 0.88,
+    "arr_at_risk_usd": null,
+    "ev_impact_usd": -15000000,
+    "ev_impact_turns": -1.21,
+    "finding": "Management's QoE schedule includes a $1.25M owner compensation normalisation, but the cited third-party benchmark and any payroll support were not provided in the reviewed data room. Without evidence that the excess cost is both real and embedded in FY2025 EBITDA, the adjustment is unsupported. On the stated M1 method, EV impact is $-15.0M, calculated as the unsupported $1.25M add-back multiplied by the 12.0x entry multiple from deal settings.",
+    "contradicts_claim": "CLM-05",
+    "evidence": [
+      {
+        "type": "document",
+        "ref": "vdr/08_QoE_Adjustment_Schedule_Mgmt.md",
+        "page": 1,
+        "section": "ADJ-004 row",
+        "quote": "Founder salary above market; normalised to a market rate for the role. Supported by a third-party compensation benchmark dated Sep-2025."
+      },
+      {
+        "type": "query",
+        "ref": "workspace.aava_deal_studio.mgmt_ebitda_adjustment",
+        "sql": "SELECT adjustment_id, fiscal_year, category, amount_usd FROM workspace.aava_deal_studio.mgmt_ebitda_adjustment WHERE adjustment_id = 'ADJ-004'",
+        "result": [{"adjustment_id": "ADJ-004", "fiscal_year": "FY2025", "category": "Owner compensation normalisation", "amount_usd": 1250000}]
+      },
+      {
+        "type": "query",
+        "ref": "workspace.aava_deal_studio.mgmt_ebitda_adjustment",
+        "sql": "SELECT ROUND(-1 * 1250000.0 * 12.0, 0) AS ev_impact_usd",
+        "result": [{"ev_impact_usd": -15000000}]
+      },
+      {
+        "type": "query",
+        "ref": "workspace.aava_deal_studio.mgmt_ebitda_adjustment",
+        "sql": "SELECT ROUND(-15000000 / 12400000.0, 2) AS ev_impact_turns",
+        "result": [{"ev_impact_turns": -1.21}]
+      }
+    ],
+    "mitigation": "Remove ADJ-004 from EBITDA unless seller provides payroll history, employment terms, and the cited benchmark to support both amount and period.",
+    "spa_protection": "price reduction",
+    "reviewer_status": "pending_escalation",
+    "what_would_raise_confidence": "Founder payroll registers, total cash compensation history, bonus accrual details, employment agreement, and the cited September 2025 third-party compensation benchmark.",
+    "related_claims": ["CLM-05"],
+    "source_conflicts": [],
+    "customer_id": null,
+    "contract_id": null,
+    "share_of_arr_pct": null,
+    "escrow_suggestion_usd": null,
+    "ev_method": "M1",
+    "ev_method_explained": "M1 Earnings: EV impact equals negative unsupported adjustment amount times the 12.0x entry multiple from deal settings.",
+    "assumptions": {"entry_multiple": 12.0, "contribution_margin": null, "loss_probability": null, "source": "deal settings"},
+    "severity_rule": "S1",
+    "priced_in": null,
+    "for_counsel": null
+  },
+  {
+    "finding_id": "RF-005",
+    "title": "Pro-forma new-logo annualisation is unsupported and includes a documented re-engagement case",
+    "category": "Earnings",
+    "severity": "Critical",
+    "confidence": 0.95,
+    "arr_at_risk_usd": null,
+    "ev_impact_usd": -19800000,
+    "ev_impact_turns": -1.60,
+    "finding": "Management's QoE schedule adds $1.65M for the pro-forma full-year effect of FY2025 new logos, which is an annualisation beyond historical FY2025 earnings. The executed Cascade contract also states the customer previously had a 2021 agreement that expired before re-engagement, while management's summary labels Cascade a 'New logo win FY2025', undermining the reliability of the new-logo narrative used in the add-back. On the stated M1 method, EV impact is $-19.8M, calculated as the unsupported $1.65M add-back multiplied by the 12.0x entry multiple from deal settings.",
+    "contradicts_claim": "CLM-05",
+    "evidence": [
+      {
+        "type": "document",
+        "ref": "vdr/08_QoE_Adjustment_Schedule_Mgmt.md",
+        "page": 1,
+        "section": "ADJ-010 row",
+        "quote": "Annualising the FY2025 in-year contribution of logos won during the year."
+      },
+      {
+        "type": "document",
+        "ref": "vdr/06_MSA_Cascade_Foods_Holdings_2025.md",
+        "page": 1,
+        "section": "Recitals",
+        "quote": "Customer was previously party to a Master Services Agreement with Supplier dated 1 March 2021"
+      },
+      {
+        "type": "document",
+        "ref": "vdr/07_Customer_Contract_Summary_Mgmt.md",
+        "page": 1,
+        "section": "Customer Contract Summary — Top Accounts",
+        "quote": "| CTR-00006 | Cascade Foods Holdings | 1,950,000 | 2028-05-31 | Yes (60d) | None noted | No | No | New logo win FY2025 |"
+      },
+      {
+        "type": "query",
+        "ref": "workspace.aava_deal_studio.mgmt_ebitda_adjustment",
+        "sql": "SELECT adjustment_id, fiscal_year, category, amount_usd FROM workspace.aava_deal_studio.mgmt_ebitda_adjustment WHERE adjustment_id = 'ADJ-010'",
+        "result": [{"adjustment_id": "ADJ-010", "fiscal_year": "FY2025", "category": "Pro-forma full-year effect of new logos", "amount_usd": 1650000}]
+      },
+      {
+        "type": "query",
+        "ref": "workspace.aava_deal_studio.mgmt_ebitda_adjustment",
+        "sql": "SELECT ROUND(-1 * 1650000.0 * 12.0, 0) AS ev_impact_usd",
+        "result": [{"ev_impact_usd": -19800000}]
+      },
+      {
+        "type": "query",
+        "ref": "workspace.aava_deal_studio.mgmt_ebitda_adjustment",
+        "sql": "SELECT ROUND(-19800000 / 12400000.0, 2) AS ev_impact_turns",
+        "result": [{"ev_impact_turns": -1.60}]
+      }
+    ],
+    "mitigation": "Exclude ADJ-010 from the price basis and require a customer-by-customer bridge separating true new logos from reactivations and re-engagements.",
+    "spa_protection": "price reduction",
+    "reviewer_status": "pending_escalation",
+    "what_would_raise_confidence": "Customer-level annualization model, gross margin/EBITDA conversion support, booking-to-revenue bridge, and clear evidence separating true new logos from reactivations/re-engagements.",
+    "related_claims": ["CLM-05", "CLM-10", "CLM-12"],
+    "source_conflicts": ["CF-004"],
+    "customer_id": "CUST-0006",
+    "contract_id": "CTR-00006",
+    "share_of_arr_pct": 5.4,
+    "escrow_suggestion_usd": null,
+    "ev_method": "M1",
+    "ev_method_explained": "M1 Earnings: EV impact equals negative unsupported adjustment amount times the 12.0x entry multiple from deal settings; this finding excludes any separate M4 pricing to avoid double counting the same underlying new-logo issue.",
+    "assumptions": {"entry_multiple": 12.0, "contribution_margin": null, "loss_probability": null, "source": "deal settings"},
+    "severity_rule": "S1",
+    "priced_in": null,
+    "for_counsel": null
+  },
+  {
+    "finding_id": "RF-006",
+    "title": "Vantage MFN may require discount true-up after Pinnacle received a 34% discount",
+    "category": "Contract",
+    "severity": "High",
+    "confidence": 0.91,
+    "arr_at_risk_usd": 4681407.34,
+    "ev_impact_usd": -11724708,
+    "ev_impact_turns": -0.95,
+    "finding": "The executed Vantage MSA states its 18% discount must remain no less favorable than discounts granted to any customer with comparable annual committed spend, and requires retrospective application of a better discount. Pinnacle's executed contract grants a 34% discount, and the structured contract data shows Pinnacle's ACV meets the 50% comparability threshold. On the stated M3 method, SQL calculates an annual credit of $913,445.33 and back credit of $763,364.04, producing EV impact of $-11.7M as negative ((annual credit x 12.0x) + back credit); whether Pinnacle qualifies as a comparable customer remains a counsel question.",
+    "contradicts_claim": "CLM-11",
+    "evidence": [
+      {
+        "type": "document",
+        "ref": "vdr/03_MSA_Vantage_Grocers_2023.md",
+        "page": 9,
+        "section": "Section 8.4 Most Favoured Customer Pricing",
+        "quote": "is and shall remain not less favourable than the effective discount granted by Supplier to any other customer"
+      },
+      {
+        "type": "document",
+        "ref": "vdr/03_MSA_Vantage_Grocers_2023.md",
+        "page": 9,
+        "section": "Section 8.4 Most Favoured Customer Pricing",
+        "quote": "retrospectively from the date such discount was first granted to the other customer"
+      },
+      {
+        "type": "document",
+        "ref": "vdr/03_MSA_Vantage_Grocers_2023.md",
+        "page": 10,
+        "section": "Section 8.5",
+        "quote": "Comparable annual committed spend means annual committed spend of not less than fifty per cent (50%)"
+      },
+      {
+        "type": "document",
+        "ref": "vdr/04_MSA_Pinnacle_Outdoor_2025.md",
+        "page": 8,
+        "section": "Section 7.1 Fees and Discount",
+        "quote": "Supplier grants a discount of thirty-four per cent (34%) against list pricing"
+      },
+      {
+        "type": "query",
+        "ref": "workspace.aava_deal_studio.dim_contract",
+        "sql": "SELECT b.contract_id AS other_contract_id, b.customer_id AS other_customer_id, b.discount_pct AS other_discount_pct, b.acv_usd AS other_acv_usd, a.discount_pct AS vantage_discount_pct, a.acv_usd AS vantage_acv_usd, b.acv_usd >= 0.5 * a.acv_usd AS comparable FROM workspace.aava_deal_studio.dim_contract a JOIN workspace.aava_deal_studio.dim_contract b ON a.contract_id <> b.contract_id WHERE a.contract_id = 'CTR-00002' AND b.discount_pct > a.discount_pct ORDER BY b.discount_pct DESC",
+        "result": [{"other_contract_id": "CTR-00003", "other_customer_id": "CUST-0003", "other_discount_pct": "0.34", "other_acv_usd": "2900000.0", "vantage_discount_pct": "0.18", "vantage_acv_usd": "4100000.0", "comparable": "true"}]
+      },
+      {
+        "type": "query",
+        "ref": "workspace.aava_deal_studio.fact_subscription_month",
+        "sql": "SELECT arr_usd FROM workspace.aava_deal_studio.fact_subscription_month WHERE customer_id = 'CUST-0002' AND to_date(snapshot_month) = DATE '2025-12-01'",
+        "result": [{"arr_usd": 4681407.34}]
+      },
+      {
+        "type": "query",
+        "ref": "workspace.aava_deal_studio.fact_invoice",
+        "sql": "SELECT SUM(invoice_amount_usd) AS invoiced_amount_usd FROM workspace.aava_deal_studio.fact_invoice WHERE customer_id = 'CUST-0002' AND to_date(invoice_date) >= to_date('2025-03-14')",
+        "result": [{"invoiced_amount_usd": 3917240.7}]
+      },
+      {
+        "type": "query",
+        "ref": "workspace.aava_deal_studio.fact_invoice",
+        "sql": "SELECT ROUND(4681407.34 * (0.34 - 0.18) / (1 - 0.18), 2) AS annual_credit, ROUND(3917240.7 * (0.34 - 0.18) / (1 - 0.18), 2) AS back_credit",
+        "result": [{"annual_credit": 913445.33, "back_credit": 763364.04}]
+      },
+      {
+        "type": "query",
+        "ref": "workspace.aava_deal_studio.fact_invoice",
+        "sql": "SELECT ROUND(-1 * ((913445.33 * 12.0) + 763364.04), 0) AS ev_impact_usd",
+        "result": [{"ev_impact_usd": -11724708}]
+      },
+      {
+        "type": "query",
+        "ref": "workspace.aava_deal_studio.fact_invoice",
+        "sql": "SELECT ROUND(-11724708 / 12400000.0, 2) AS ev_impact_turns",
+        "result": [{"ev_impact_turns": -0.95}]
+      }
+    ],
+    "mitigation": "Quantify and settle any Vantage credit exposure before close, and freeze further comparable pricing concessions until counsel confirms MFN scope.",
+    "spa_protection": "specific indemnity",
+    "reviewer_status": "pending",
+    "what_would_raise_confidence": "The full Vantage pricing schedule, any MFN exceptions, and billing or credit history showing whether Harborline already assessed or satisfied the clause after the 14 March 2025 Pinnacle approval.",
+    "related_claims": ["CLM-11"],
+    "source_conflicts": ["CF-002", "CF-006"],
+    "customer_id": "CUST-0002",
+    "contract_id": "CTR-00002",
+    "share_of_arr_pct": 12.1,
+    "escrow_suggestion_usd": null,
+    "ev_method": "M3",
+    "ev_method_explained": "M3 Most-favoured pricing: annual credit equals Vantage ARR times the discount delta adjusted by net price; back credit equals Vantage invoiced amount since 14 March 2025 times the same factor; EV impact equals negative ((annual credit x 12.0x) + back credit).",
+    "assumptions": {"entry_multiple": 12.0, "contribution_margin": null, "loss_probability": null, "source": "deal settings"},
+    "severity_rule": "S3",
+    "priced_in": null,
+    "for_counsel": "Does Pinnacle count as a 'customer of comparable annual committed spend' under Sections 8.4 and 8.5, and if so from what date would any retrospective credit run?"
+  },
+  {
+    "finding_id": "RF-007",
+    "title": "Vantage has an SLA-linked exit path and renewal is under active review",
+    "category": "Contract",
+    "severity": "High",
+    "confidence": 0.97,
+    "arr_at_risk_usd": 4681407.34,
+    "ev_impact_usd": -6741227,
+    "ev_impact_turns": -0.54,
+    "finding": "The executed Vantage MSA allows termination if availability falls below 99.0% in two consecutive months and preserves those remedies when Severity 1 incidents exceed four in a rolling three-month period. Board minutes state the customer has invoked the escalation provision and placed the FY2027 renewal under active review. On the stated M2 method, EV impact is $-6.7M, calculated in SQL as ARR at risk of $4.68M times 40% contribution margin times 30% loss probability times the 12.0x entry multiple; escrow suggestion equals the full ARR at risk.",
+    "contradicts_claim": "CLM-12",
+    "evidence": [
+      {
+        "type": "document",
+        "ref": "vdr/03_MSA_Vantage_Grocers_2023.md",
+        "page": 16,
+        "section": "Section 12.2 Service Levels",
+        "quote": "Customer may terminate for material breach on thirty (30) days' notice."
+      },
+      {
+        "type": "document",
+        "ref": "vdr/03_MSA_Vantage_Grocers_2023.md",
+        "page": 17,
+        "section": "Section 12.3 Escalation",
+        "quote": "Customer's remedies under Section 12.2 shall be available."
+      },
+      {
+        "type": "document",
+        "ref": "vdr/09_Board_Minutes_Q3_2025.md",
+        "page": 1,
+        "section": "Item 4 — Customer Matters",
+        "quote": "has invoked the escalation provision of the MSA and has placed the FY2027 renewal \"under active review\""
+      },
+      {
+        "type": "query",
+        "ref": "workspace.aava_deal_studio.fact_support_ticket",
+        "sql": "SELECT m.month_start, COUNT(t.ticket_id) AS sev1_count FROM (SELECT DISTINCT date_trunc('month', to_date(opened_date)) AS month_start FROM workspace.aava_deal_studio.fact_support_ticket WHERE customer_id = 'CUST-0002') m JOIN workspace.aava_deal_studio.fact_support_ticket t ON t.customer_id = 'CUST-0002' AND t.severity = 'S1' AND to_date(t.opened_date) >= m.month_start AND to_date(t.opened_date) < add_months(m.month_start, 3) GROUP BY m.month_start ORDER BY sev1_count DESC LIMIT 1",
+        "result": [{"month_start": "2025-04-01T00:00:00.000Z", "sev1_count": "6"}]
+      },
+      {
+        "type": "query",
+        "ref": "workspace.aava_deal_studio.fact_support_ticket",
+        "sql": "SELECT 6 > 4 AS exceeds_threshold",
+        "result": [{"exceeds_threshold": "true"}]
+      },
+      {
+        "type": "query",
+        "ref": "workspace.aava_deal_studio.fact_subscription_month",
+        "sql": "SELECT arr_usd FROM workspace.aava_deal_studio.fact_subscription_month WHERE customer_id = 'CUST-0002' AND to_date(snapshot_month) = DATE '2025-12-01'",
+        "result": [{"arr_usd": 4681407.34}]
+      },
+      {
+        "type": "query",
+        "ref": "workspace.aava_deal_studio.fact_subscription_month",
+        "sql": "SELECT ROUND(100 * 4681407.34 / 38662136.43, 1) AS share_of_arr_pct",
+        "result": [{"share_of_arr_pct": 12.1}]
+      },
+      {
+        "type": "query",
+        "ref": "workspace.aava_deal_studio.fact_subscription_month",
+        "sql": "SELECT ROUND(-1 * 4681407.34 * 0.40 * 0.30 * 12.0, 0) AS ev_impact_usd",
+        "result": [{"ev_impact_usd": -6741227}]
+      },
+      {
+        "type": "query",
+        "ref": "workspace.aava_deal_studio.fact_subscription_month",
+        "sql": "SELECT ROUND(-6741227 / 12400000.0, 2) AS ev_impact_turns",
+        "result": [{"ev_impact_turns": -0.54}]
+      }
+    ],
+    "mitigation": "Obtain a documented retention plan, verify uptime calculations, and engage Vantage before signing to assess whether escalation can be resolved before the non-renewal window opens.",
+    "spa_protection": "escrow or holdback sized to the risk",
+    "reviewer_status": "pending",
+    "what_would_raise_confidence": "Monthly uptime calculations for Vantage and any customer escalation notices or cure communications.",
+    "related_claims": ["CLM-12"],
+    "source_conflicts": ["CF-008"],
+    "customer_id": "CUST-0002",
+    "contract_id": "CTR-00002",
+    "share_of_arr_pct": 12.1,
+    "escrow_suggestion_usd": 4681407.34,
+    "ev_method": "M2",
+    "ev_method_explained": "M2 Contract ARR at risk: EV impact equals negative ARR at risk times 40% contribution margin times 30% loss probability times the 12.0x entry multiple; probability selected because renewal is under active review and escalation has been invoked.",
+    "assumptions": {"entry_multiple": 12.0, "contribution_margin": 0.4, "loss_probability": 0.3, "source": "deal settings"},
+    "severity_rule": "S3",
+    "priced_in": null,
+    "for_counsel": "Given Section 12.2 and 12.3, what contractual remedies were available to Vantage based on the measured incident pattern and any separate availability calculations?"
+  },
+  {
+    "finding_id": "RF-008",
+    "title": "Legacy On-Prem loss add-back is unsupported by product data or VDR support",
+    "category": "Earnings",
+    "severity": "High",
+    "confidence": 0.93,
+    "arr_at_risk_usd": null,
+    "ev_impact_usd": -6480000,
+    "ev_impact_turns": -0.52,
+    "finding": "Management's QoE schedule adds back a $540k loss for a 'Legacy On-Prem product', but SQL queries over the product catalog and FY2025 revenue data found no product name, family, or delivery model matching Legacy or On-Prem, and no shutdown evidence was supplied. On the stated M1 method, EV impact is $-6.48M, calculated as the unsupported $540k add-back multiplied by the 12.0x entry multiple from deal settings.",
+    "contradicts_claim": "CLM-05",
+    "evidence": [
+      {
+        "type": "document",
+        "ref": "vdr/08_QoE_Adjustment_Schedule_Mgmt.md",
+        "page": 1,
+        "section": "ADJ-007 row",
+        "quote": "Trading losses on the Legacy On-Prem product, which is being sunset."
+      },
+      {
+        "type": "query",
+        "ref": "workspace.aava_deal_studio.fact_invoice_line",
+        "sql": "WITH product_2025 AS ( SELECT p.product_id, p.product_name, p.product_family, p.delivery_model, SUM(CAST(il.line_amount_usd AS DOUBLE)) AS fy2025_revenue_usd FROM workspace.aava_deal_studio.fact_invoice_line il JOIN workspace.aava_deal_studio.fact_invoice i ON il.invoice_id = i.invoice_id LEFT JOIN workspace.aava_deal_studio.dim_product p ON il.product_id = p.product_id WHERE year(to_date(i.invoice_date)) = 2025 GROUP BY p.product_id, p.product_name, p.product_family, p.delivery_model ) SELECT * FROM product_2025 WHERE lower(product_name) LIKE '%legacy%' OR lower(product_family) LIKE '%legacy%' OR lower(product_name) LIKE '%on-prem%' OR lower(delivery_model) LIKE '%on-prem%' ORDER BY fy2025_revenue_usd DESC",
+        "result": []
+      },
+      {
+        "type": "query",
+        "ref": "workspace.aava_deal_studio.mgmt_ebitda_adjustment",
+        "sql": "SELECT ROUND(-1 * 540000.0 * 12.0, 0) AS ev_impact_usd",
+        "result": [{"ev_impact_usd": -6480000}]
+      },
+      {
+        "type": "query",
+        "ref": "workspace.aava_deal_studio.mgmt_ebitda_adjustment",
+        "sql": "SELECT ROUND(-6480000 / 12400000.0, 2) AS ev_impact_turns",
+        "result": [{"ev_impact_turns": -0.52}]
+      }
+    ],
+    "mitigation": "Exclude ADJ-007 unless seller can provide SKU mapping, product P&L, and a formal sunset plan tied to FY2025 reported EBITDA.",
+    "spa_protection": "price reduction",
+    "reviewer_status": "pending",
+    "what_would_raise_confidence": "Product P&L, SKU mapping for the legacy on-prem line, formal sunset or exit plan, and evidence of the costs embedded in reported EBITDA.",
+    "related_claims": ["CLM-05"],
+    "source_conflicts": [],
+    "customer_id": null,
+    "contract_id": null,
+    "share_of_arr_pct": null,
+    "escrow_suggestion_usd": null,
+    "ev_method": "M1",
+    "ev_method_explained": "M1 Earnings: EV impact equals negative unsupported adjustment amount times the 12.0x entry multiple from deal settings.",
+    "assumptions": {"entry_multiple": 12.0, "contribution_margin": null, "loss_probability": null, "source": "deal settings"},
+    "severity_rule": "S3",
+    "priced_in": null,
+    "for_counsel": null
+  },
+  {
+    "finding_id": "RF-009",
+    "title": "Europe direct expansion is constrained by Atlas territorial exclusivity and current platform capability",
+    "category": "Strategy",
+    "severity": "High",
+    "confidence": 0.95,
+    "arr_at_risk_usd": 1830725.38,
+    "ev_impact_usd": 0,
+    "ev_impact_turns": 0,
+    "finding": "The executed Atlas agreement grants sole and exclusive distribution rights in the EU, UK, Switzerland and Norway and bars direct or indirect sales to customers in that territory during the term, while the CIM presents direct European expansion as a core growth vector. Management's IT overview also says the plan assumes a $6M ARR European direct business served from the existing single-region US deployment and that no EU data residency capability exists today. Under M6, EV impact is set to $0 because the issue does not change today's price-basis EBITDA on the evidence provided, but it directly constrains a stated growth plan.",
+    "contradicts_claim": "CLM-07",
+    "evidence": [
+      {
+        "type": "document",
+        "ref": "vdr/05_Reseller_Agreement_Atlas_Distribution_2024.md",
+        "page": 4,
+        "section": "Section 4.1 Appointment",
+        "quote": "Supplier appoints Reseller as its sole and exclusive distributor of the Harborline Platform in the Territory."
+      },
+      {
+        "type": "document",
+        "ref": "vdr/05_Reseller_Agreement_Atlas_Distribution_2024.md",
+        "page": 5,
+        "section": "Section 4.3 Exclusivity Covenant",
+        "quote": "Supplier shall not, whether directly or through any affiliate, agent, or other reseller, market"
+      },
+      {
+        "type": "document",
+        "ref": "vdr/01_CIM_Excerpt_Harborline.md",
+        "page": 31,
+        "section": "Growth Strategy",
+        "quote": "Direct expansion into Europe is the primary growth vector, worth $6M ARR by FY2028."
+      },
+      {
+        "type": "document",
+        "ref": "vdr/10_IT_Systems_Overview_Mgmt.md",
+        "page": 1,
+        "section": "Roadmap",
+        "quote": "No EU data residency capability exists today."
+      },
+      {
+        "type": "query",
+        "ref": "workspace.aava_deal_studio.fact_subscription_month",
+        "sql": "SELECT arr_usd FROM workspace.aava_deal_studio.fact_subscription_month WHERE customer_id = 'CUST-0004' AND to_date(snapshot_month) = DATE '2025-12-01'",
+        "result": [{"arr_usd": 1830725.38}]
+      },
+      {
+        "type": "query",
+        "ref": "workspace.aava_deal_studio.fact_subscription_month",
+        "sql": "SELECT ROUND(100 * 1830725.38 / 38662136.43, 1) AS share_of_arr_pct",
+        "result": [{"share_of_arr_pct": 4.7}]
+      },
+      {
+        "type": "query",
+        "ref": "workspace.aava_deal_studio.fact_subscription_month",
+        "sql": "SELECT CAST(0 AS DOUBLE) AS ev_impact_usd",
+        "result": [{"ev_impact_usd": 0.0}]
+      },
+      {
+        "type": "query",
+        "ref": "workspace.aava_deal_studio.fact_subscription_month",
+        "sql": "SELECT ROUND(0.0 / 12400000.0, 2) AS ev_impact_turns",
+        "result": [{"ev_impact_turns": 0.0}]
+      }
+    ],
+    "mitigation": "Obtain an Atlas waiver or amendment before underwriting direct Europe expansion, and produce a dated capability roadmap for EU hosting and compliance.",
+    "spa_protection": "specific warranty",
+    "reviewer_status": "pending",
+    "what_would_raise_confidence": "Any amendment, waiver, or side letter on Section 4.3 and successor obligations, plus a documented product and infrastructure roadmap for EU deployment.",
+    "related_claims": ["CLM-07"],
+    "source_conflicts": ["CF-003", "CF-005", "CF-009"],
+    "customer_id": "CUST-0004",
+    "contract_id": "CTR-00004",
+    "share_of_arr_pct": 4.7,
+    "escrow_suggestion_usd": null,
+    "ev_method": "M6",
+    "ev_method_explained": "M6 Strategy: EV impact is set to 0 because the evidence shows a constraint on a forward growth plan rather than a reduction to current price-basis EBITDA.",
+    "assumptions": {"entry_multiple": 12.0, "contribution_margin": null, "loss_probability": null, "source": "deal settings"},
+    "severity_rule": "S3",
+    "priced_in": null,
+    "for_counsel": "Does the contract's bar on direct or indirect selling to customers whose principal place of business is in the Territory prohibit the contemplated direct Europe plan as structured?"
+  },
+  {
+    "finding_id": "RF-010",
+    "title": "Recurring revenue classification is valuation-method dependent and 10.94% of FY2025 revenue fails the restated test",
+    "category": "Revenue",
+    "severity": "Medium",
+    "confidence": 0.9,
+    "arr_at_risk_usd": null,
+    "ev_impact_usd": null,
+    "ev_impact_turns": null,
+    "finding": "Management-tagged recurring revenue was $42.02M, but the stricter restated test supported only $37.34M, leaving $4.68M of FY2025 revenue tagged recurring that failed the restated test. Because deal settings did not provide recurring and non-recurring revenue multiples, EV impact is null and valuation-method dependent. Severity is Medium because the affected revenue equals 10.94% of FY2025 revenue under SQL evidence.",
+    "contradicts_claim": "CLM-03",
+    "evidence": [
+      {
+        "type": "query",
+        "ref": "workspace.aava_deal_studio.fact_invoice_line",
+        "sql": "WITH x AS (SELECT SUM(l.line_amount_usd) AS total_revenue, SUM(CASE WHEN LOWER(COALESCE(l.revenue_type,'')) LIKE '%recurr%' OR LOWER(COALESCE(l.revenue_type,'')) LIKE '%subscr%' THEN l.line_amount_usd ELSE 0 END) AS tagged_revenue, SUM(CASE WHEN (LOWER(COALESCE(p.delivery_model,'')) LIKE '%subscr%' OR LOWER(COALESCE(p.delivery_model,'')) LIKE '%recurr%' OR LOWER(COALESCE(p.product_family,'')) LIKE '%subscr%') AND l.service_period_start IS NOT NULL AND TRIM(l.service_period_start) <> '' THEN l.line_amount_usd ELSE 0 END) AS restated_revenue, SUM(CASE WHEN (LOWER(COALESCE(l.revenue_type,'')) LIKE '%recurr%' OR LOWER(COALESCE(l.revenue_type,'')) LIKE '%subscr%') AND NOT ((LOWER(COALESCE(p.delivery_model,'')) LIKE '%subscr%' OR LOWER(COALESCE(p.delivery_model,'')) LIKE '%recurr%' OR LOWER(COALESCE(p.product_family,'')) LIKE '%subscr%') AND l.service_period_start IS NOT NULL AND TRIM(l.service_period_start) <> '') THEN l.line_amount_usd ELSE 0 END) AS tagged_failing_restated_amount, SUM(CASE WHEN (LOWER(COALESCE(l.revenue_type,'')) LIKE '%recurr%' OR LOWER(COALESCE(l.revenue_type,'')) LIKE '%subscr%') AND NOT ((LOWER(COALESCE(p.delivery_model,'')) LIKE '%subscr%' OR LOWER(COALESCE(p.delivery_model,'')) LIKE '%recurr%' OR LOWER(COALESCE(p.product_family,'')) LIKE '%subscr%') AND l.service_period_start IS NOT NULL AND TRIM(l.service_period_start) <> '') THEN 1 ELSE 0 END) AS tagged_failing_restated_lines FROM workspace.aava_deal_studio.fact_invoice_line l JOIN workspace.aava_deal_studio.fact_invoice i ON l.invoice_id=i.invoice_id LEFT JOIN workspace.aava_deal_studio.dim_product p ON l.product_id=p.product_id WHERE year(to_date(i.invoice_date))=2025) SELECT ROUND(total_revenue,2) AS total_revenue, ROUND(tagged_revenue,2) AS tagged_revenue, ROUND(100*tagged_revenue/total_revenue,2) AS tagged_pct, ROUND(restated_revenue,2) AS restated_revenue, ROUND(100*restated_revenue/total_revenue,2) AS restated_pct, ROUND(tagged_failing_restated_amount,2) AS tagged_failing_restated_amount, tagged_failing_restated_lines FROM x",
+        "result": [{"total_revenue": 42730073.29, "tagged_revenue": 42019535.98, "tagged_pct": 98.34, "restated_revenue": 37344457.53, "restated_pct": 87.4, "tagged_failing_restated_amount": 4675078.45, "tagged_failing_restated_lines": 421}]
+      },
+      {
+        "type": "query",
+        "ref": "workspace.aava_deal_studio.fact_invoice_line",
+        "sql": "SELECT ROUND(100 * 4675078.45 / 42730073.29, 2) AS affected_pct",
+        "result": [{"affected_pct": 10.94}]
+      }
+    ],
+    "mitigation": "Require a line-by-line recurring revenue policy and reclassify the 421 lines before final valuation work.",
+    "spa_protection": "specific warranty",
+    "reviewer_status": "pending",
+    "what_would_raise_confidence": "Contract-level billing support or product master rules proving whether the 421 tagged lines without restated support should still count as recurring.",
+    "related_claims": ["CLM-03"],
+    "source_conflicts": [],
+    "customer_id": null,
+    "contract_id": null,
+    "share_of_arr_pct": null,
+    "escrow_suggestion_usd": null,
+    "ev_method": "M4",
+    "ev_method_explained": "M4 Revenue quality: EV impact is null because deal settings did not provide recurring and non-recurring revenue multiples; severity is based on the SQL-computed 10.94% share of revenue affected.",
+    "assumptions": {"entry_multiple": 12.0, "contribution_margin": null, "loss_probability": null, "source": "deal settings"},
+    "severity_rule": "S4",
+    "priced_in": null,
+    "for_counsel": null
+  },
+  {
+    "finding_id": "RF-011",
+    "title": "Weighted collection days are above the claimed 45-day level, but full DSO normalisation is not fully supported",
+    "category": "Working capital",
+    "severity": "Medium",
+    "confidence": 0.84,
+    "arr_at_risk_usd": null,
+    "ev_impact_usd": -1030205,
+    "ev_impact_turns": -0.08,
+    "finding": "SQL-calculated weighted collection days for FY2025 Q4 were 53.8 days versus the claimed 45 days, and board minutes state receivables from the three largest customers extended materially during the year. Using the stated M5 formula with FY2025 revenue of $42.73M, SQL calculates a $-1.03M working-capital adjustment. This should be treated as directional because the data room supports weighted collection days more directly than a full AR-ledger DSO measure.",
+    "contradicts_claim": "CLM-06",
+    "evidence": [
+      {
+        "type": "document",
+        "ref": "vdr/09_Board_Minutes_Q3_2025.md",
+        "page": 1,
+        "section": "Item 11 — Working Capital",
+        "quote": "receivables from the three largest customers had extended materially during the year"
+      },
+      {
+        "type": "query",
+        "ref": "workspace.aava_deal_studio.fact_collection",
+        "sql": "SELECT concat(year(to_date(i.invoice_date)), '-Q', quarter(to_date(i.invoice_date))) AS q, ROUND(AVG(c.days_outstanding), 1) AS avg_days, ROUND(SUM(c.days_outstanding * i.invoice_amount_usd) / SUM(i.invoice_amount_usd), 1) AS weighted_days FROM workspace.aava_deal_studio.fact_collection c JOIN workspace.aava_deal_studio.fact_invoice i ON c.invoice_id = i.invoice_id WHERE year(to_date(i.invoice_date))=2025 GROUP BY 1 ORDER BY 1",
+        "result": [
+          {"q": "2025-Q1", "avg_days": 51.6, "weighted_days": 63.4},
+          {"q": "2025-Q2", "avg_days": 52.6, "weighted_days": 76.1},
+          {"q": "2025-Q3", "avg_days": 54.5, "weighted_days": 75.4},
+          {"q": "2025-Q4", "avg_days": 47.4, "weighted_days": 53.8}
+        ]
+      },
+      {
+        "type": "query",
+        "ref": "workspace.aava_deal_studio.fact_invoice_line",
+        "sql": "SELECT ROUND(-1 * (53.8 - 45.0) * 42730073.29 / 365, 0) AS ev_impact_usd",
+        "result": [{"ev_impact_usd": -1030205}]
+      },
+      {
+        "type": "query",
+        "ref": "workspace.aava_deal_studio.fact_invoice_line",
+        "sql": "SELECT ROUND(-1030205 / 12400000.0, 2) AS ev_impact_turns",
+        "result": [{"ev_impact_turns": -0.08}]
+      }
+    ],
+    "mitigation": "Rebuild a true AR-ledger DSO and set the normalized working-capital peg with customer-level overdue balances before signing.",
+    "spa_protection": "price reduction",
+    "reviewer_status": "pending",
+    "what_would_raise_confidence": "A true AR balance ledger or due-date based DSO schedule, because the data room supports weighted collection days more directly than full traditional DSO.",
+    "related_claims": ["CLM-06"],
+    "source_conflicts": [],
+    "customer_id": null,
+    "contract_id": null,
+    "share_of_arr_pct": null,
+    "escrow_suggestion_usd": null,
+    "ev_method": "M5",
+    "ev_method_explained": "M5 Working capital: EV impact equals negative excess days times claim-year revenue divided by 365, using 53.8 weighted days versus the claimed 45.0 days and FY2025 revenue of $42.73M. The result is directional because a full AR-ledger DSO was not supported in the data room.",
+    "assumptions": {"entry_multiple": 12.0, "contribution_margin": null, "loss_probability": null, "source": "deal settings"},
+    "severity_rule": "S4",
+    "priced_in": null,
+    "for_counsel": null
+  }
+]
