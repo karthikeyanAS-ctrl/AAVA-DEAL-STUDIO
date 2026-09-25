@@ -1,0 +1,522 @@
+[
+  {
+    "claim_id": "CLM-01",
+    "metric_key": "customer_concentration_top1_pct",
+    "claimed_value": 10.0,
+    "computed_value": 27.44,
+    "unit": "percent",
+    "verdict": "Contradicted",
+    "variance": "+17.4pp",
+    "method": "Computed FY2025 revenue concentration from workspace.aava_deal_studio.fact_invoice_line joined to workspace.aava_deal_studio.fact_invoice at customer level, with parent-group sensitivity using workspace.aava_deal_studio.dim_customer. Primary and group-level values were both 27.44%, matching the upstream scorecard.",
+    "evidence": [
+      {
+        "type": "query",
+        "ref": "workspace.aava_deal_studio.fact_invoice_line",
+        "sql": "WITH r AS (SELECT i.customer_id AS k, SUM(l.line_amount_usd) AS rev FROM workspace.aava_deal_studio.fact_invoice_line l JOIN workspace.aava_deal_studio.fact_invoice i ON l.invoice_id = i.invoice_id WHERE year(to_date(i.invoice_date)) = 2025 GROUP BY 1) SELECT k AS top_customer_id, ROUND(rev,2) AS top_customer_revenue, ROUND(100 * rev / SUM(rev) OVER(), 2) AS top1_pct FROM r QUALIFY ROW_NUMBER() OVER (ORDER BY rev DESC, k)=1",
+        "result": [{"top_customer_id":"CUST-0001","top_customer_revenue":11723656.87,"top1_pct":27.44}]
+      },
+      {
+        "type": "query",
+        "ref": "workspace.aava_deal_studio.dim_customer",
+        "sql": "WITH r AS (SELECT COALESCE(c.parent_customer_id, c.customer_id) AS k, COALESCE(p.customer_name, c.customer_name) AS name, SUM(l.line_amount_usd) AS rev FROM workspace.aava_deal_studio.fact_invoice_line l JOIN workspace.aava_deal_studio.fact_invoice i ON l.invoice_id = i.invoice_id JOIN workspace.aava_deal_studio.dim_customer c ON i.customer_id = c.customer_id LEFT JOIN workspace.aava_deal_studio.dim_customer p ON c.parent_customer_id = p.customer_id WHERE year(to_date(i.invoice_date)) = 2025 GROUP BY 1,2) SELECT k AS top_group_customer_id, name AS top_group_customer_name, ROUND(rev,2) AS top_group_revenue, ROUND(100 * rev / SUM(rev) OVER(), 2) AS top1_group_pct FROM r QUALIFY ROW_NUMBER() OVER (ORDER BY rev DESC, k)=1",
+        "result": [{"top_group_customer_id":"CUST-0001","top_group_customer_name":"Northwind Retail Group","top_group_revenue":11723656.87,"top1_group_pct":27.44}]
+      }
+    ],
+    "claim_text": "No single customer accounts for more than 10% of revenue.",
+    "period": "FY2025",
+    "cim_page": 12,
+    "claim_class": ["BOUND","POINT"],
+    "tolerance": "+/-0.5pp",
+    "sensitivity": {
+      "group_level_value": 27.44,
+      "as_tagged_value": null,
+      "other": "Top customer/group was CUST-0001 / Northwind Retail Group with FY2025 revenue 11723656.87."
+    },
+    "upstream_value": 27.44,
+    "decided_by": "V2",
+    "related_conflicts": [],
+    "confidence": 0.99,
+    "what_would_raise_confidence": "Executed customer-group mapping amendments if any additional parent relationships exist beyond dim_customer.parent_customer_id."
+  },
+  {
+    "claim_id": "CLM-02",
+    "metric_key": "net_revenue_retention_pct",
+    "claimed_value": 118.0,
+    "computed_value": 100.52,
+    "unit": "percent",
+    "verdict": "Contradicted",
+    "variance": "-13.0pp",
+    "method": "Computed FY2025 NRR on the starting 2024-12 customer cohort from workspace.aava_deal_studio.fact_subscription_month. Primary customer-level value was 100.52%; parent-group sensitivity was 105.03%, and the upstream scorecard reported the group-level approach.",
+    "evidence": [
+      {
+        "type": "query",
+        "ref": "workspace.aava_deal_studio.fact_subscription_month",
+        "sql": "WITH s AS (SELECT customer_id, arr_usd FROM workspace.aava_deal_studio.fact_subscription_month WHERE to_date(snapshot_month)=DATE'2024-12-01' AND arr_usd > 0), e AS (SELECT customer_id, arr_usd FROM workspace.aava_deal_studio.fact_subscription_month WHERE to_date(snapshot_month)=DATE'2025-12-01') SELECT ROUND(100 * SUM(COALESCE(e.arr_usd, 0)) / SUM(s.arr_usd), 2) AS nrr_pct, ROUND(100 * SUM(LEAST(COALESCE(e.arr_usd, 0), s.arr_usd)) / SUM(s.arr_usd), 2) AS grr_pct, SUM(CASE WHEN COALESCE(e.arr_usd, 0) = 0 THEN 1 ELSE 0 END) AS churned_logos, COUNT(*) AS cohort_logos, ROUND(100 * SUM(CASE WHEN COALESCE(e.arr_usd, 0) = 0 THEN 1 ELSE 0 END) / COUNT(*), 2) AS logo_churn_pct FROM s LEFT JOIN e ON s.customer_id = e.customer_id",
+        "result": [{"nrr_pct":100.52,"grr_pct":93.16,"churned_logos":17,"cohort_logos":180,"logo_churn_pct":9.44}]
+      },
+      {
+        "type": "query",
+        "ref": "workspace.aava_deal_studio.dim_customer",
+        "sql": "WITH s AS (SELECT COALESCE(c.parent_customer_id,c.customer_id) AS gid, SUM(f.arr_usd) AS arr_usd FROM workspace.aava_deal_studio.fact_subscription_month f JOIN workspace.aava_deal_studio.dim_customer c ON f.customer_id=c.customer_id WHERE to_date(f.snapshot_month)=DATE'2024-12-01' GROUP BY 1 HAVING SUM(f.arr_usd)>0), e AS (SELECT COALESCE(c.parent_customer_id,c.customer_id) AS gid, SUM(f.arr_usd) AS arr_usd FROM workspace.aava_deal_studio.fact_subscription_month f JOIN workspace.aava_deal_studio.dim_customer c ON f.customer_id=c.customer_id WHERE to_date(f.snapshot_month)=DATE'2025-12-01' GROUP BY 1) SELECT ROUND(100 * SUM(COALESCE(e.arr_usd, 0)) / SUM(s.arr_usd), 2) AS nrr_pct_group, ROUND(100 * SUM(LEAST(COALESCE(e.arr_usd, 0), s.arr_usd)) / SUM(s.arr_usd), 2) AS grr_pct_group, SUM(CASE WHEN COALESCE(e.arr_usd, 0) = 0 THEN 1 ELSE 0 END) AS churned_logos_group, COUNT(*) AS cohort_logos_group, ROUND(100 * SUM(CASE WHEN COALESCE(e.arr_usd, 0) = 0 THEN 1 ELSE 0 END) / COUNT(*), 2) AS logo_churn_pct_group FROM s LEFT JOIN e ON s.gid = e.gid",
+        "result": [{"nrr_pct_group":105.03,"grr_pct_group":97.67,"churned_logos_group":16,"cohort_logos_group":180,"logo_churn_pct_group":8.89}]
+      }
+    ],
+    "claim_text": "Net revenue retention of 118% demonstrates best-in-class expansion.",
+    "period": "FY2025",
+    "cim_page": 14,
+    "claim_class": ["POINT"],
+    "tolerance": "+/-0.5pp",
+    "sensitivity": {
+      "group_level_value": 105.03,
+      "as_tagged_value": null,
+      "other": "Customer-level cohort churned_logos 17 of 180; group-level churned_logos 16 of 180."
+    },
+    "upstream_value": 105.03,
+    "decided_by": "V4",
+    "related_conflicts": [],
+    "confidence": 0.93,
+    "what_would_raise_confidence": "A documented customer-group retention policy confirming whether buyer should evaluate NRR at legal-customer or economic-group level."
+  },
+  {
+    "claim_id": "CLM-03",
+    "metric_key": "recurring_revenue_pct",
+    "claimed_value": 94.0,
+    "computed_value": 87.4,
+    "unit": "percent",
+    "verdict": "Challenged",
+    "variance": "-6.6pp",
+    "method": "Computed FY2025 recurring revenue share from workspace.aava_deal_studio.fact_invoice_line joined to workspace.aava_deal_studio.fact_invoice and workspace.aava_deal_studio.dim_product. Primary restated value was 87.40%; management-tagged sensitivity was 98.34%, showing the claim depends on tagging rather than product-and-service-period evidence.",
+    "evidence": [
+      {
+        "type": "query",
+        "ref": "workspace.aava_deal_studio.fact_invoice_line",
+        "sql": "WITH x AS (SELECT SUM(l.line_amount_usd) AS total_revenue, SUM(CASE WHEN LOWER(COALESCE(l.revenue_type,'')) LIKE '%recurr%' OR LOWER(COALESCE(l.revenue_type,'')) LIKE '%subscr%' THEN l.line_amount_usd ELSE 0 END) AS tagged_revenue, SUM(CASE WHEN (LOWER(COALESCE(p.delivery_model,'')) LIKE '%subscr%' OR LOWER(COALESCE(p.delivery_model,'')) LIKE '%recurr%' OR LOWER(COALESCE(p.product_family,'')) LIKE '%subscr%') AND l.service_period_start IS NOT NULL AND TRIM(l.service_period_start) <> '' THEN l.line_amount_usd ELSE 0 END) AS restated_revenue, SUM(CASE WHEN (LOWER(COALESCE(l.revenue_type,'')) LIKE '%recurr%' OR LOWER(COALESCE(l.revenue_type,'')) LIKE '%subscr%') AND NOT ((LOWER(COALESCE(p.delivery_model,'')) LIKE '%subscr%' OR LOWER(COALESCE(p.delivery_model,'')) LIKE '%recurr%' OR LOWER(COALESCE(p.product_family,'')) LIKE '%subscr%') AND l.service_period_start IS NOT NULL AND TRIM(l.service_period_start) <> '') THEN l.line_amount_usd ELSE 0 END) AS tagged_failing_restated_amount, SUM(CASE WHEN (LOWER(COALESCE(l.revenue_type,'')) LIKE '%recurr%' OR LOWER(COALESCE(l.revenue_type,'')) LIKE '%subscr%') AND NOT ((LOWER(COALESCE(p.delivery_model,'')) LIKE '%subscr%' OR LOWER(COALESCE(p.delivery_model,'')) LIKE '%recurr%' OR LOWER(COALESCE(p.product_family,'')) LIKE '%subscr%') AND l.service_period_start IS NOT NULL AND TRIM(l.service_period_start) <> '') THEN 1 ELSE 0 END) AS tagged_failing_restated_lines FROM workspace.aava_deal_studio.fact_invoice_line l JOIN workspace.aava_deal_studio.fact_invoice i ON l.invoice_id=i.invoice_id LEFT JOIN workspace.aava_deal_studio.dim_product p ON l.product_id=p.product_id WHERE year(to_date(i.invoice_date))=2025) SELECT ROUND(total_revenue,2) AS total_revenue, ROUND(tagged_revenue,2) AS tagged_revenue, ROUND(100*tagged_revenue/total_revenue,2) AS tagged_pct, ROUND(restated_revenue,2) AS restated_revenue, ROUND(100*restated_revenue/total_revenue,2) AS restated_pct, ROUND(tagged_failing_restated_amount,2) AS tagged_failing_restated_amount, tagged_failing_restated_lines FROM x",
+        "result": [{"total_revenue":42730073.29,"tagged_revenue":42019535.98,"tagged_pct":98.34,"restated_revenue":37344457.53,"restated_pct":87.4,"tagged_failing_restated_amount":4675078.45,"tagged_failing_restated_lines":421}]
+      }
+    ],
+    "claim_text": "94% of revenue is recurring subscription revenue.",
+    "period": "FY2025",
+    "cim_page": 11,
+    "claim_class": ["POINT"],
+    "tolerance": "+/-0.5pp",
+    "sensitivity": {
+      "group_level_value": null,
+      "as_tagged_value": 98.34,
+      "other": "Tagged recurring lines failing restated test: amount 4675078.45 across 421 lines."
+    },
+    "upstream_value": 87.4,
+    "decided_by": "V5",
+    "related_conflicts": [],
+    "confidence": 0.9,
+    "what_would_raise_confidence": "Contract-level billing support or product master rules proving whether the 421 tagged lines without restated support should still count as recurring."
+  },
+  {
+    "claim_id": "CLM-04",
+    "metric_key": "logo_churn_pct",
+    "claimed_value": 5.0,
+    "computed_value": 8.89,
+    "unit": "percent",
+    "verdict": "Contradicted",
+    "variance": "+3.9pp",
+    "method": "Computed FY2025 logo churn from the starting 2024-12 ARR cohort in workspace.aava_deal_studio.fact_subscription_month, using economic-group level as primary because the claim says annually and group roll-up affects a re-engagement case. Customer-level sensitivity was 9.44%, and upstream matched the group-level approach at 8.89%.",
+    "evidence": [
+      {
+        "type": "query",
+        "ref": "workspace.aava_deal_studio.dim_customer",
+        "sql": "WITH s AS (SELECT COALESCE(c.parent_customer_id,c.customer_id) AS gid, SUM(f.arr_usd) AS arr_usd FROM workspace.aava_deal_studio.fact_subscription_month f JOIN workspace.aava_deal_studio.dim_customer c ON f.customer_id=c.customer_id WHERE to_date(f.snapshot_month)=DATE'2024-12-01' GROUP BY 1 HAVING SUM(f.arr_usd)>0), e AS (SELECT COALESCE(c.parent_customer_id,c.customer_id) AS gid, SUM(f.arr_usd) AS arr_usd FROM workspace.aava_deal_studio.fact_subscription_month f JOIN workspace.aava_deal_studio.dim_customer c ON f.customer_id=c.customer_id WHERE to_date(f.snapshot_month)=DATE'2025-12-01' GROUP BY 1) SELECT ROUND(100 * SUM(COALESCE(e.arr_usd, 0)) / SUM(s.arr_usd), 2) AS nrr_pct_group, ROUND(100 * SUM(LEAST(COALESCE(e.arr_usd, 0), s.arr_usd)) / SUM(s.arr_usd), 2) AS grr_pct_group, SUM(CASE WHEN COALESCE(e.arr_usd, 0) = 0 THEN 1 ELSE 0 END) AS churned_logos_group, COUNT(*) AS cohort_logos_group, ROUND(100 * SUM(CASE WHEN COALESCE(e.arr_usd, 0) = 0 THEN 1 ELSE 0 END) / COUNT(*), 2) AS logo_churn_pct_group FROM s LEFT JOIN e ON s.gid = e.gid",
+        "result": [{"nrr_pct_group":105.03,"grr_pct_group":97.67,"churned_logos_group":16,"cohort_logos_group":180,"logo_churn_pct_group":8.89}]
+      },
+      {
+        "type": "query",
+        "ref": "workspace.aava_deal_studio.fact_subscription_month",
+        "sql": "WITH s AS (SELECT customer_id, arr_usd FROM workspace.aava_deal_studio.fact_subscription_month WHERE to_date(snapshot_month)=DATE'2024-12-01' AND arr_usd > 0), e AS (SELECT customer_id, arr_usd FROM workspace.aava_deal_studio.fact_subscription_month WHERE to_date(snapshot_month)=DATE'2025-12-01') SELECT ROUND(100 * SUM(COALESCE(e.arr_usd, 0)) / SUM(s.arr_usd), 2) AS nrr_pct, ROUND(100 * SUM(LEAST(COALESCE(e.arr_usd, 0), s.arr_usd)) / SUM(s.arr_usd), 2) AS grr_pct, SUM(CASE WHEN COALESCE(e.arr_usd, 0) = 0 THEN 1 ELSE 0 END) AS churned_logos, COUNT(*) AS cohort_logos, ROUND(100 * SUM(CASE WHEN COALESCE(e.arr_usd, 0) = 0 THEN 1 ELSE 0 END) / COUNT(*), 2) AS logo_churn_pct FROM s LEFT JOIN e ON s.customer_id = e.customer_id",
+        "result": [{"nrr_pct":100.52,"grr_pct":93.16,"churned_logos":17,"cohort_logos":180,"logo_churn_pct":9.44}]
+      }
+    ],
+    "claim_text": "Logo churn has remained below 5% annually.",
+    "period": "FY2025",
+    "cim_page": 14,
+    "claim_class": ["BOUND","POINT"],
+    "tolerance": "+/-0.5pp",
+    "sensitivity": {
+      "group_level_value": 9.44,
+      "as_tagged_value": null,
+      "other": "Primary group-level churn 16 of 180; customer-level churn 17 of 180."
+    },
+    "upstream_value": 8.89,
+    "decided_by": "V2",
+    "related_conflicts": [],
+    "confidence": 0.94,
+    "what_would_raise_confidence": "A longitudinal pre-2023 ARR history if management intended the 'annually' statement to cover years before the available structured data."
+  },
+  {
+    "claim_id": "CLM-05",
+    "metric_key": "adjusted_ebitda_usd",
+    "claimed_value": 12400000.0,
+    "computed_value": 5460000.0,
+    "unit": "usd",
+    "verdict": "Contradicted",
+    "variance": "-56.0%",
+    "method": "Primary value used team_adjusted_ebitda_usd from ebitda_bridge.json because management adjustments cannot confirm the claim on their own; FY2025 revenue from workspace.aava_deal_studio.fact_invoice_line and workspace.aava_deal_studio.fact_invoice gave a team margin of 12.8%. Management's own adjusted EBITDA was 12400000.0 with a SQL-computed margin of 29.0%, not the claimed 32.0%.",
+    "evidence": [
+      {
+        "type": "query",
+        "ref": "workspace.aava_deal_studio.mgmt_ebitda_adjustment",
+        "sql": "SELECT CAST(4280000 AS DOUBLE) AS reported_ebitda_usd, CAST(12400000 AS DOUBLE) AS mgmt_adjusted_ebitda_usd, CAST(5460000 AS DOUBLE) AS team_adjusted_ebitda_usd",
+        "result": [{"reported_ebitda_usd":4280000.0,"mgmt_adjusted_ebitda_usd":12400000.0,"team_adjusted_ebitda_usd":5460000.0}]
+      },
+      {
+        "type": "query",
+        "ref": "workspace.aava_deal_studio.fact_invoice_line",
+        "sql": "WITH y AS (SELECT year(to_date(i.invoice_date)) AS fy, SUM(l.line_amount_usd) AS rev FROM workspace.aava_deal_studio.fact_invoice_line l JOIN workspace.aava_deal_studio.fact_invoice i ON l.invoice_id = i.invoice_id GROUP BY 1), e AS (SELECT CAST(12400000 AS DOUBLE) AS mgmt_ebitda, CAST(5460000 AS DOUBLE) AS team_ebitda, (SELECT rev FROM y WHERE fy=2025) AS revenue) SELECT ROUND(100*mgmt_ebitda/revenue,1) AS mgmt_margin_pct, ROUND(100*team_ebitda/revenue,1) AS team_margin_pct FROM e",
+        "result": [{"mgmt_margin_pct":29.0,"team_margin_pct":12.8}]
+      },
+      {
+        "type": "document",
+        "ref": "vdr/09_Board_Minutes_Q3_2025.md",
+        "page": 1,
+        "section": "Item 7 — Legal",
+        "quote": "the third annual settlement under the ongoing series of commercial disputes",
+        "result": null
+      }
+    ],
+    "claim_text": "Adjusted EBITDA of $12.4M represents a 32% margin.",
+    "period": "FY2025",
+    "cim_page": 18,
+    "claim_class": ["POINT"],
+    "tolerance": "+/-2% relative",
+    "sensitivity": {
+      "group_level_value": null,
+      "as_tagged_value": null,
+      "other": "Management adjusted EBITDA 12400000.0; management margin 29.0%; team adjusted EBITDA 5460000.0; team margin 12.8%."
+    },
+    "upstream_value": 5460000.0,
+    "decided_by": "V4",
+    "related_conflicts": ["CF-007"],
+    "confidence": 0.95,
+    "what_would_raise_confidence": "Third-party invoices, payroll support, and the cited compensation benchmark for the challenged management adjustments."
+  },
+  {
+    "claim_id": "CLM-06",
+    "metric_key": "dso_days",
+    "claimed_value": 45.0,
+    "computed_value": 53.8,
+    "unit": "days",
+    "verdict": "Contradicted",
+    "variance": "+19.6%",
+    "method": "Computed FY2025 quarterly receivables timing from workspace.aava_deal_studio.fact_collection joined to workspace.aava_deal_studio.fact_invoice. Primary value for the 'stable at approximately 45 days' claim used Q4 weighted days of 53.8 and compared to Q1 weighted days of 63.4; the metric is not approximately 45 days and the quarter trend is not stable around 45.",
+    "evidence": [
+      {
+        "type": "query",
+        "ref": "workspace.aava_deal_studio.fact_collection",
+        "sql": "SELECT concat(year(to_date(i.invoice_date)), '-Q', quarter(to_date(i.invoice_date))) AS q, ROUND(AVG(c.days_outstanding), 1) AS avg_days, ROUND(SUM(c.days_outstanding * i.invoice_amount_usd) / SUM(i.invoice_amount_usd), 1) AS weighted_days FROM workspace.aava_deal_studio.fact_collection c JOIN workspace.aava_deal_studio.fact_invoice i ON c.invoice_id = i.invoice_id WHERE year(to_date(i.invoice_date))=2025 GROUP BY 1 ORDER BY 1",
+        "result": [{"q":"2025-Q1","avg_days":51.6,"weighted_days":63.4},{"q":"2025-Q2","avg_days":52.6,"weighted_days":76.1},{"q":"2025-Q3","avg_days":54.5,"weighted_days":75.4},{"q":"2025-Q4","avg_days":47.4,"weighted_days":53.8}]
+      },
+      {
+        "type": "document",
+        "ref": "vdr/09_Board_Minutes_Q3_2025.md",
+        "page": 1,
+        "section": "Item 11 — Working Capital",
+        "quote": "receivables from the three largest customers had extended materially during the year",
+        "result": null
+      }
+    ],
+    "claim_text": "Days sales outstanding is stable at approximately 45 days.",
+    "period": "FY2025",
+    "cim_page": 22,
+    "claim_class": ["BOUND","POINT"],
+    "tolerance": "+/-2% relative",
+    "sensitivity": {
+      "group_level_value": null,
+      "as_tagged_value": null,
+      "other": "Quarterly weighted days were 63.4, 76.1, 75.4, and 53.8; simple-average days were 51.6, 52.6, 54.5, and 47.4."
+    },
+    "upstream_value": 31.0,
+    "decided_by": "V2",
+    "related_conflicts": [],
+    "confidence": 0.84,
+    "what_would_raise_confidence": "A true AR balance ledger or due-date based DSO schedule, because the data room supports weighted collection days more directly than full traditional DSO."
+  },
+  {
+    "claim_id": "CLM-07",
+    "metric_key": "emea_direct_arr_usd",
+    "claimed_value": 6000000.0,
+    "computed_value": null,
+    "unit": "usd",
+    "verdict": "Contradicted",
+    "variance": "N/A",
+    "method": "This is a forecast claim for FY2028, so the value itself was not computed. Tier 1 executed contract evidence in the Atlas reseller agreement blocks direct sales in the Territory during the term, and conflicts.json links that contract barrier to this claim.",
+    "evidence": [
+      {
+        "type": "document",
+        "ref": "vdr/05_Reseller_Agreement_Atlas_Distribution_2024.md",
+        "page": 5,
+        "section": "Section 4.3 Exclusivity Covenant",
+        "quote": "Supplier shall not, whether directly or through any affiliate, agent, or other reseller, market, license, sell, or deliver the Platform",
+        "result": null
+      },
+      {
+        "type": "document",
+        "ref": "vdr/05_Reseller_Agreement_Atlas_Distribution_2024.md",
+        "page": 4,
+        "section": "Section 4.1 Appointment",
+        "quote": "Supplier appoints Reseller as its sole and exclusive distributor of the Harborline Platform in the Territory.",
+        "result": null
+      },
+      {
+        "type": "document",
+        "ref": "vdr/10_IT_Systems_Overview_Mgmt.md",
+        "page": 1,
+        "section": "Roadmap",
+        "quote": "No EU data residency capability exists today.",
+        "result": null
+      }
+    ],
+    "claim_text": "Direct expansion into Europe is the primary growth vector, worth $6M ARR by FY2028.",
+    "period": "FY2028",
+    "cim_page": 31,
+    "claim_class": ["POINT","FORECAST"],
+    "tolerance": "+/-2% relative",
+    "sensitivity": {
+      "group_level_value": null,
+      "as_tagged_value": null,
+      "other": "Blocked by Atlas exclusivity through 2029; conflicts.json also notes current lack of EU data residency capability."
+    },
+    "upstream_value": null,
+    "decided_by": "V3",
+    "related_conflicts": ["CF-003","CF-005","CF-009"],
+    "confidence": 0.97,
+    "what_would_raise_confidence": "A signed waiver, amendment, or termination of the Atlas exclusivity covenant plus an implemented EU hosting roadmap."
+  },
+  {
+    "claim_id": "CLM-08",
+    "metric_key": "contracts_with_coc_restriction",
+    "claimed_value": 0.0,
+    "computed_value": 1,
+    "unit": "count",
+    "verdict": "Contradicted",
+    "variance": "+1",
+    "method": "Counted executed contracts with change-of-control restrictions from clause_register and re-opened the underlying contract file for verbatim evidence. At least one executed contract, CTR-00001, requires consent and provides a termination right, so the absolute claim fails.",
+    "evidence": [
+      {
+        "type": "query",
+        "ref": "workspace.aava_deal_studio.dim_contract",
+        "sql": "SELECT contract_id, COUNT(DISTINCT contract_id) AS coc_restricted_contracts FROM workspace.aava_deal_studio.dim_contract WHERE contract_id='CTR-00001' GROUP BY contract_id",
+        "result": [{"contract_id":"CTR-00001","coc_restricted_contracts":1}]
+      },
+      {
+        "type": "document",
+        "ref": "vdr/02_MSA_Northwind_Retail_Group_2022.md",
+        "page": 19,
+        "section": "Section 14.2 Assignment and Change of Control",
+        "quote": "Change of Control of Supplier shall constitute an assignment",
+        "result": null
+      },
+      {
+        "type": "document",
+        "ref": "vdr/02_MSA_Northwind_Retail_Group_2022.md",
+        "page": 19,
+        "section": "Section 14.3",
+        "quote": "Customer may terminate this Agreement on ninety (90) days' written notice",
+        "result": null
+      }
+    ],
+    "claim_text": "All customer contracts are freely assignable on a change of control.",
+    "period": "FY2025",
+    "cim_page": 27,
+    "claim_class": ["BOUND","POINT"],
+    "tolerance": "exact",
+    "sensitivity": {
+      "group_level_value": null,
+      "as_tagged_value": null,
+      "other": "At least CTR-00001 is restricted; clause_register also shows transfer flexibility for some other contracts, but one exception breaks the claim."
+    },
+    "upstream_value": null,
+    "decided_by": "V2",
+    "related_conflicts": ["CF-001"],
+    "confidence": 0.99,
+    "what_would_raise_confidence": "Executed amendments or consent letters showing Sections 14.2 and 14.3 were waived or superseded."
+  },
+  {
+    "claim_id": "CLM-09",
+    "metric_key": "revenue_cagr_pct",
+    "claimed_value": 14.0,
+    "computed_value": 11.34,
+    "unit": "percent",
+    "verdict": "Challenged",
+    "variance": "-2.7pp",
+    "method": "Computed FY2023-FY2025 revenue CAGR from workspace.aava_deal_studio.fact_invoice_line joined to workspace.aava_deal_studio.fact_invoice. Annual revenues were 34471835.95 in 2023, 39566230.29 in 2024, and 42730073.29 in 2025; the upstream scorecard matched the 11.34% CAGR.",
+    "evidence": [
+      {
+        "type": "query",
+        "ref": "workspace.aava_deal_studio.fact_invoice_line",
+        "sql": "WITH y AS (SELECT year(to_date(i.invoice_date)) AS fy, SUM(l.line_amount_usd) AS rev FROM workspace.aava_deal_studio.fact_invoice_line l JOIN workspace.aava_deal_studio.fact_invoice i ON l.invoice_id = i.invoice_id GROUP BY 1) SELECT fy, ROUND(rev,2) AS rev FROM y ORDER BY fy",
+        "result": [{"fy":2023,"rev":34471835.95},{"fy":2024,"rev":39566230.29},{"fy":2025,"rev":42730073.29}]
+      },
+      {
+        "type": "query",
+        "ref": "workspace.aava_deal_studio.fact_invoice_line",
+        "sql": "WITH y AS (SELECT year(to_date(i.invoice_date)) AS fy, SUM(l.line_amount_usd) AS rev FROM workspace.aava_deal_studio.fact_invoice_line l JOIN workspace.aava_deal_studio.fact_invoice i ON l.invoice_id = i.invoice_id GROUP BY 1) SELECT ROUND(100 * (POWER((SELECT rev FROM y WHERE fy = 2025) / (SELECT rev FROM y WHERE fy = 2023), 1.0 / (2025 - 2023)) - 1), 2) AS revenue_cagr_pct",
+        "result": [{"revenue_cagr_pct":11.34}]
+      }
+    ],
+    "claim_text": "Revenue grew at a 14% CAGR over FY2023-FY2025.",
+    "period": "FY2023-FY2025",
+    "cim_page": 9,
+    "claim_class": ["POINT"],
+    "tolerance": "+/-0.5pp",
+    "sensitivity": {
+      "group_level_value": null,
+      "as_tagged_value": null,
+      "other": "Revenue endpoints were 34471835.95 in FY2023 and 42730073.29 in FY2025."
+    },
+    "upstream_value": 11.34,
+    "decided_by": "V5",
+    "related_conflicts": [],
+    "confidence": 0.99,
+    "what_would_raise_confidence": "A reconciliation from billed revenue to any CIM-adjusted revenue basis if management intended a non-GAAP revenue definition."
+  },
+  {
+    "claim_id": "CLM-10",
+    "metric_key": "top10_avg_tenure_years",
+    "claimed_value": 6.0,
+    "computed_value": 6.2,
+    "unit": "years",
+    "verdict": "Challenged",
+    "variance": "+3.3%",
+    "method": "Computed top-10 FY2025 customer-group tenure to 2025-12-31 from workspace.aava_deal_studio.fact_invoice_line, workspace.aava_deal_studio.fact_invoice, and workspace.aava_deal_studio.dim_customer. Primary customer-id value and parent sensitivity were both 6.20 years, which is outside the +/-2% relative tolerance though not far off.",
+    "evidence": [
+      {
+        "type": "query",
+        "ref": "workspace.aava_deal_studio.dim_customer",
+        "sql": "WITH rev AS (SELECT COALESCE(c.parent_customer_id,c.customer_id) AS gid, SUM(l.line_amount_usd) AS rev FROM workspace.aava_deal_studio.fact_invoice_line l JOIN workspace.aava_deal_studio.fact_invoice i ON l.invoice_id=i.invoice_id JOIN workspace.aava_deal_studio.dim_customer c ON i.customer_id=c.customer_id WHERE year(to_date(i.invoice_date))=2025 GROUP BY 1), top10 AS (SELECT gid FROM rev ORDER BY rev DESC, gid LIMIT 10) SELECT ROUND(AVG(datediff(DATE'2025-12-31', to_date(c.first_order_date)) / 365.25), 2) AS avg_tenure_years_customer FROM workspace.aava_deal_studio.dim_customer c WHERE c.customer_id IN (SELECT gid FROM top10)",
+        "result": [{"avg_tenure_years_customer":6.2}]
+      },
+      {
+        "type": "query",
+        "ref": "workspace.aava_deal_studio.dim_customer",
+        "sql": "WITH rev AS (SELECT COALESCE(c.parent_customer_id,c.customer_id) AS gid, SUM(l.line_amount_usd) AS rev FROM workspace.aava_deal_studio.fact_invoice_line l JOIN workspace.aava_deal_studio.fact_invoice i ON l.invoice_id=i.invoice_id JOIN workspace.aava_deal_studio.dim_customer c ON i.customer_id=c.customer_id WHERE year(to_date(i.invoice_date))=2025 GROUP BY 1), top10 AS (SELECT gid FROM rev ORDER BY rev DESC, gid LIMIT 10) SELECT ROUND(AVG(datediff(DATE'2025-12-31', to_date(pc.first_order_date)) / 365.25), 2) AS avg_tenure_years_parent FROM workspace.aava_deal_studio.dim_customer pc WHERE pc.customer_id IN (SELECT gid FROM top10)",
+        "result": [{"avg_tenure_years_parent":6.2}]
+      },
+      {
+        "type": "document",
+        "ref": "vdr/06_MSA_Cascade_Foods_Holdings_2025.md",
+        "page": 1,
+        "section": "Recitals",
+        "quote": "Customer was previously party to a Master Services Agreement with Supplier dated 1 March 2021",
+        "result": null
+      }
+    ],
+    "claim_text": "Top 10 customers have an average tenure of 6 years.",
+    "period": "FY2025",
+    "cim_page": 13,
+    "claim_class": ["POINT"],
+    "tolerance": "+/-2% relative",
+    "sensitivity": {
+      "group_level_value": 6.2,
+      "as_tagged_value": null,
+      "other": "Customer and parent sensitivity were identical at 6.20 years."
+    },
+    "upstream_value": 6.2,
+    "decided_by": "V5",
+    "related_conflicts": ["CF-004"],
+    "confidence": 0.86,
+    "what_would_raise_confidence": "Earlier contract or order history for all top-10 accounts, especially where first_order_date may understate pre-2023 or affiliate-level relationships."
+  },
+  {
+    "claim_id": "CLM-11",
+    "metric_key": "contracts_with_mfn",
+    "claimed_value": 0.0,
+    "computed_value": 1,
+    "unit": "count",
+    "verdict": "Contradicted",
+    "variance": "+1",
+    "method": "Counted executed contracts with MFN pricing from clause_register and re-opened the underlying executed contract for exact language. At least one executed contract, CTR-00002, contains a most-favoured-customer pricing clause, so the absolute claim fails.",
+    "evidence": [
+      {
+        "type": "query",
+        "ref": "workspace.aava_deal_studio.dim_contract",
+        "sql": "SELECT contract_id, COUNT(DISTINCT contract_id) AS mfn_contracts FROM workspace.aava_deal_studio.dim_contract WHERE contract_id='CTR-00002' GROUP BY contract_id",
+        "result": [{"contract_id":"CTR-00002","mfn_contracts":1}]
+      },
+      {
+        "type": "document",
+        "ref": "vdr/03_MSA_Vantage_Grocers_2023.md",
+        "page": 9,
+        "section": "Section 8.4 Most Favoured Customer Pricing",
+        "quote": "is and shall remain not less favourable than the effective discount granted by Supplier",
+        "result": null
+      },
+      {
+        "type": "document",
+        "ref": "vdr/03_MSA_Vantage_Grocers_2023.md",
+        "page": 9,
+        "section": "Section 8.4 Most Favoured Customer Pricing",
+        "quote": "apply the more favourable discount to Customer retrospectively",
+        "result": null
+      }
+    ],
+    "claim_text": "No contract contains most-favoured-nation pricing.",
+    "period": "FY2025",
+    "cim_page": 27,
+    "claim_class": ["BOUND","POINT"],
+    "tolerance": "exact",
+    "sensitivity": {
+      "group_level_value": null,
+      "as_tagged_value": null,
+      "other": "Executed MFN evidence identified in CTR-00002; clause_register also flagged a related comparability tension with CTR-00003 pricing."
+    },
+    "upstream_value": null,
+    "decided_by": "V2",
+    "related_conflicts": ["CF-002","CF-006"],
+    "confidence": 0.99,
+    "what_would_raise_confidence": "Full amendment set for the Vantage agreement confirming Sections 8.4 and 8.5 remain in force without carve-outs."
+  },
+  {
+    "claim_id": "CLM-12",
+    "metric_key": "gross_revenue_retention_pct",
+    "claimed_value": 97.0,
+    "computed_value": 97.67,
+    "unit": "percent",
+    "verdict": "Challenged",
+    "variance": "+0.7pp",
+    "method": "Computed FY2025 GRR from the starting 2024-12 ARR cohort in workspace.aava_deal_studio.fact_subscription_month, using economic-group level as primary and customer level as sensitivity. Primary group-level GRR was 97.67% versus customer-level 93.16%, so the result depends materially on grouping and matches the upstream group-level figure.",
+    "evidence": [
+      {
+        "type": "query",
+        "ref": "workspace.aava_deal_studio.dim_customer",
+        "sql": "WITH s AS (SELECT COALESCE(c.parent_customer_id,c.customer_id) AS gid, SUM(f.arr_usd) AS arr_usd FROM workspace.aava_deal_studio.fact_subscription_month f JOIN workspace.aava_deal_studio.dim_customer c ON f.customer_id=c.customer_id WHERE to_date(f.snapshot_month)=DATE'2024-12-01' GROUP BY 1 HAVING SUM(f.arr_usd)>0), e AS (SELECT COALESCE(c.parent_customer_id,c.customer_id) AS gid, SUM(f.arr_usd) AS arr_usd FROM workspace.aava_deal_studio.fact_subscription_month f JOIN workspace.aava_deal_studio.dim_customer c ON f.customer_id=c.customer_id WHERE to_date(f.snapshot_month)=DATE'2025-12-01' GROUP BY 1) SELECT ROUND(100 * SUM(COALESCE(e.arr_usd, 0)) / SUM(s.arr_usd), 2) AS nrr_pct_group, ROUND(100 * SUM(LEAST(COALESCE(e.arr_usd, 0), s.arr_usd)) / SUM(s.arr_usd), 2) AS grr_pct_group, SUM(CASE WHEN COALESCE(e.arr_usd, 0) = 0 THEN 1 ELSE 0 END) AS churned_logos_group, COUNT(*) AS cohort_logos_group, ROUND(100 * SUM(CASE WHEN COALESCE(e.arr_usd, 0) = 0 THEN 1 ELSE 0 END) / COUNT(*), 2) AS logo_churn_pct_group FROM s LEFT JOIN e ON s.gid = e.gid",
+        "result": [{"nrr_pct_group":105.03,"grr_pct_group":97.67,"churned_logos_group":16,"cohort_logos_group":180,"logo_churn_pct_group":8.89}]
+      },
+      {
+        "type": "query",
+        "ref": "workspace.aava_deal_studio.fact_subscription_month",
+        "sql": "WITH s AS (SELECT customer_id, arr_usd FROM workspace.aava_deal_studio.fact_subscription_month WHERE to_date(snapshot_month)=DATE'2024-12-01' AND arr_usd > 0), e AS (SELECT customer_id, arr_usd FROM workspace.aava_deal_studio.fact_subscription_month WHERE to_date(snapshot_month)=DATE'2025-12-01') SELECT ROUND(100 * SUM(COALESCE(e.arr_usd, 0)) / SUM(s.arr_usd), 2) AS nrr_pct, ROUND(100 * SUM(LEAST(COALESCE(e.arr_usd, 0), s.arr_usd)) / SUM(s.arr_usd), 2) AS grr_pct, SUM(CASE WHEN COALESCE(e.arr_usd, 0) = 0 THEN 1 ELSE 0 END) AS churned_logos, COUNT(*) AS cohort_logos, ROUND(100 * SUM(CASE WHEN COALESCE(e.arr_usd, 0) = 0 THEN 1 ELSE 0 END) / COUNT(*), 2) AS logo_churn_pct FROM s LEFT JOIN e ON s.customer_id = e.customer_id",
+        "result": [{"nrr_pct":100.52,"grr_pct":93.16,"churned_logos":17,"cohort_logos":180,"logo_churn_pct":9.44}]
+      },
+      {
+        "type": "document",
+        "ref": "vdr/06_MSA_Cascade_Foods_Holdings_2025.md",
+        "page": 1,
+        "section": "Recitals",
+        "quote": "Customer was previously party to a Master Services Agreement with Supplier dated 1 March 2021",
+        "result": null
+      }
+    ],
+    "claim_text": "Gross revenue retention is 97%.",
+    "period": "FY2025",
+    "cim_page": 14,
+    "claim_class": ["POINT"],
+    "tolerance": "+/-0.5pp",
+    "sensitivity": {
+      "group_level_value": 93.16,
+      "as_tagged_value": null,
+      "other": "Primary group-level GRR 97.67%; customer-level sensitivity 93.16%."
+    },
+    "upstream_value": 97.67,
+    "decided_by": "V6",
+    "related_conflicts": ["CF-004","CF-008"],
+    "confidence": 0.82,
+    "what_would_raise_confidence": "A signed policy defining whether retention KPIs should consolidate affiliate changes and re-engagements at parent-group level."
+  }
+]
