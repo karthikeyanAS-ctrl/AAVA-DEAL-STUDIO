@@ -1,10 +1,10 @@
 [
   {
     "id": "wb_1",
-    "name": "Sample",
-    "use_case": "Sample",
-    "description": "",
+    "name": "Harborline Systems Inc",
+    "use_case": "Due Diligence",
+    "description": "A fund wants to buy Harborline Systems for $148M based on a claimed $12.4M profit, and our AI agents check the seller's 12 claims against the real data and contracts to show the true profit is about $6.7M, so the company is worth nearer $80M.",
     "created_at": "2026-09-25T00:27:17",
-    "updated_at": "2026-09-25T00:27:17"
+    "updated_at": "2026-09-25T14:37:39"
   }
 ]
