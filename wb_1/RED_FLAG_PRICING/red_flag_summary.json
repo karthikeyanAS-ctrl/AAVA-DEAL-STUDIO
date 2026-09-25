@@ -1,14 +1,14 @@
 {
   "deal_settings_used": {
     "enterprise_value_usd": 148000000,
-    "entry_multiple": 12.0,
+    "entry_multiple": 11.935484,
     "price_basis_ebitda_usd": 12400000,
     "close_date": "2026-03-31",
     "contribution_margin": 0.4,
     "loss_probabilities": {
-      "consent_needed_or_expires_within_12_months_no_auto_renewal": 0.35,
-      "renewal_under_review_escalation_or_sla_triggered": 0.3,
-      "sla_termination_right_exists_not_triggered": 0.15,
+      "consent_needed_change_of_control_or_expiry_within_12_months_no_auto_renewal": 0.35,
+      "renewal_under_review_escalation_or_sla_termination_triggered": 0.3,
+      "sla_termination_right_exists_but_not_triggered": 0.15,
       "other_contractual_exit_right": 0.1
     },
     "assumption_sources": {
@@ -16,39 +16,46 @@
       "entry_multiple": "deal settings",
       "price_basis_ebitda_usd": "deal settings",
       "close_date": "deal settings",
-      "contribution_margin": "deal settings",
-      "loss_probabilities": "deal settings"
+      "contribution_margin": "default assumption",
+      "loss_probabilities": "default assumption"
     }
   },
   "latest_arr_month": "2025-12-01",
   "total_arr_usd": 38662136.43,
-  "findings_by_severity": {"Critical": 5, "High": 4, "Medium": 2},
-  "total_ev_impact_usd": -120495168,
-  "total_ev_impact_turns": -9.72,
-  "indicative_ev_usd": 27504832,
-  "aggregate_sql": "WITH all_impacts AS (SELECT -25200000 AS ev_impact_usd UNION ALL SELECT -17719028 UNION ALL SELECT -16800000 UNION ALL SELECT -15000000 UNION ALL SELECT -19800000 UNION ALL SELECT -11724708 UNION ALL SELECT -6741227 UNION ALL SELECT -6480000 UNION ALL SELECT 0 UNION ALL SELECT -1030205) SELECT SUM(ev_impact_usd) AS total_ev_impact_usd, ROUND(SUM(ev_impact_usd) / 12400000.0, 2) AS total_ev_impact_turns, 148000000 + SUM(ev_impact_usd) AS indicative_ev_usd FROM all_impacts",
+  "findings_by_severity": {"Critical": 6, "High": 2, "Medium": 1},
+  "total_ev_impact_usd": -123538002,
+  "total_ev_impact_turns": -9.96,
+  "indicative_ev_usd": 24461998,
+  "aggregate_sql": "SELECT ROUND((-25064516 + -17623765 + -19693548 + -16709677 + -15350652 + -14919355 + -6704983 + -6445161 + -1030205),0) AS total_ev_impact_usd, ROUND(((-25064516 + -17623765 + -19693548 + -16709677 + -15350652 + -14919355 + -6704983 + -6445161 + -1030205) / 12400000),2) AS total_ev_impact_turns, ROUND(148000000 + (-25064516 + -17623765 + -19693548 + -16709677 + -15350652 + -14919355 + -6704983 + -6445161 + -1030205),0) AS indicative_ev_usd",
   "observations": [
     {
-      "title": "Atlas management summary shows auto-renew yes (180d), but the reviewed executed extract did not contain a renewal clause",
+      "title": "Atlas exclusivity blocks the stated Europe direct plan, but current price-basis impact is valuation-method dependent",
       "evidence": [
-        {"type": "document", "ref": "vdr/07_Customer_Contract_Summary_Mgmt.md", "page": 1, "section": "Customer Contract Summary — Top Accounts", "quote": "| CTR-00004 | Atlas Distribution | 2,050,000 | 2029-12-31 | Yes (180d) | None noted | No | Standard reseller terms | EMEA channel partner |"},
-        {"type": "document", "ref": "vdr/05_Reseller_Agreement_Atlas_Distribution_2024.md", "page": 1, "section": "Term", "quote": "Six (6) years from 1 January 2024, expiring 31 December 2029."}
+        {"type": "document", "ref": "vdr/05_Reseller_Agreement_Atlas_Distribution_2024.md", "page": 5, "section": "Section 4.3 Exclusivity Covenant", "quote": "Supplier shall not, whether directly or through any affiliate, agent, or other reseller, market, license, sell, or deliver the Platform to any customer whose principal place of business is within the Territory"},
+        {"type": "document", "ref": "vdr/01_CIM_Excerpt_Harborline.md", "page": 31, "section": "Growth Strategy", "quote": "Direct expansion into Europe is the primary growth vector, worth $6M ARR by FY2028."},
+        {"type": "query", "ref": "workspace.aava_deal_studio.fact_subscription_month", "sql": "SELECT SUM(s.arr_usd) AS latest_arr_territory_usd FROM workspace.aava_deal_studio.fact_subscription_month s JOIN workspace.aava_deal_studio.dim_customer c ON s.customer_id = c.customer_id WHERE c.country IN ('Germany','Netherlands','UK') AND c.customer_id <> 'CUST-0004' AND s.snapshot_month = DATE '2025-12-01'", "result": [{"latest_arr_territory_usd":"3195791.8000000003"}]}
+      ]
+    },
+    {
+      "title": "Recurring revenue tagging exceeds the stricter restated recurring test by $4.67507845M, but EV impact is valuation-method dependent",
+      "evidence": [
+        {"type": "query", "ref": "workspace.aava_deal_studio.fact_invoice_line", "sql": "WITH x AS (SELECT SUM(l.line_amount_usd) AS total_revenue, SUM(CASE WHEN LOWER(COALESCE(l.revenue_type,'')) LIKE '%recurr%' OR LOWER(COALESCE(l.revenue_type,'')) LIKE '%subscr%' THEN l.line_amount_usd ELSE 0 END) AS tagged_revenue, SUM(CASE WHEN (LOWER(COALESCE(p.delivery_model,'')) LIKE '%subscr%' OR LOWER(COALESCE(p.delivery_model,'')) LIKE '%recurr%' OR LOWER(COALESCE(p.product_family,'')) LIKE '%subscr%') AND l.service_period_start IS NOT NULL AND TRIM(l.service_period_start) <> '' THEN l.line_amount_usd ELSE 0 END) AS restated_revenue, SUM(CASE WHEN (LOWER(COALESCE(l.revenue_type,'')) LIKE '%recurr%' OR LOWER(COALESCE(l.revenue_type,'')) LIKE '%subscr%') AND NOT ((LOWER(COALESCE(p.delivery_model,'')) LIKE '%subscr%' OR LOWER(COALESCE(p.delivery_model,'')) LIKE '%recurr%' OR LOWER(COALESCE(p.product_family,'')) LIKE '%subscr%') AND l.service_period_start IS NOT NULL AND TRIM(l.service_period_start) <> '') THEN l.line_amount_usd ELSE 0 END) AS tagged_failing_restated_amount, SUM(CASE WHEN (LOWER(COALESCE(l.revenue_type,'')) LIKE '%recurr%' OR LOWER(COALESCE(l.revenue_type,'')) LIKE '%subscr%') AND NOT ((LOWER(COALESCE(p.delivery_model,'')) LIKE '%subscr%' OR LOWER(COALESCE(p.delivery_model,'')) LIKE '%recurr%' OR LOWER(COALESCE(p.product_family,'')) LIKE '%subscr%') AND l.service_period_start IS NOT NULL AND TRIM(l.service_period_start) <> '') THEN 1 ELSE 0 END) AS tagged_failing_restated_lines FROM workspace.aava_deal_studio.fact_invoice_line l JOIN workspace.aava_deal_studio.fact_invoice i ON l.invoice_id=i.invoice_id LEFT JOIN workspace.aava_deal_studio.dim_product p ON l.product_id=p.product_id WHERE year(to_date(i.invoice_date))=2025) SELECT ROUND(total_revenue,2) AS total_revenue, ROUND(tagged_revenue,2) AS tagged_revenue, ROUND(100*tagged_revenue/total_revenue,2) AS tagged_pct, ROUND(restated_revenue,2) AS restated_revenue, ROUND(100*restated_revenue/total_revenue,2) AS restated_pct, ROUND(tagged_failing_restated_amount,2) AS tagged_failing_restated_amount, tagged_failing_restated_lines FROM x", "result": [{"total_revenue":42730073.29,"tagged_revenue":42019535.98,"tagged_pct":98.34,"restated_revenue":37344457.53,"restated_pct":87.4,"tagged_failing_restated_amount":4675078.45,"tagged_failing_restated_lines":421}]}
       ]
     }
   ],
   "upstream_issues": [
-    "wb_1/REVENUE_QUALITY_ANALYZER/revenue_quality_scorecard.json status is PARTIAL.",
-    "wb_1/CONTRACT_INTELLIGENCE_ANALYZER/clause_register.json status is PARTIAL.",
-    "wb_1/EARNINGS_CHALLENGE_ANALYZER/ebitda_bridge.json status is PARTIAL.",
-    "wb_1/CROSS_SOURCE_RECONCILIATION/conflicts.json status is PARTIAL.",
-    "wb_1/DOCUMENT_TRIAGE/doc_catalog.json was missing (404)."
+    "revenue_quality_scorecard.json status is PARTIAL.",
+    "clause_register.json status is PARTIAL.",
+    "ebitda_bridge.json status is PARTIAL.",
+    "conflicts.json status is PARTIAL.",
+    "doc_catalog.json missing at wb_1/DOCUMENT_TRIAGE/doc_catalog.json (404)."
   ],
   "data_gaps": [
-    "Revenue multiples for recurring versus non-recurring revenue were not provided, so M4 EV pricing is not supported by the data room.",
-    "A full AR-ledger DSO schedule was not provided, so the working-capital pricing uses weighted collection days as a directional proxy.",
-    "Payroll support and the cited compensation benchmark for ADJ-004 were not provided.",
-    "No executed contracts were supplied for CTR-00007 or CTR-00008.",
-    "No amendment package was supplied to test whether contract clauses were superseded."
+    "No revenue multiple settings were provided, so revenue-quality EV impacts are valuation-method dependent and not priced.",
+    "No payroll table or compensation benchmark was provided to support ADJ-004.",
+    "No product P&L or sunset support was provided for ADJ-007.",
+    "No true AR ledger was provided; working-capital analysis relies on weighted collection days rather than full traditional DSO.",
+    "Atlas renewal mechanics shown in management summary were not supported by the reviewed executed contract extract."
   ],
   "self_check": {"C1": true, "C2": true, "C3": true, "C4": true, "C5": true, "C6": true, "C7": true, "C8": true}
 }
