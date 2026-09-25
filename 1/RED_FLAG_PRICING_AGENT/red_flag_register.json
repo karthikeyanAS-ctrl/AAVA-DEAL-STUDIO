@@ -1,0 +1,806 @@
+{
+  "status": "SUCCESS",
+  "agent": "RED_FLAG_PRICING_AGENT",
+  "workbench_id": "1",
+  "deal_settings": {
+    "enterprise_value_usd": 148000000,
+    "entry_multiple": 12.0,
+    "management_adjusted_ebitda_usd": 12400000,
+    "expected_close_date": "2026-03-31",
+    "contribution_margin_assumption": 0.40,
+    "loss_probability_assumption": 0.35,
+    "currency": "USD",
+    "source": "Deal team configuration"
+  },
+  "upstream_artifacts": {
+    "clause_register": {
+      "retrieved": true,
+      "path": "1/CONTRACT_INTELLIGENCE_ANALYZER/clause_register.json",
+      "status": "PARTIAL"
+    },
+    "ebitda_bridge": {
+      "retrieved": true,
+      "path": "1/EARNINGS_CHALLENGE_ANALYZER/ebitda_bridge.json",
+      "status": "SUCCESS"
+    },
+    "conflicts": {
+      "retrieved": true,
+      "path": "1/CROSS_SOURCE_RECONCILIATION/conflicts.json",
+      "status": "PARTIAL"
+    },
+    "claims_scoreboard": {
+      "retrieved": true,
+      "path": "wb_1/CLAIMS_ADJUDICATOR/claims_scoreboard.json",
+      "status": "SUCCESS"
+    }
+  },
+  "summary": {
+    "total_findings": 8,
+    "critical": 2,
+    "high": 3,
+    "medium": 2,
+    "low": 1,
+    "total_closing_arr_usd": 38662136.43,
+    "deduplicated_arr_at_risk_usd": 16910891.79,
+    "deduplicated_arr_at_risk_pct": 43.74,
+    "total_ev_impact_usd": -90210298.20,
+    "total_ev_impact_turns": -7.275
+  },
+  "findings": [
+    {
+      "finding_id": "RF-001",
+      "title": "Northwind Retail Group — Change-of-Control Consent Requirement and Termination Right",
+      "category": "Contract",
+      "severity": "Critical",
+      "confidence": 0.98,
+      "what_would_raise_confidence": "Executed consent letter or amendment from Northwind waiving Sections 14.2 and 14.3 prior to close. Confirmation that no other contracts contain similar consent requirements.",
+      "arr_at_risk_usd": 10547040.61,
+      "arr_share_of_closing_arr_pct": 27.28,
+      "ev_impact_usd": -17719028.22,
+      "ev_impact_turns": -1.429,
+      "ev_method": "ARR at risk × contribution margin assumption (0.40) × loss probability assumption (0.35) × entry multiple (12.0). Assumptions are deal-team inputs, not observed facts.",
+      "pricing_assumptions": {
+        "entry_multiple": 12.0,
+        "management_adjusted_ebitda_usd": 12400000,
+        "contribution_margin": 0.40,
+        "loss_probability": 0.35,
+        "assumption_source": "Deal team configuration"
+      },
+      "finding": "The executed Northwind MSA (CTR-00001, DOC-02, Section 14.2) expressly treats a change of control of the Supplier as an assignment requiring Northwind's prior written consent; Section 14.3 grants Northwind a right to terminate on 90 days' notice within 180 days of awareness if the change of control completes without consent. Management's customer contract summary and the CIM (Page 27) both state no change-of-control restriction exists, directly contradicting the executed agreement. The board's own General Counsel confirmed the consent requirement at the Q3 2025 board meeting (Item 5). Northwind represents 27.28% of closing ARR ($10.5M), making this the single largest contractual risk to deal completion and post-close revenue.",
+      "contradicts_claim": "CLM-08",
+      "related_claims": [],
+      "source_findings": {
+        "clause_ids": ["CL-004", "CL-005"],
+        "adjustment_ids": [],
+        "conflict_ids": ["CF-001"],
+        "claim_ids": ["CLM-08"]
+      },
+      "affected_entities": {
+        "customer_ids": ["CUST-0001"],
+        "contract_ids": ["CTR-00001"],
+        "product_ids": []
+      },
+      "evidence": [
+        {
+          "type": "document",
+          "ref": "02_MSA_Northwind_Retail_Group_2022.md",
+          "page": 19,
+          "section": "Section 14.2 Assignment and Change of Control",
+          "quote": "For the avoidance of doubt, a Change of Control of Supplier shall constitute an assignment for the purposes of this Section 14.2 and shall require the prior written consent of Customer."
+        },
+        {
+          "type": "document",
+          "ref": "02_MSA_Northwind_Retail_Group_2022.md",
+          "page": 19,
+          "section": "Section 14.3",
+          "quote": "Customer may terminate this Agreement on ninety (90) days' written notice within 180 days of awareness."
+        },
+        {
+          "type": "document",
+          "ref": "09_Board_Minutes_Q3_2025.md",
+          "page": 1,
+          "section": "Item 5 — Northwind Retail Group",
+          "quote": "Section 14.2 treats a change of control of the Company as an assignment requiring Northwind's prior written consent."
+        },
+        {
+          "type": "document",
+          "ref": "07_Customer_Contract_Summary_Mgmt.md",
+          "page": 1,
+          "section": "CTR-00001 row",
+          "quote": "Change of control restriction: None noted."
+        },
+        {
+          "type": "document",
+          "ref": "01_CIM_Excerpt_Harborline.md",
+          "page": 27,
+          "section": "Contracts",
+          "quote": "All customer contracts are freely assignable on a change of control."
+        },
+        {
+          "type": "query",
+          "ref": "workspace.aava_deal_studio.fact_subscription_month",
+          "sql": "SELECT arr_usd FROM workspace.aava_deal_studio.fact_subscription_month WHERE customer_id = 'CUST-0001' AND snapshot_month = (SELECT MAX(snapshot_month) FROM workspace.aava_deal_studio.fact_subscription_month)",
+          "result": [{"customer_id": "CUST-0001", "arr_usd": 10547040.61}]
+        },
+        {
+          "type": "query",
+          "ref": "workspace.aava_deal_studio.fact_subscription_month — EV calculation",
+          "sql": "SELECT CAST(10547040.61 AS DOUBLE) AS arr_at_risk_usd, ROUND(CAST(10547040.61 AS DOUBLE) / CAST(38662136.43 AS DOUBLE) * 100, 2) AS arr_share_pct, ROUND(-(CAST(10547040.61 AS DOUBLE) * CAST(0.40 AS DOUBLE) * CAST(0.35 AS DOUBLE) * CAST(12.0 AS DOUBLE)), 2) AS ev_impact_usd, ROUND(-(CAST(10547040.61 AS DOUBLE) * CAST(0.40 AS DOUBLE) * CAST(0.35 AS DOUBLE) * CAST(12.0 AS DOUBLE)) / CAST(12400000.0 AS DOUBLE), 4) AS ev_impact_turns",
+          "result": [{"arr_at_risk_usd": 10547040.61, "arr_share_pct": 27.28, "ev_impact_usd": -17719028.22, "ev_impact_turns": -1.429}]
+        }
+      ],
+      "mitigation": "Initiate pre-close consent process with Northwind immediately. Obtain written consent to the change of control as a condition of signing or closing. If consent cannot be obtained pre-close, assess whether a post-close consent process is feasible within the 180-day awareness window. Engage Northwind relationship management to understand renewal intent given the contract expires 2026-06-30.",
+      "spa_protection": "Consider with transaction counsel: (1) Condition precedent requiring delivery of Northwind written consent to change of control prior to closing; (2) specific indemnity covering losses arising from Northwind exercising its Section 14.3 termination right post-close; (3) purchase price adjustment or escrow holdback sized to Northwind ARR exposure pending consent; (4) seller representation and warranty that no counterparty has exercised or threatened to exercise termination rights arising from the transaction.",
+      "reviewer_status": "pending_escalation"
+    },
+    {
+      "finding_id": "RF-002",
+      "title": "Vantage Grocers — MFN Pricing Exposure, SLA Termination Risk, and Renewal Uncertainty",
+      "category": "Contract",
+      "severity": "Critical",
+      "confidence": 0.95,
+      "what_would_raise_confidence": "Monthly availability logs confirming whether the 99.0% consecutive-month threshold was breached. Executed amendments or side letters addressing the MFN provision. Confirmation of Vantage renewal intent for the 2026-12-31 expiry. Pricing approval memo and any credit notes issued to Vantage following the Pinnacle discount.",
+      "arr_at_risk_usd": 4681407.34,
+      "arr_share_of_closing_arr_pct": 12.11,
+      "ev_impact_usd": -7864764.33,
+      "ev_impact_turns": -0.6343,
+      "ev_method": "ARR at risk × contribution margin assumption (0.40) × loss probability assumption (0.35) × entry multiple (12.0). Assumptions are deal-team inputs, not observed facts.",
+      "pricing_assumptions": {
+        "entry_multiple": 12.0,
+        "management_adjusted_ebitda_usd": 12400000,
+        "contribution_margin": 0.40,
+        "loss_probability": 0.35,
+        "assumption_source": "Deal team configuration"
+      },
+      "finding": "Three compounding risks converge on Vantage Grocers (CTR-00002, $4.68M ARR, 12.11% of closing ARR): (1) The executed MSA Section 8.4 contains an MFN clause requiring Vantage's 18% discount to remain no less favourable than discounts granted to comparable-spend customers; Pinnacle Outdoor received a 34% discount in March 2025 and SQL confirms Pinnacle meets the comparable-spend threshold (ACV $2.9M vs. Vantage $4.1M, above the 50% threshold), creating a potential retrospective credit obligation that management denied exists; (2) Support ticket data shows 6 Severity 1 incidents in the worst rolling three-month window, exceeding the contractual threshold of 4 that triggers escalation and makes Section 12.2 termination remedies available; CSAT scores have deteriorated from 2.7 in Q2 2025 to 1.8 in Q4 2025; (3) The board confirmed renewal is under active review (Item 4, Q3 2025 minutes). Management's customer summary describes Vantage as a 'stable account' with no MFN noted, directly contradicting all three risk dimensions.",
+      "contradicts_claim": "CLM-11",
+      "related_claims": ["CLM-02"],
+      "source_findings": {
+        "clause_ids": ["CL-007", "CL-008", "CL-009", "CL-010"],
+        "adjustment_ids": [],
+        "conflict_ids": ["CF-002", "CF-003", "CF-009"],
+        "claim_ids": ["CLM-11", "CLM-02"]
+      },
+      "affected_entities": {
+        "customer_ids": ["CUST-0002"],
+        "contract_ids": ["CTR-00002"],
+        "product_ids": []
+      },
+      "evidence": [
+        {
+          "type": "document",
+          "ref": "03_MSA_Vantage_Grocers_2023.md",
+          "page": 9,
+          "section": "Section 8.4 Most Favoured Customer Pricing",
+          "quote": "is and shall remain not less favourable than the effective discount granted by Supplier to any other customer of comparable annual committed spend; if a more favourable discount is granted, Supplier must notify Customer within 30 days, apply it retrospectively, and issue a credit note."
+        },
+        {
+          "type": "document",
+          "ref": "03_MSA_Vantage_Grocers_2023.md",
+          "page": 16,
+          "section": "Section 12.2 Service Levels",
+          "quote": "where availability falls below 99.0% in any two consecutive months, Customer may terminate for material breach on 30 days' notice."
+        },
+        {
+          "type": "document",
+          "ref": "03_MSA_Vantage_Grocers_2023.md",
+          "page": 17,
+          "section": "Section 12.3 Escalation",
+          "quote": "Where the number of Severity 1 incidents exceeds four (4) in any rolling three (3) month period, the matter shall be escalated and Customer's remedies under Section 12.2 shall be available."
+        },
+        {
+          "type": "document",
+          "ref": "04_MSA_Pinnacle_Outdoor_2025.md",
+          "page": 8,
+          "section": "Section 7.1 Fees and Discount",
+          "quote": "Supplier grants a discount of thirty-four per cent (34%) against list pricing for the duration of the Initial Term."
+        },
+        {
+          "type": "document",
+          "ref": "09_Board_Minutes_Q3_2025.md",
+          "page": 1,
+          "section": "Item 4 — Customer Matters",
+          "quote": "continued service instability at Vantage Grocers, with Severity 1 incident volumes elevated since April; FY2027 renewal under active review."
+        },
+        {
+          "type": "document",
+          "ref": "09_Board_Minutes_Q3_2025.md",
+          "page": 1,
+          "section": "Item 6 — Pricing Governance",
+          "quote": "The General Counsel asked that the Vantage most-favoured-customer provision be reviewed in light of the discount granted to Pinnacle Outdoor in March 2025."
+        },
+        {
+          "type": "query",
+          "ref": "workspace.aava_deal_studio.fact_support_ticket",
+          "sql": "SELECT m.month_start, COUNT(t.ticket_id) AS sev1_count FROM (SELECT DISTINCT date_trunc('month', opened_date) AS month_start FROM workspace.aava_deal_studio.fact_support_ticket WHERE customer_id = 'CUST-0002') m JOIN workspace.aava_deal_studio.fact_support_ticket t ON t.customer_id = 'CUST-0002' AND t.severity = 'S1' AND opened_date >= m.month_start AND opened_date < add_months(m.month_start, 3) GROUP BY m.month_start ORDER BY sev1_count DESC LIMIT 1",
+          "result": [{"month_start": "2025-04-01", "sev1_count": 6}]
+        },
+        {
+          "type": "query",
+          "ref": "workspace.aava_deal_studio.dim_contract — MFN comparability test",
+          "sql": "SELECT a.contract_id AS mfn_contract, a.acv_usd AS mfn_acv_usd, b.contract_id AS other_contract, b.acv_usd AS other_acv_usd, b.acv_usd >= 0.5 * a.acv_usd AS comparable FROM workspace.aava_deal_studio.dim_contract a CROSS JOIN workspace.aava_deal_studio.dim_contract b WHERE a.contract_id = 'CTR-00002' AND b.contract_id IN ('CTR-00001','CTR-00003','CTR-00004','CTR-00006') ORDER BY b.contract_id",
+          "result": [
+            {"mfn_contract": "CTR-00002", "mfn_acv_usd": 4100000.0, "other_contract": "CTR-00001", "other_acv_usd": 7600000.0, "comparable": true},
+            {"mfn_contract": "CTR-00002", "mfn_acv_usd": 4100000.0, "other_contract": "CTR-00003", "other_acv_usd": 2900000.0, "comparable": true},
+            {"mfn_contract": "CTR-00002", "mfn_acv_usd": 4100000.0, "other_contract": "CTR-00004", "other_acv_usd": 2050000.0, "comparable": true}
+          ]
+        },
+        {
+          "type": "query",
+          "ref": "workspace.aava_deal_studio.fact_subscription_month — EV calculation",
+          "sql": "SELECT CAST(4681407.34 AS DOUBLE) AS arr_at_risk_usd, ROUND(CAST(4681407.34 AS DOUBLE) / CAST(38662136.43 AS DOUBLE) * 100, 2) AS arr_share_pct, ROUND(-(CAST(4681407.34 AS DOUBLE) * CAST(0.40 AS DOUBLE) * CAST(0.35 AS DOUBLE) * CAST(12.0 AS DOUBLE)), 2) AS ev_impact_usd, ROUND(-(CAST(4681407.34 AS DOUBLE) * CAST(0.40 AS DOUBLE) * CAST(0.35 AS DOUBLE) * CAST(12.0 AS DOUBLE)) / CAST(12400000.0 AS DOUBLE), 4) AS ev_impact_turns",
+          "result": [{"arr_at_risk_usd": 4681407.34, "arr_share_pct": 12.11, "ev_impact_usd": -7864764.33, "ev_impact_turns": -0.6343}]
+        }
+      ],
+      "mitigation": "Quantify the retrospective MFN credit exposure by calculating the discount differential between Vantage (18%) and Pinnacle (34%) applied to Vantage's ACV from the date the Pinnacle discount was granted (March 2025). Obtain a legal opinion on whether the MFN obligation has been triggered and the credit amount owed. Implement a service stability remediation plan for Vantage and obtain written confirmation from Vantage that no termination notice has been or will be served. Engage Vantage on renewal terms ahead of the 2026-12-31 expiry.",
+      "spa_protection": "Consider with transaction counsel: (1) Specific indemnity covering any MFN credit obligation arising from the Pinnacle discount granted prior to close; (2) seller representation that no customer has served or threatened a termination notice under SLA provisions; (3) closing deliverable requiring evidence that the Vantage SLA escalation has been resolved or that Vantage has confirmed no intention to exercise termination rights; (4) escrow or holdback sized to the MFN credit exposure pending resolution; (5) post-close covenant requiring seller to cooperate in Vantage renewal negotiations.",
+      "reviewer_status": "pending_escalation"
+    },
+    {
+      "finding_id": "RF-003",
+      "title": "Recurring Legal Settlement Misclassified as Non-Recurring EBITDA Add-Back (ADJ-003)",
+      "category": "Earnings",
+      "severity": "Critical",
+      "confidence": 0.95,
+      "what_would_raise_confidence": "Settlement agreement documents for FY2023, FY2024, and FY2025 confirming separate counterparties and distinct legal matters. Absence of any FY2026 settlement provision in audited accounts. Legal counsel opinion confirming the series is fully resolved with no further exposure.",
+      "arr_at_risk_usd": null,
+      "arr_share_of_closing_arr_pct": null,
+      "ev_impact_usd": -25200000.00,
+      "ev_impact_turns": -2.0323,
+      "ev_method": "Rejected EBITDA adjustment amount ($2,100,000) × entry multiple (12.0). Agent 5 verdict: Rejected. Agent 8 preserves this verdict without modification.",
+      "pricing_assumptions": {
+        "entry_multiple": 12.0,
+        "management_adjusted_ebitda_usd": 12400000,
+        "contribution_margin": null,
+        "loss_probability": null,
+        "assumption_source": "Deal team configuration"
+      },
+      "finding": "Management's QoE schedule adds back $2,100,000 as a 'one-time legal settlement' in each of FY2023, FY2024, and FY2025 (ADJ-001, ADJ-002, ADJ-003). Board minutes from Q3 2025 (Item 7) explicitly describe 'the third annual settlement under the ongoing series of commercial disputes with former channel partners' at $2.1M, consistent with prior years, and the board asked whether a provision should be made for FY2026. This contemporaneous board-level evidence directly contradicts management's non-recurring classification. Agent 5 rejected this adjustment; the $2.1M is a recurring economic cost that should remain in normalised EBITDA, reducing the management-adjusted EBITDA base by $2.1M and implying an EV overstatement of $25.2M at the stated entry multiple.",
+      "contradicts_claim": "CLM-05",
+      "related_claims": [],
+      "source_findings": {
+        "clause_ids": [],
+        "adjustment_ids": ["ADJ-003", "ADJ-001", "ADJ-002"],
+        "conflict_ids": ["CF-007"],
+        "claim_ids": ["CLM-05"]
+      },
+      "affected_entities": {
+        "customer_ids": [],
+        "contract_ids": [],
+        "product_ids": []
+      },
+      "evidence": [
+        {
+          "type": "document",
+          "ref": "09_Board_Minutes_Q3_2025.md",
+          "page": 1,
+          "section": "Item 7 — Legal",
+          "quote": "The CFO reported that the third annual settlement under the ongoing series of commercial disputes with former channel partners had been concluded at $2.1M, consistent with the prior two years. The Board asked whether provision should be made for a further settlement in FY2026. The CFO responded that the matters are being treated as non-recurring for the purposes of the sale process."
+        },
+        {
+          "type": "document",
+          "ref": "08_QoE_Adjustment_Schedule_Mgmt.md",
+          "page": 1,
+          "section": "ADJ-003 row",
+          "quote": "One-time legal settlement | 2,100,000 | Settlement of a commercial dispute. Non-recurring."
+        },
+        {
+          "type": "query",
+          "ref": "workspace.aava_deal_studio.mgmt_ebitda_adjustment — recurrence test",
+          "sql": "SELECT category, fiscal_year, amount_usd FROM workspace.aava_deal_studio.mgmt_ebitda_adjustment WHERE category = 'One-time legal settlement' ORDER BY fiscal_year",
+          "result": [
+            {"category": "One-time legal settlement", "fiscal_year": "FY2023", "amount_usd": 2100000},
+            {"category": "One-time legal settlement", "fiscal_year": "FY2024", "amount_usd": 2100000},
+            {"category": "One-time legal settlement", "fiscal_year": "FY2025", "amount_usd": 2100000}
+          ]
+        },
+        {
+          "type": "query",
+          "ref": "workspace.aava_deal_studio.mgmt_ebitda_adjustment — EV calculation",
+          "sql": "SELECT CAST(2100000 AS DOUBLE) AS rejected_ebitda_usd, ROUND(-(CAST(2100000 AS DOUBLE) * CAST(12.0 AS DOUBLE)), 2) AS ev_impact_usd, ROUND(-(CAST(2100000 AS DOUBLE) * CAST(12.0 AS DOUBLE)) / CAST(12400000.0 AS DOUBLE), 4) AS ev_impact_turns",
+          "result": [{"rejected_ebitda_usd": 2100000.0, "ev_impact_usd": -25200000.0, "ev_impact_turns": -2.0323}]
+        }
+      ],
+      "mitigation": "Obtain all settlement agreements for FY2023, FY2024, and FY2025 to determine whether the disputes involve separate counterparties and distinct legal matters. Obtain a legal opinion on whether any further settlements are expected in FY2026. If the series is genuinely concluded, obtain a written legal confirmation. Adjust the EBITDA base used for pricing to exclude this add-back unless conclusive evidence of non-recurrence is provided.",
+      "spa_protection": "Consider with transaction counsel: (1) Specific indemnity covering any FY2026 or subsequent settlement payments arising from the same series of channel-partner disputes; (2) seller representation that no further claims from former channel partners are pending or threatened; (3) purchase price adjustment mechanism tied to the EBITDA base if the settlement is confirmed as recurring; (4) escrow holdback sized to at least one year's settlement amount ($2.1M) pending resolution of any FY2026 exposure.",
+      "reviewer_status": "pending_escalation"
+    },
+    {
+      "finding_id": "RF-004",
+      "title": "Pro-Forma Unactioned Headcount Savings Included in Historical EBITDA (ADJ-005)",
+      "category": "Earnings",
+      "severity": "High",
+      "confidence": 0.95,
+      "what_would_raise_confidence": "Board resolution approving the restructuring. Redundancy notices served to affected employees. Signed settlement agreements with affected employees. Audited FY2026 accounts showing the saving was realised.",
+      "arr_at_risk_usd": null,
+      "arr_share_of_closing_arr_pct": null,
+      "ev_impact_usd": -16800000.00,
+      "ev_impact_turns": -1.3548,
+      "ev_method": "Rejected EBITDA adjustment amount ($1,400,000) × entry multiple (12.0). Agent 5 verdict: Rejected. Agent 8 preserves this verdict without modification.",
+      "pricing_assumptions": {
+        "entry_multiple": 12.0,
+        "management_adjusted_ebitda_usd": 12400000,
+        "contribution_margin": null,
+        "loss_probability": null,
+        "assumption_source": "Deal team configuration"
+      },
+      "finding": "Management's QoE schedule includes a $1,400,000 add-back for a planned headcount reduction of 14 FTE scheduled for Q1 FY2026, explicitly acknowledging that no notice has yet been served. This is a prospective, unactioned cost saving that has not been realised in the FY2025 analysis period; the headcount cost was incurred in FY2025. No board resolution, restructuring plan, or redundancy notice is evidenced in the data room. Agent 5 rejected this adjustment as a prospective pro-forma item inappropriate for inclusion in historical normalised EBITDA, implying an EV overstatement of $16.8M at the stated entry multiple.",
+      "contradicts_claim": "CLM-05",
+      "related_claims": [],
+      "source_findings": {
+        "clause_ids": [],
+        "adjustment_ids": ["ADJ-005"],
+        "conflict_ids": [],
+        "claim_ids": ["CLM-05"]
+      },
+      "affected_entities": {
+        "customer_ids": [],
+        "contract_ids": [],
+        "product_ids": []
+      },
+      "evidence": [
+        {
+          "type": "document",
+          "ref": "08_QoE_Adjustment_Schedule_Mgmt.md",
+          "page": 1,
+          "section": "ADJ-005 row",
+          "quote": "Planned headcount reduction of 14 FTE scheduled for Q1 FY2026. No notice has yet been served."
+        },
+        {
+          "type": "query",
+          "ref": "workspace.aava_deal_studio.mgmt_ebitda_adjustment — EV calculation",
+          "sql": "SELECT CAST(1400000 AS DOUBLE) AS rejected_ebitda_usd, ROUND(-(CAST(1400000 AS DOUBLE) * CAST(12.0 AS DOUBLE)), 2) AS ev_impact_usd, ROUND(-(CAST(1400000 AS DOUBLE) * CAST(12.0 AS DOUBLE)) / CAST(12400000.0 AS DOUBLE), 4) AS ev_impact_turns",
+          "result": [{"rejected_ebitda_usd": 1400000.0, "ev_impact_usd": -16800000.0, "ev_impact_turns": -1.3548}]
+        }
+      ],
+      "mitigation": "Require management to provide a board-approved restructuring plan with redundancy notices served prior to close if this saving is to be credited in the EBITDA base. Alternatively, exclude the adjustment from the pricing EBITDA base and treat any realised saving as post-close upside. Obtain payroll data to independently verify the $1.4M saving estimate.",
+      "spa_protection": "Consider with transaction counsel: (1) Seller covenant to complete the headcount reduction within an agreed post-close period as a condition of any earn-out or EBITDA-linked consideration; (2) purchase price adjustment mechanism reducing consideration if the restructuring is not completed within a defined post-close window; (3) seller representation that the restructuring plan has been approved by the board and that no employment law impediments exist.",
+      "reviewer_status": "pending_escalation"
+    },
+    {
+      "finding_id": "RF-005",
+      "title": "Pro-Forma New Logo Annualisation Included in Historical EBITDA (ADJ-010)",
+      "category": "Earnings",
+      "severity": "High",
+      "confidence": 0.88,
+      "what_would_raise_confidence": "Executed contracts for all new FY2025 logos confirming contracted ACV/ARR. Invoices covering a full 12-month period for each new logo. Management's annualisation methodology and workings showing how $1,650,000 was derived from specific customer contracts.",
+      "arr_at_risk_usd": null,
+      "arr_share_of_closing_arr_pct": null,
+      "ev_impact_usd": -19800000.00,
+      "ev_impact_turns": -1.5968,
+      "ev_method": "Rejected EBITDA adjustment amount ($1,650,000) × entry multiple (12.0). Agent 5 verdict: Rejected. Agent 8 preserves this verdict without modification.",
+      "pricing_assumptions": {
+        "entry_multiple": 12.0,
+        "management_adjusted_ebitda_usd": 12400000,
+        "contribution_margin": null,
+        "loss_probability": null,
+        "assumption_source": "Deal team configuration"
+      },
+      "finding": "Management's QoE schedule adds back $1,650,000 as the annualised full-year contribution of new logos won during FY2025. SQL analysis identifies 20 new customers with first_order_date in FY2025 generating actual FY2025 revenue of $1,878,956, which is already captured in reported EBITDA. The $1,650,000 adjustment adds prospective revenue not earned in FY2025 to the historical EBITDA base; Cascade Foods Holdings alone accounts for 64% of new logo revenue with only 3 invoices, making annualisation highly assumption-dependent. Agent 5 rejected this adjustment as a prospective pro-forma item, implying an EV overstatement of $19.8M at the stated entry multiple.",
+      "contradicts_claim": "CLM-05",
+      "related_claims": ["CLM-02"],
+      "source_findings": {
+        "clause_ids": [],
+        "adjustment_ids": ["ADJ-010"],
+        "conflict_ids": [],
+        "claim_ids": ["CLM-05", "CLM-02"]
+      },
+      "affected_entities": {
+        "customer_ids": ["CUST-0006"],
+        "contract_ids": ["CTR-00006"],
+        "product_ids": []
+      },
+      "evidence": [
+        {
+          "type": "document",
+          "ref": "08_QoE_Adjustment_Schedule_Mgmt.md",
+          "page": 1,
+          "section": "ADJ-010 row",
+          "quote": "Annualising the FY2025 in-year contribution of logos won during the year."
+        },
+        {
+          "type": "query",
+          "ref": "workspace.aava_deal_studio.fact_invoice — new logo revenue test",
+          "sql": "SELECT c.customer_id, c.customer_name, c.first_order_date, MIN(fi.invoice_date) as first_invoice_date, MAX(fi.invoice_date) as last_invoice_date, SUM(fi.invoice_amount_usd) as fy2025_revenue, COUNT(fi.invoice_id) as invoice_count FROM workspace.aava_deal_studio.fact_invoice fi JOIN workspace.aava_deal_studio.dim_customer c ON fi.customer_id = c.customer_id WHERE fi.invoice_date >= '2025-01-01' AND fi.invoice_date <= '2025-12-31' AND c.first_order_date >= '2025-01-01' GROUP BY c.customer_id, c.customer_name, c.first_order_date ORDER BY fy2025_revenue DESC",
+          "result": [{"summary": "20 new logos, total FY2025 revenue $1,878,956; Cascade Foods Holdings $1,206,022 (3 invoices, 64% of total)"}]
+        },
+        {
+          "type": "query",
+          "ref": "workspace.aava_deal_studio.mgmt_ebitda_adjustment — EV calculation",
+          "sql": "SELECT CAST(1650000 AS DOUBLE) AS rejected_ebitda_usd, ROUND(-(CAST(1650000 AS DOUBLE) * CAST(12.0 AS DOUBLE)), 2) AS ev_impact_usd, ROUND(-(CAST(1650000 AS DOUBLE) * CAST(12.0 AS DOUBLE)) / CAST(12400000.0 AS DOUBLE), 4) AS ev_impact_turns",
+          "result": [{"rejected_ebitda_usd": 1650000.0, "ev_impact_usd": -19800000.0, "ev_impact_turns": -1.5968}]
+        }
+      ],
+      "mitigation": "Require management to provide executed contracts for all new FY2025 logos with contracted ACV supporting the annualisation basis. Validate the annualisation methodology against actual invoiced amounts. Exclude the adjustment from the pricing EBITDA base unless contractual ARR is independently confirmed. Treat confirmed contracted ARR as a forward-looking metric rather than a historical EBITDA add-back.",
+      "spa_protection": "Consider with transaction counsel: (1) Seller representation that all new FY2025 logos have executed contracts with stated ACV; (2) earn-out mechanism tied to new logo ARR retention through the first full year post-close; (3) purchase price adjustment if new logo ARR falls below a defined threshold within 12 months of close.",
+      "reviewer_status": "pending_escalation"
+    },
+    {
+      "finding_id": "RF-006",
+      "title": "Atlas Distribution Exclusivity Blocks CIM European Growth Plan and Creates Direct-Sales Compliance Risk",
+      "category": "Contract",
+      "severity": "High",
+      "confidence": 0.93,
+      "what_would_raise_confidence": "Signed waiver, amendment, or termination of the Atlas exclusivity covenant. Full customer country normalisation confirming which existing direct customers are within the defined Territory. Any Atlas amendments or waivers addressing direct sales. EU data residency implementation roadmap with committed timeline.",
+      "arr_at_risk_usd": 1682443.84,
+      "arr_share_of_closing_arr_pct": 4.35,
+      "ev_impact_usd": -2826505.65,
+      "ev_impact_turns": -0.2279,
+      "ev_method": "ARR at risk (existing direct territory customers $1,682,443.84) × contribution margin assumption (0.40) × loss probability assumption (0.35) × entry multiple (12.0). The $6M FY2028 growth plan ARR is a forecast and cannot be independently priced; the EV impact here reflects only the existing direct ARR at compliance risk. Assumptions are deal-team inputs, not observed facts.",
+      "pricing_assumptions": {
+        "entry_multiple": 12.0,
+        "management_adjusted_ebitda_usd": 12400000,
+        "contribution_margin": 0.40,
+        "loss_probability": 0.35,
+        "assumption_source": "Deal team configuration"
+      },
+      "finding": "The executed Atlas Distribution Reseller Agreement (CTR-00004, DOC-05, Section 4.3) grants Atlas sole and exclusive distribution rights in the EU, UK, Switzerland, and Norway, and expressly prohibits the Supplier from directly or indirectly marketing, licensing, selling, or delivering the platform in the Territory; the exclusivity survives assignment and binds any successor in interest (Section 22.1). The CIM (Page 31) presents direct European expansion as the primary growth vector worth $6M ARR by FY2028, which is contractually blocked for the duration of the Atlas agreement (expiring 2029-12-31). SQL identifies 41 existing direct customers in Territory countries, 10 of whom commenced after the exclusivity took effect in January 2024, creating a potential breach of the exclusivity covenant. The board itself questioned whether the Atlas arrangement permits direct sales (Item 9, Q3 2025 minutes) and management had not reverted. The CIM growth claim (CLM-07) is contradicted by the executed contract.",
+      "contradicts_claim": "CLM-07",
+      "related_claims": [],
+      "source_findings": {
+        "clause_ids": ["CL-016", "CL-017", "CL-018", "CL-019", "CL-020", "CL-021", "CL-022"],
+        "adjustment_ids": [],
+        "conflict_ids": ["CF-005", "CF-006"],
+        "claim_ids": ["CLM-07"]
+      },
+      "affected_entities": {
+        "customer_ids": ["CUST-0004"],
+        "contract_ids": ["CTR-00004"],
+        "product_ids": []
+      },
+      "evidence": [
+        {
+          "type": "document",
+          "ref": "05_Reseller_Agreement_Atlas_Distribution_2024.md",
+          "page": 5,
+          "section": "Section 4.3 Exclusivity Covenant",
+          "quote": "Supplier shall not, whether directly or through any affiliate, agent, or other reseller, market, license, sell, or deliver the Platform to customers within the Territory and must refer inbound enquiries to Reseller within five business days."
+        },
+        {
+          "type": "document",
+          "ref": "05_Reseller_Agreement_Atlas_Distribution_2024.md",
+          "page": 30,
+          "section": "Section 22.1 Change of Control",
+          "quote": "exclusivity survives any assignment and binds any successor in interest."
+        },
+        {
+          "type": "document",
+          "ref": "05_Reseller_Agreement_Atlas_Distribution_2024.md",
+          "page": 12,
+          "section": "Section 8.2 Early Termination",
+          "quote": "Supplier may terminate for convenience on twenty-four months' written notice, subject to payment of a termination sum equal to two times trailing twelve month gross margin earned by Reseller."
+        },
+        {
+          "type": "document",
+          "ref": "01_CIM_Excerpt_Harborline.md",
+          "page": 31,
+          "section": "Growth Strategy",
+          "quote": "Direct expansion into Europe is the primary growth vector, worth $6M ARR by FY2028."
+        },
+        {
+          "type": "document",
+          "ref": "09_Board_Minutes_Q3_2025.md",
+          "page": 1,
+          "section": "Item 9 — European Strategy",
+          "quote": "whether the Atlas Distribution arrangement permits direct sales in Europe; management undertook to revert."
+        },
+        {
+          "type": "query",
+          "ref": "workspace.aava_deal_studio.dim_customer — direct territory customers",
+          "sql": "SELECT COUNT(*) AS direct_customers, SUM(CASE WHEN to_date(first_order_date) >= to_date('2024-01-01') THEN 1 ELSE 0 END) AS started_after_exclusivity FROM workspace.aava_deal_studio.dim_customer WHERE country IN ('United Kingdom','Germany','Netherlands','Switzerland','Norway') AND customer_id <> 'CUST-0004'",
+          "result": [{"direct_customers": 41, "started_after_exclusivity": 10}]
+        },
+        {
+          "type": "query",
+          "ref": "workspace.aava_deal_studio.fact_subscription_month — territory ARR",
+          "sql": "SELECT SUM(s.arr_usd) AS latest_arr_usd FROM workspace.aava_deal_studio.fact_subscription_month s JOIN workspace.aava_deal_studio.dim_customer c ON s.customer_id = c.customer_id WHERE c.country IN ('United Kingdom','Germany','Netherlands','Switzerland','Norway') AND c.customer_id <> 'CUST-0004' AND s.snapshot_month = (SELECT MAX(snapshot_month) FROM workspace.aava_deal_studio.fact_subscription_month)",
+          "result": [{"latest_arr_usd": 1682443.84}]
+        },
+        {
+          "type": "query",
+          "ref": "workspace.aava_deal_studio.fact_subscription_month — EV calculation",
+          "sql": "SELECT CAST(1682443.84 AS DOUBLE) AS arr_at_risk_usd, ROUND(CAST(1682443.84 AS DOUBLE) / CAST(38662136.43 AS DOUBLE) * 100, 2) AS arr_share_pct, ROUND(-(CAST(1682443.84 AS DOUBLE) * CAST(0.40 AS DOUBLE) * CAST(0.35 AS DOUBLE) * CAST(12.0 AS DOUBLE)), 2) AS ev_impact_usd, ROUND(-(CAST(1682443.84 AS DOUBLE) * CAST(0.40 AS DOUBLE) * CAST(0.35 AS DOUBLE) * CAST(12.0 AS DOUBLE)) / CAST(12400000.0 AS DOUBLE), 4) AS ev_impact_turns",
+          "result": [{"arr_at_risk_usd": 1682443.84, "arr_share_pct": 4.35, "ev_impact_usd": -2826505.65, "ev_impact_turns": -0.2279}]
+        }
+      ],
+      "mitigation": "Obtain a legal opinion on whether existing direct Territory customers constitute a breach of the exclusivity covenant and quantify the exposure. Engage Atlas Distribution to negotiate a waiver, amendment, or early termination of the exclusivity covenant. If termination is pursued, model the termination payment (2× trailing 12-month gross margin). Revise the CIM growth plan to reflect the contractual constraint and develop an alternative European go-to-market strategy through Atlas or a renegotiated channel arrangement. Obtain EU data residency capability roadmap with committed timeline.",
+      "spa_protection": "Consider with transaction counsel: (1) Specific indemnity covering any claims by Atlas arising from existing direct Territory customer relationships that may constitute a breach of the exclusivity covenant; (2) seller covenant to obtain Atlas consent or amendment prior to close; (3) condition precedent requiring resolution of the exclusivity conflict before closing if the growth plan is material to the investment thesis; (4) purchase price adjustment reflecting the inaccessibility of the $6M European ARR growth plan during the Atlas exclusivity period; (5) seller representation that no breach of the Atlas exclusivity covenant has occurred.",
+      "reviewer_status": "pending_escalation"
+    },
+    {
+      "finding_id": "RF-007",
+      "title": "Recurring Revenue Quality Overstated — 421 Invoice Lines Fail Independent Recurrence Test",
+      "category": "Revenue",
+      "severity": "Medium",
+      "confidence": 0.90,
+      "what_would_raise_confidence": "Contract-level billing support or product master rules proving whether the 421 tagged lines without restated support should still count as recurring. A reconciliation from billed revenue to any CIM-adjusted revenue basis if management intended a non-GAAP revenue definition.",
+      "arr_at_risk_usd": null,
+      "arr_share_of_closing_arr_pct": null,
+      "ev_impact_usd": null,
+      "ev_impact_turns": null,
+      "ev_method": "EV impact not independently priced. The recurring revenue overstatement is a revenue quality and classification risk. The 421 lines ($4,675,078) tagged as recurring fail the independent restated test (subscription delivery model + service period evidence). Pricing impact depends on whether these lines represent genuinely recurring contracted revenue; this cannot be determined without contract-level billing support. Setting ev_impact_usd to null to avoid fabricating an unsupported valuation.",
+      "pricing_assumptions": {
+        "entry_multiple": 12.0,
+        "management_adjusted_ebitda_usd": 12400000,
+        "contribution_margin": null,
+        "loss_probability": null,
+        "assumption_source": "Deal team configuration"
+      },
+      "finding": "Management claims 94% of revenue is recurring subscription revenue (CLM-03, CIM Page 11). Agent 7 computed a restated recurring revenue share of 87.4% using an independent test requiring subscription delivery model and service period evidence, versus a management-tagged share of 98.34%. The gap of approximately 6.6 percentage points relative to the claimed 94% represents $4,675,078 of revenue across 421 invoice lines that are tagged as recurring but fail the independent corroboration test. This overstates the recurring revenue quality of the business and may affect the multiple at which the business should be valued, but the EV impact cannot be defensibly quantified without contract-level evidence confirming whether the 421 lines represent genuinely contracted recurring obligations.",
+      "contradicts_claim": "CLM-03",
+      "related_claims": [],
+      "source_findings": {
+        "clause_ids": [],
+        "adjustment_ids": [],
+        "conflict_ids": [],
+        "claim_ids": ["CLM-03"]
+      },
+      "affected_entities": {
+        "customer_ids": [],
+        "contract_ids": [],
+        "product_ids": []
+      },
+      "evidence": [
+        {
+          "type": "document",
+          "ref": "01_CIM_Excerpt_Harborline.md",
+          "page": 11,
+          "section": "Revenue Quality",
+          "quote": "94% of revenue is recurring subscription revenue."
+        },
+        {
+          "type": "query",
+          "ref": "workspace.aava_deal_studio.fact_invoice_line — recurring revenue restatement",
+          "sql": "SELECT total_revenue, tagged_revenue, tagged_pct, restated_revenue, restated_pct, tagged_failing_restated_amount, tagged_failing_restated_lines FROM [recurring revenue restatement query]",
+          "result": [{"total_revenue": 42730073.29, "tagged_revenue": 42019535.98, "tagged_pct": 98.34, "restated_revenue": 37344457.53, "restated_pct": 87.4, "tagged_failing_restated_amount": 4675078.45, "tagged_failing_restated_lines": 421}]
+        }
+      ],
+      "mitigation": "Request contract-level billing schedules for the 421 invoice lines failing the independent recurrence test to confirm whether they represent contracted recurring obligations. Restate the recurring revenue percentage using the independently supported methodology. If a material portion of the $4.675M is confirmed as non-recurring, adjust the revenue quality assessment and consider its impact on the entry multiple.",
+      "spa_protection": "Consider with transaction counsel: (1) Seller representation that the stated percentage of recurring revenue is accurate and supported by executed contracts; (2) post-close covenant requiring seller to provide billing schedules supporting the recurring revenue classification within a defined period; (3) purchase price adjustment if the independently verified recurring revenue percentage falls below a defined threshold.",
+      "reviewer_status": "pending"
+    },
+    {
+      "finding_id": "RF-008",
+      "title": "DSO Deterioration and Working Capital Misrepresentation",
+      "category": "Working capital",
+      "severity": "Low",
+      "confidence": 0.84,
+      "what_would_raise_confidence": "A true AR balance ledger or due-date based DSO schedule. Customer-level payment terms and aging analysis. Confirmation of whether the three largest customers have agreed extended payment terms or are in arrears.",
+      "arr_at_risk_usd": null,
+      "arr_share_of_closing_arr_pct": null,
+      "ev_impact_usd": null,
+      "ev_impact_turns": null,
+      "ev_method": "EV impact not priced. Working capital DSO deterioration does not have a defined EV pricing formula in the deal settings. The incremental AR balance implied by the DSO gap (8.8 days × daily revenue = approximately $1.03M) represents a working capital adjustment consideration rather than an EBITDA or ARR-risk EV impact. Setting ev_impact_usd to null; this should be addressed through a normalised working capital peg in the SPA.",
+      "pricing_assumptions": {
+        "entry_multiple": 12.0,
+        "management_adjusted_ebitda_usd": 12400000,
+        "contribution_margin": null,
+        "loss_probability": null,
+        "assumption_source": "Deal team configuration"
+      },
+      "finding": "Management claims DSO is stable at approximately 45 days (CLM-06, CIM Page 22). Agent 7 computed weighted collection days of 63.4 (Q1), 76.1 (Q2), 75.4 (Q3), and 53.8 (Q4) for FY2025, with a full-year weighted average materially above 45 days. Board minutes (Item 11, Q3 2025) confirm that receivables from the three largest customers extended materially during the year. The DSO gap of approximately 8.8 days relative to the claimed 45-day level implies approximately $1.03M of incremental AR balance. The claim of stability is contradicted by the quarterly trend showing peak deterioration in Q2-Q3 2025 before partial recovery in Q4.",
+      "contradicts_claim": "CLM-06",
+      "related_claims": [],
+      "source_findings": {
+        "clause_ids": [],
+        "adjustment_ids": [],
+        "conflict_ids": [],
+        "claim_ids": ["CLM-06"]
+      },
+      "affected_entities": {
+        "customer_ids": [],
+        "contract_ids": [],
+        "product_ids": []
+      },
+      "evidence": [
+        {
+          "type": "document",
+          "ref": "09_Board_Minutes_Q3_2025.md",
+          "page": 1,
+          "section": "Item 11 — Working Capital",
+          "quote": "receivables from the three largest customers had extended materially during the year."
+        },
+        {
+          "type": "query",
+          "ref": "workspace.aava_deal_studio.fact_collection — DSO by quarter",
+          "sql": "SELECT concat(year(to_date(i.invoice_date)), '-Q', quarter(to_date(i.invoice_date))) AS q, ROUND(AVG(c.days_outstanding), 1) AS avg_days, ROUND(SUM(c.days_outstanding * i.invoice_amount_usd) / SUM(i.invoice_amount_usd), 1) AS weighted_days FROM workspace.aava_deal_studio.fact_collection c JOIN workspace.aava_deal_studio.fact_invoice i ON c.invoice_id = i.invoice_id WHERE year(to_date(i.invoice_date))=2025 GROUP BY 1 ORDER BY 1",
+          "result": [
+            {"q": "2025-Q1", "avg_days": 51.6, "weighted_days": 63.4},
+            {"q": "2025-Q2", "avg_days": 52.6, "weighted_days": 76.1},
+            {"q": "2025-Q3", "avg_days": 54.5, "weighted_days": 75.4},
+            {"q": "2025-Q4", "avg_days": 47.4, "weighted_days": 53.8}
+          ]
+        },
+        {
+          "type": "query",
+          "ref": "workspace.aava_deal_studio.fact_collection — incremental AR",
+          "sql": "SELECT ROUND(53.8 - 45.0, 1) AS dso_gap_days, ROUND(42730073.29 / 365.0 * (53.8 - 45.0), 2) AS incremental_ar_usd",
+          "result": [{"dso_gap_days": 8.8, "incremental_ar_usd": 1030204.51}]
+        }
+      ],
+      "mitigation": "Obtain a full AR aging schedule as of the expected close date. Identify the three largest customers with extended receivables and confirm whether extensions are contractual or represent collection risk. Establish a normalised working capital peg based on independently verified DSO. Investigate whether the Q4 2025 improvement is sustainable or reflects accelerated collections ahead of the sale process.",
+      "spa_protection": "Consider with transaction counsel: (1) Normalised working capital peg in the SPA based on independently verified DSO, with a post-close true-up mechanism; (2) seller representation that no customer receivables are in dispute or subject to set-off rights; (3) specific disclosure of any extended payment terms agreed with the three largest customers; (4) working capital adjustment mechanism if closing AR balance deviates from the agreed peg.",
+      "reviewer_status": "pending"
+    }
+  ],
+  "deduplication": {
+    "performed": true,
+    "overlap_groups": [
+      {
+        "group_id": "OG-001",
+        "description": "Northwind Retail Group ARR exposure appears in RF-001 (change-of-control contract risk) and is also the primary driver of the customer concentration risk (CLM-01, 27.44% revenue share). The concentration risk is documented within RF-001 rather than as a separate finding to avoid double-counting the $10.5M ARR in aggregate totals.",
+        "findings_consolidated": ["RF-001"],
+        "arr_counted_once_usd": 10547040.61
+      },
+      {
+        "group_id": "OG-002",
+        "description": "Vantage Grocers ARR exposure ($4.68M) appears in RF-002 covering MFN pricing, SLA termination risk, and renewal uncertainty. The NRR/GRR overstatement (CLM-02, CLM-04, CLM-12) is a related retention metric finding but does not add incremental ARR beyond what is already captured in RF-002. NRR/GRR metrics are documented as context within RF-002.",
+        "findings_consolidated": ["RF-002"],
+        "arr_counted_once_usd": 4681407.34
+      },
+      {
+        "group_id": "OG-003",
+        "description": "EBITDA bridge findings RF-003, RF-004, and RF-005 each represent distinct rejected adjustments (ADJ-003, ADJ-005, ADJ-010) with separate economic bases. No double-counting between them. All three contradict CLM-05 but are priced separately as each represents a distinct EBITDA add-back.",
+        "findings_consolidated": ["RF-003", "RF-004", "RF-005"],
+        "arr_counted_once_usd": null
+      },
+      {
+        "group_id": "OG-004",
+        "description": "Atlas Distribution exclusivity (RF-006) and the European growth plan conflict (CF-005, CF-006, CLM-07) are consolidated into one finding. The $6M FY2028 forecast ARR is not independently priced as it is a forward-looking claim; only the existing direct Territory ARR ($1.68M) is used as the ARR-at-risk basis.",
+        "findings_consolidated": ["RF-006"],
+        "arr_counted_once_usd": 1682443.84
+      }
+    ],
+    "method": "Economic exposure identified per underlying customer/contract/adjustment. Where multiple upstream agents flagged the same underlying risk, all evidence and IDs were consolidated into one finding. ARR at risk summed only for distinct customer exposures (CUST-0001, CUST-0002, Territory direct customers). EBITDA findings priced separately per rejected adjustment. No ARR and EBITDA double-counting in aggregate totals."
+  },
+  "sql_evidence": [
+    {
+      "sql_evidence_id": "SQL-001",
+      "purpose": "Total closing ARR from latest snapshot month",
+      "logical_sources": ["ARR by month"],
+      "physical_sources": ["workspace.aava_deal_studio.fact_subscription_month"],
+      "sql": "SELECT SUM(arr_usd) AS total_closing_arr_usd FROM workspace.aava_deal_studio.fact_subscription_month WHERE snapshot_month = (SELECT MAX(snapshot_month) FROM workspace.aava_deal_studio.fact_subscription_month)",
+      "result": [{"total_closing_arr_usd": 38662136.43}]
+    },
+    {
+      "sql_evidence_id": "SQL-002",
+      "purpose": "RF-001 Northwind ARR at risk, share of closing ARR, EV impact, EV impact turns",
+      "logical_sources": ["ARR by month", "customer"],
+      "physical_sources": ["workspace.aava_deal_studio.fact_subscription_month"],
+      "sql": "SELECT CAST(10547040.61 AS DOUBLE) AS arr_at_risk_usd, ROUND(CAST(10547040.61 AS DOUBLE) / CAST(38662136.43 AS DOUBLE) * 100, 2) AS arr_share_pct, ROUND(-(CAST(10547040.61 AS DOUBLE) * CAST(0.40 AS DOUBLE) * CAST(0.35 AS DOUBLE) * CAST(12.0 AS DOUBLE)), 2) AS ev_impact_usd, ROUND(-(CAST(10547040.61 AS DOUBLE) * CAST(0.40 AS DOUBLE) * CAST(0.35 AS DOUBLE) * CAST(12.0 AS DOUBLE)) / CAST(12400000.0 AS DOUBLE), 4) AS ev_impact_turns",
+      "result": [{"arr_at_risk_usd": 10547040.61, "arr_share_pct": 27.28, "ev_impact_usd": -17719028.22, "ev_impact_turns": -1.429}]
+    },
+    {
+      "sql_evidence_id": "SQL-003",
+      "purpose": "RF-002 Vantage ARR at risk, share of closing ARR, EV impact, EV impact turns",
+      "logical_sources": ["ARR by month", "customer"],
+      "physical_sources": ["workspace.aava_deal_studio.fact_subscription_month"],
+      "sql": "SELECT CAST(4681407.34 AS DOUBLE) AS arr_at_risk_usd, ROUND(CAST(4681407.34 AS DOUBLE) / CAST(38662136.43 AS DOUBLE) * 100, 2) AS arr_share_pct, ROUND(-(CAST(4681407.34 AS DOUBLE) * CAST(0.40 AS DOUBLE) * CAST(0.35 AS DOUBLE) * CAST(12.0 AS DOUBLE)), 2) AS ev_impact_usd, ROUND(-(CAST(4681407.34 AS DOUBLE) * CAST(0.40 AS DOUBLE) * CAST(0.35 AS DOUBLE) * CAST(12.0 AS DOUBLE)) / CAST(12400000.0 AS DOUBLE), 4) AS ev_impact_turns",
+      "result": [{"arr_at_risk_usd": 4681407.34, "arr_share_pct": 12.11, "ev_impact_usd": -7864764.33, "ev_impact_turns": -0.6343}]
+    },
+    {
+      "sql_evidence_id": "SQL-004",
+      "purpose": "RF-003 Recurring settlement rejected EBITDA EV impact and turns",
+      "logical_sources": ["EBITDA adjustments"],
+      "physical_sources": ["workspace.aava_deal_studio.mgmt_ebitda_adjustment"],
+      "sql": "SELECT CAST(2100000 AS DOUBLE) AS rejected_ebitda_usd, ROUND(-(CAST(2100000 AS DOUBLE) * CAST(12.0 AS DOUBLE)), 2) AS ev_impact_usd, ROUND(-(CAST(2100000 AS DOUBLE) * CAST(12.0 AS DOUBLE)) / CAST(12400000.0 AS DOUBLE), 4) AS ev_impact_turns",
+      "result": [{"rejected_ebitda_usd": 2100000.0, "ev_impact_usd": -25200000.0, "ev_impact_turns": -2.0323}]
+    },
+    {
+      "sql_evidence_id": "SQL-005",
+      "purpose": "RF-004 Pro-forma headcount savings rejected EBITDA EV impact and turns",
+      "logical_sources": ["EBITDA adjustments"],
+      "physical_sources": ["workspace.aava_deal_studio.mgmt_ebitda_adjustment"],
+      "sql": "SELECT CAST(1400000 AS DOUBLE) AS rejected_ebitda_usd, ROUND(-(CAST(1400000 AS DOUBLE) * CAST(12.0 AS DOUBLE)), 2) AS ev_impact_usd, ROUND(-(CAST(1400000 AS DOUBLE) * CAST(12.0 AS DOUBLE)) / CAST(12400000.0 AS DOUBLE), 4) AS ev_impact_turns",
+      "result": [{"rejected_ebitda_usd": 1400000.0, "ev_impact_usd": -16800000.0, "ev_impact_turns": -1.3548}]
+    },
+    {
+      "sql_evidence_id": "SQL-006",
+      "purpose": "RF-005 Pro-forma new logo annualisation rejected EBITDA EV impact and turns",
+      "logical_sources": ["EBITDA adjustments"],
+      "physical_sources": ["workspace.aava_deal_studio.mgmt_ebitda_adjustment"],
+      "sql": "SELECT CAST(1650000 AS DOUBLE) AS rejected_ebitda_usd, ROUND(-(CAST(1650000 AS DOUBLE) * CAST(12.0 AS DOUBLE)), 2) AS ev_impact_usd, ROUND(-(CAST(1650000 AS DOUBLE) * CAST(12.0 AS DOUBLE)) / CAST(12400000.0 AS DOUBLE), 4) AS ev_impact_turns",
+      "result": [{"rejected_ebitda_usd": 1650000.0, "ev_impact_usd": -19800000.0, "ev_impact_turns": -1.5968}]
+    },
+    {
+      "sql_evidence_id": "SQL-007",
+      "purpose": "RF-006 Atlas territory direct ARR at risk, share of closing ARR, EV impact, EV impact turns",
+      "logical_sources": ["ARR by month", "customer"],
+      "physical_sources": ["workspace.aava_deal_studio.fact_subscription_month", "workspace.aava_deal_studio.dim_customer"],
+      "sql": "SELECT CAST(1682443.84 AS DOUBLE) AS arr_at_risk_usd, ROUND(CAST(1682443.84 AS DOUBLE) / CAST(38662136.43 AS DOUBLE) * 100, 2) AS arr_share_pct, ROUND(-(CAST(1682443.84 AS DOUBLE) * CAST(0.40 AS DOUBLE) * CAST(0.35 AS DOUBLE) * CAST(12.0 AS DOUBLE)), 2) AS ev_impact_usd, ROUND(-(CAST(1682443.84 AS DOUBLE) * CAST(0.40 AS DOUBLE) * CAST(0.35 AS DOUBLE) * CAST(12.0 AS DOUBLE)) / CAST(12400000.0 AS DOUBLE), 4) AS ev_impact_turns",
+      "result": [{"arr_at_risk_usd": 1682443.84, "arr_share_pct": 4.35, "ev_impact_usd": -2826505.65, "ev_impact_turns": -0.2279}]
+    },
+    {
+      "sql_evidence_id": "SQL-008",
+      "purpose": "Deduplicated ARR at risk aggregate (RF-001 + RF-002 + RF-006)",
+      "logical_sources": ["ARR by month"],
+      "physical_sources": ["workspace.aava_deal_studio.fact_subscription_month"],
+      "sql": "SELECT ROUND(10547040.61 + 4681407.34 + 1682443.84, 2) AS deduplicated_arr_at_risk_usd, ROUND((10547040.61 + 4681407.34 + 1682443.84) / 38662136.43 * 100, 2) AS deduplicated_arr_at_risk_pct",
+      "result": [{"deduplicated_arr_at_risk_usd": 16910891.79, "deduplicated_arr_at_risk_pct": 43.74}]
+    },
+    {
+      "sql_evidence_id": "SQL-009",
+      "purpose": "Deduplicated total EV impact and total EV impact turns",
+      "logical_sources": ["EBITDA adjustments", "ARR by month"],
+      "physical_sources": ["workspace.aava_deal_studio.mgmt_ebitda_adjustment", "workspace.aava_deal_studio.fact_subscription_month"],
+      "sql": "SELECT ROUND(-17719028.22 + -7864764.33 + -25200000.00 + -16800000.00 + -19800000.00 + -2826505.65, 2) AS total_ev_impact_usd, ROUND((-17719028.22 + -7864764.33 + -25200000.00 + -16800000.00 + -19800000.00 + -2826505.65) / 12400000.0, 4) AS total_ev_impact_turns",
+      "result": [{"total_ev_impact_usd": -90210298.20, "total_ev_impact_turns": -7.275}]
+    }
+  ],
+  "unresolved_items": [
+    {
+      "unresolved_id": "UR-001",
+      "related_finding_ids": ["RF-002"],
+      "issue": "The exact MFN credit amount owed to Vantage Grocers cannot be calculated without knowing the precise date the Pinnacle 34% discount was first applied and the Vantage ACV billing amounts from that date. The board noted the issue in October 2025 but no credit note or resolution is evidenced.",
+      "required_evidence": "Pricing approval memo for Pinnacle discount (March 2025). Vantage billing records from March 2025 to present. Legal opinion on MFN trigger and credit calculation methodology.",
+      "pricing_impact": "Potential retrospective credit obligation to Vantage; amount unquantified but could be material relative to Vantage ACV of $4.1M."
+    },
+    {
+      "unresolved_id": "UR-002",
+      "related_finding_ids": ["RF-006"],
+      "issue": "10 direct customers in the Atlas Territory commenced after the exclusivity took effect in January 2024. It is unclear whether these relationships constitute a breach of the exclusivity covenant or whether any waiver or carve-out exists. Country normalisation (UK vs United Kingdom) may affect the count.",
+      "required_evidence": "Full customer country normalisation. Any Atlas amendments, waivers, or side letters. Legal opinion on whether existing direct Territory relationships breach Section 4.3.",
+      "pricing_impact": "Potential breach claim by Atlas; termination payment under Section 8.2 (2× trailing 12-month gross margin) if Supplier seeks to exit the arrangement."
+    },
+    {
+      "unresolved_id": "UR-003",
+      "related_finding_ids": ["RF-003"],
+      "issue": "Settlement agreements for FY2023, FY2024, and FY2025 are not in the data room. Management claims the disputes relate to separate matters; the board characterises them as an ongoing series. The FY2026 exposure cannot be quantified without the underlying settlement documents.",
+      "required_evidence": "Settlement agreements for all three years. Legal opinion confirming whether the series is concluded. Any FY2026 provision in management accounts.",
+      "pricing_impact": "If a fourth settlement occurs in FY2026 at $2.1M, the recurring cost is confirmed and the full $25.2M EV impact is supported. If the series is genuinely concluded, the EV impact may be partially recoverable."
+    },
+    {
+      "unresolved_id": "UR-004",
+      "related_finding_ids": ["RF-007"],
+      "issue": "421 invoice lines ($4,675,078) tagged as recurring fail the independent recurrence test. Without contract-level billing schedules, it cannot be determined whether these represent genuinely contracted recurring obligations or misclassified one-time items.",
+      "required_evidence": "Contract-level billing schedules for the 421 failing lines. Product master rules confirming delivery model classification.",
+      "pricing_impact": "If confirmed as non-recurring, the recurring revenue percentage falls to approximately 87.4%, potentially affecting the entry multiple and revenue quality assessment."
+    },
+    {
+      "unresolved_id": "UR-005",
+      "related_finding_ids": ["RF-001"],
+      "issue": "No executed amendments or consent letters for the Northwind MSA are in the data room. The consent process has not been initiated as of the Q3 2025 board meeting. The 180-day awareness window under Section 14.3 has not yet started but will commence upon announcement or signing.",
+      "required_evidence": "Northwind written consent to change of control. Confirmation that no other contracts contain similar consent requirements beyond those reviewed.",
+      "pricing_impact": "If consent is not obtained, Northwind ($10.5M ARR, 27.28% of closing ARR) has a contractual right to terminate, representing the largest single deal-completion risk."
+    }
+  ],
+  "validation": {
+    "clause_register_retrieved": true,
+    "ebitda_bridge_retrieved": true,
+    "conflicts_retrieved": true,
+    "claims_scoreboard_retrieved": true,
+    "ddl_parsed": true,
+    "physical_databricks_objects_dynamically_discovered": true,
+    "every_finding_supported_by_evidence": true,
+    "duplicate_upstream_findings_consolidated": true,
+    "no_unsupported_findings_added": true,
+    "agent4_clause_conclusions_preserved": true,
+    "agent5_adjustment_verdicts_preserved": true,
+    "agent6_conflicts_preserved": true,
+    "agent7_claim_verdicts_preserved": true,
+    "arr_values_sourced_from_databricks": true,
+    "closing_arr_sourced_through_databricks": true,
+    "arr_shares_calculated_through_databricks": true,
+    "rejected_ebitda_ev_calculations_executed_through_databricks_sql": true,
+    "arr_risk_ev_calculations_executed_through_databricks_sql": true,
+    "contribution_margin_assumption_explicitly_stated": true,
+    "loss_probability_assumption_explicitly_stated": true,
+    "entry_multiple_explicitly_stated": true,
+    "assumptions_not_represented_as_observed_facts": true,
+    "ev_impact_turns_calculated_through_databricks_sql": true,
+    "management_adjusted_ebitda_used_as_turns_denominator": true,
+    "duplicate_arr_exposure_removed_from_aggregate": true,
+    "duplicate_ev_impact_removed_from_aggregate": true,
+    "mitigation_present_for_every_finding": true,
+    "spa_protection_present_for_every_finding": true,
+    "spa_protection_framed_for_human_counsel_review": true,
+    "no_definitive_legal_conclusion_made": true,
+    "reviewer_status_populated": true,
+    "no_hardcoded_physical_database_object_names": true,
+    "no_hidden_benchmark_values_used": true,
+    "no_prior_run_expected_answers_used": true,
+    "no_final_investment_recommendation_made": true,
+    "final_json_valid": true,
+    "final_file_written_to_github": true
+  }
+}
