@@ -1,14 +1,1 @@
-{
-  "items": [],
-  "value_checks": [],
-  "files_checked": [],
-  "files_missing": [],
-  "self_check": {
-    "V1": false,
-    "V2": false,
-    "V3": false,
-    "V4": true,
-    "V5": false,
-    "V6": true
-  }
-}
+{"items":[],"value_checks":[],"files_checked":[],"files_missing":["wb_1/Input/deal_settings.json","wb_1/Input/doc_catalog.json"],"self_check":{"V1":false,"V2":false,"V3":false,"V4":true,"V5":false,"V6":true}}
