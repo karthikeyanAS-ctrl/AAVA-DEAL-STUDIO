@@ -1,0 +1,54 @@
+{
+  "deal_settings_used": {
+    "enterprise_value_usd": 148000000,
+    "entry_multiple": 12.0,
+    "price_basis_ebitda_usd": 12400000,
+    "close_date": "2026-03-31",
+    "contribution_margin": 0.4,
+    "loss_probabilities": {
+      "consent_needed_or_expires_within_12_months_no_auto_renewal": 0.35,
+      "renewal_under_review_escalation_or_sla_triggered": 0.3,
+      "sla_termination_right_exists_not_triggered": 0.15,
+      "other_contractual_exit_right": 0.1
+    },
+    "assumption_sources": {
+      "enterprise_value_usd": "deal settings",
+      "entry_multiple": "deal settings",
+      "price_basis_ebitda_usd": "deal settings",
+      "close_date": "deal settings",
+      "contribution_margin": "deal settings",
+      "loss_probabilities": "deal settings"
+    }
+  },
+  "latest_arr_month": "2025-12-01",
+  "total_arr_usd": 38662136.43,
+  "findings_by_severity": {"Critical": 5, "High": 4, "Medium": 2},
+  "total_ev_impact_usd": -120495168,
+  "total_ev_impact_turns": -9.72,
+  "indicative_ev_usd": 27504832,
+  "aggregate_sql": "WITH all_impacts AS (SELECT -25200000 AS ev_impact_usd UNION ALL SELECT -17719028 UNION ALL SELECT -16800000 UNION ALL SELECT -15000000 UNION ALL SELECT -19800000 UNION ALL SELECT -11724708 UNION ALL SELECT -6741227 UNION ALL SELECT -6480000 UNION ALL SELECT 0 UNION ALL SELECT -1030205) SELECT SUM(ev_impact_usd) AS total_ev_impact_usd, ROUND(SUM(ev_impact_usd) / 12400000.0, 2) AS total_ev_impact_turns, 148000000 + SUM(ev_impact_usd) AS indicative_ev_usd FROM all_impacts",
+  "observations": [
+    {
+      "title": "Atlas management summary shows auto-renew yes (180d), but the reviewed executed extract did not contain a renewal clause",
+      "evidence": [
+        {"type": "document", "ref": "vdr/07_Customer_Contract_Summary_Mgmt.md", "page": 1, "section": "Customer Contract Summary — Top Accounts", "quote": "| CTR-00004 | Atlas Distribution | 2,050,000 | 2029-12-31 | Yes (180d) | None noted | No | Standard reseller terms | EMEA channel partner |"},
+        {"type": "document", "ref": "vdr/05_Reseller_Agreement_Atlas_Distribution_2024.md", "page": 1, "section": "Term", "quote": "Six (6) years from 1 January 2024, expiring 31 December 2029."}
+      ]
+    }
+  ],
+  "upstream_issues": [
+    "wb_1/REVENUE_QUALITY_ANALYZER/revenue_quality_scorecard.json status is PARTIAL.",
+    "wb_1/CONTRACT_INTELLIGENCE_ANALYZER/clause_register.json status is PARTIAL.",
+    "wb_1/EARNINGS_CHALLENGE_ANALYZER/ebitda_bridge.json status is PARTIAL.",
+    "wb_1/CROSS_SOURCE_RECONCILIATION/conflicts.json status is PARTIAL.",
+    "wb_1/DOCUMENT_TRIAGE/doc_catalog.json was missing (404)."
+  ],
+  "data_gaps": [
+    "Revenue multiples for recurring versus non-recurring revenue were not provided, so M4 EV pricing is not supported by the data room.",
+    "A full AR-ledger DSO schedule was not provided, so the working-capital pricing uses weighted collection days as a directional proxy.",
+    "Payroll support and the cited compensation benchmark for ADJ-004 were not provided.",
+    "No executed contracts were supplied for CTR-00007 or CTR-00008.",
+    "No amendment package was supplied to test whether contract clauses were superseded."
+  ],
+  "self_check": {"C1": true, "C2": true, "C3": true, "C4": true, "C5": true, "C6": true, "C7": true, "C8": true}
+}
