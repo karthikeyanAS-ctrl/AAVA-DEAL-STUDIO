@@ -23,10 +23,10 @@
   "latest_arr_month": "2025-12-01",
   "total_arr_usd": 38662136.43,
   "findings_by_severity": {"Critical": 6, "High": 2, "Medium": 1},
-  "total_ev_impact_usd": -123538002,
-  "total_ev_impact_turns": -9.96,
-  "indicative_ev_usd": 24461998,
-  "aggregate_sql": "SELECT ROUND((-25064516 + -17623765 + -19693548 + -16709677 + -15350652 + -14919355 + -6704983 + -6445161 + -1030205),0) AS total_ev_impact_usd, ROUND(((-25064516 + -17623765 + -19693548 + -16709677 + -15350652 + -14919355 + -6704983 + -6445161 + -1030205) / 12400000),2) AS total_ev_impact_turns, ROUND(148000000 + (-25064516 + -17623765 + -19693548 + -16709677 + -15350652 + -14919355 + -6704983 + -6445161 + -1030205),0) AS indicative_ev_usd",
+  "total_ev_impact_usd": -121280700,
+  "total_ev_impact_turns": -9.78,
+  "indicative_ev_usd": 26719300,
+  "aggregate_sql": "SELECT ROUND((-25064516 + -17623765 + -19693548 + -16709677 + -14919355 + -14205490 + -6704983 + -6445161 + -1030205),0) AS total_ev_impact_usd, ROUND(((-25064516 + -17623765 + -19693548 + -16709677 + -14919355 + -14205490 + -6704983 + -6445161 + -1030205) / 12400000),2) AS total_ev_impact_turns, ROUND(148000000 + (-25064516 + -17623765 + -19693548 + -16709677 + -14919355 + -14205490 + -6704983 + -6445161 + -1030205),0) AS indicative_ev_usd",
   "observations": [
     {
       "title": "Atlas exclusivity blocks the stated Europe direct plan, but current price-basis impact is valuation-method dependent",
