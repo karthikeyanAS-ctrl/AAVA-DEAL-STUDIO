@@ -1,0 +1,561 @@
+{
+  "items": [
+    {
+      "item_id": "CLM-01",
+      "item_type": "claim",
+      "source_file": "wb_1/CLAIMS_ADJUDICATOR/claims_scoreboard.json",
+      "resolved_count": 1,
+      "unresolved_ids": [
+        "E-006"
+      ],
+      "recommended_status": "partially_verified"
+    },
+    {
+      "item_id": "CLM-02",
+      "item_type": "claim",
+      "source_file": "wb_1/CLAIMS_ADJUDICATOR/claims_scoreboard.json",
+      "resolved_count": 1,
+      "unresolved_ids": [
+        "E-009"
+      ],
+      "recommended_status": "partially_verified"
+    },
+    {
+      "item_id": "CLM-03",
+      "item_type": "claim",
+      "source_file": "wb_1/CLAIMS_ADJUDICATOR/claims_scoreboard.json",
+      "resolved_count": 2,
+      "unresolved_ids": [
+        "E-010"
+      ],
+      "recommended_status": "partially_verified"
+    },
+    {
+      "item_id": "CLM-04",
+      "item_type": "claim",
+      "source_file": "wb_1/CLAIMS_ADJUDICATOR/claims_scoreboard.json",
+      "resolved_count": 1,
+      "unresolved_ids": [
+        "E-009"
+      ],
+      "recommended_status": "partially_verified"
+    },
+    {
+      "item_id": "CLM-05",
+      "item_type": "claim",
+      "source_file": "wb_1/CLAIMS_ADJUDICATOR/claims_scoreboard.json",
+      "resolved_count": 3,
+      "unresolved_ids": [
+        "E-054"
+      ],
+      "recommended_status": "partially_verified"
+    },
+    {
+      "item_id": "CLM-06",
+      "item_type": "claim",
+      "source_file": "wb_1/CLAIMS_ADJUDICATOR/claims_scoreboard.json",
+      "resolved_count": 1,
+      "unresolved_ids": [
+        "E-097"
+      ],
+      "recommended_status": "partially_verified"
+    },
+    {
+      "item_id": "CLM-07",
+      "item_type": "claim",
+      "source_file": "wb_1/CLAIMS_ADJUDICATOR/claims_scoreboard.json",
+      "resolved_count": 3,
+      "unresolved_ids": [],
+      "recommended_status": "verified"
+    },
+    {
+      "item_id": "CLM-08",
+      "item_type": "claim",
+      "source_file": "wb_1/CLAIMS_ADJUDICATOR/claims_scoreboard.json",
+      "resolved_count": 2,
+      "unresolved_ids": [
+        "E-071"
+      ],
+      "recommended_status": "partially_verified"
+    },
+    {
+      "item_id": "CLM-09",
+      "item_type": "claim",
+      "source_file": "wb_1/CLAIMS_ADJUDICATOR/claims_scoreboard.json",
+      "resolved_count": 0,
+      "unresolved_ids": [
+        "E-005"
+      ],
+      "recommended_status": "not_supported"
+    },
+    {
+      "item_id": "CLM-10",
+      "item_type": "claim",
+      "source_file": "wb_1/CLAIMS_ADJUDICATOR/claims_scoreboard.json",
+      "resolved_count": 2,
+      "unresolved_ids": [
+        "E-014"
+      ],
+      "recommended_status": "partially_verified"
+    },
+    {
+      "item_id": "CLM-11",
+      "item_type": "claim",
+      "source_file": "wb_1/CLAIMS_ADJUDICATOR/claims_scoreboard.json",
+      "resolved_count": 2,
+      "unresolved_ids": [],
+      "recommended_status": "verified"
+    },
+    {
+      "item_id": "CLM-12",
+      "item_type": "claim",
+      "source_file": "wb_1/CLAIMS_ADJUDICATOR/claims_scoreboard.json",
+      "resolved_count": 2,
+      "unresolved_ids": [
+        "E-009"
+      ],
+      "recommended_status": "partially_verified"
+    },
+    {
+      "item_id": "RF-001",
+      "item_type": "finding",
+      "source_file": "wb_1/RED_FLAG_PRICING/red_flag_register.json",
+      "resolved_count": 2,
+      "unresolved_ids": [],
+      "recommended_status": "verified"
+    },
+    {
+      "item_id": "RF-002",
+      "item_type": "finding",
+      "source_file": "wb_1/RED_FLAG_PRICING/red_flag_register.json",
+      "resolved_count": 2,
+      "unresolved_ids": [
+        "E-101"
+      ],
+      "recommended_status": "partially_verified"
+    },
+    {
+      "item_id": "RF-003",
+      "item_type": "finding",
+      "source_file": "wb_1/RED_FLAG_PRICING/red_flag_register.json",
+      "resolved_count": 3,
+      "unresolved_ids": [],
+      "recommended_status": "verified"
+    },
+    {
+      "item_id": "RF-004",
+      "item_type": "finding",
+      "source_file": "wb_1/RED_FLAG_PRICING/red_flag_register.json",
+      "resolved_count": 2,
+      "unresolved_ids": [],
+      "recommended_status": "verified"
+    },
+    {
+      "item_id": "RF-005",
+      "item_type": "finding",
+      "source_file": "wb_1/RED_FLAG_PRICING/red_flag_register.json",
+      "resolved_count": 2,
+      "unresolved_ids": [],
+      "recommended_status": "verified"
+    },
+    {
+      "item_id": "RF-006",
+      "item_type": "finding",
+      "source_file": "wb_1/RED_FLAG_PRICING/red_flag_register.json",
+      "resolved_count": 3,
+      "unresolved_ids": [
+        "E-109",
+        "E-110"
+      ],
+      "recommended_status": "partially_verified"
+    },
+    {
+      "item_id": "RF-007",
+      "item_type": "finding",
+      "source_file": "wb_1/RED_FLAG_PRICING/red_flag_register.json",
+      "resolved_count": 3,
+      "unresolved_ids": [
+        "E-112"
+      ],
+      "recommended_status": "partially_verified"
+    },
+    {
+      "item_id": "RF-008",
+      "item_type": "finding",
+      "source_file": "wb_1/RED_FLAG_PRICING/red_flag_register.json",
+      "resolved_count": 3,
+      "unresolved_ids": [],
+      "recommended_status": "verified"
+    },
+    {
+      "item_id": "RF-009",
+      "item_type": "finding",
+      "source_file": "wb_1/RED_FLAG_PRICING/red_flag_register.json",
+      "resolved_count": 1,
+      "unresolved_ids": [
+        "E-097",
+        "E-115"
+      ],
+      "recommended_status": "partially_verified"
+    },
+    {
+      "item_id": "CF-001",
+      "item_type": "conflict",
+      "source_file": "wb_1/CROSS_SOURCE_RECONCILIATION/conflicts.json",
+      "resolved_count": 3,
+      "unresolved_ids": [
+        "E-071",
+        "E-072",
+        "E-073"
+      ],
+      "recommended_status": "partially_verified"
+    },
+    {
+      "item_id": "CF-002",
+      "item_type": "conflict",
+      "source_file": "wb_1/CROSS_SOURCE_RECONCILIATION/conflicts.json",
+      "resolved_count": 3,
+      "unresolved_ids": [],
+      "recommended_status": "verified"
+    },
+    {
+      "item_id": "CF-003",
+      "item_type": "conflict",
+      "source_file": "wb_1/CROSS_SOURCE_RECONCILIATION/conflicts.json",
+      "resolved_count": 3,
+      "unresolved_ids": [],
+      "recommended_status": "verified"
+    },
+    {
+      "item_id": "CF-004",
+      "item_type": "conflict",
+      "source_file": "wb_1/CROSS_SOURCE_RECONCILIATION/conflicts.json",
+      "resolved_count": 2,
+      "unresolved_ids": [],
+      "recommended_status": "verified"
+    },
+    {
+      "item_id": "CF-005",
+      "item_type": "conflict",
+      "source_file": "wb_1/CROSS_SOURCE_RECONCILIATION/conflicts.json",
+      "resolved_count": 4,
+      "unresolved_ids": [],
+      "recommended_status": "verified"
+    },
+    {
+      "item_id": "CF-006",
+      "item_type": "conflict",
+      "source_file": "wb_1/CROSS_SOURCE_RECONCILIATION/conflicts.json",
+      "resolved_count": 3,
+      "unresolved_ids": [
+        "E-088"
+      ],
+      "recommended_status": "partially_verified"
+    },
+    {
+      "item_id": "CF-007",
+      "item_type": "conflict",
+      "source_file": "wb_1/CROSS_SOURCE_RECONCILIATION/conflicts.json",
+      "resolved_count": 2,
+      "unresolved_ids": [
+        "E-062"
+      ],
+      "recommended_status": "partially_verified"
+    },
+    {
+      "item_id": "CF-008",
+      "item_type": "conflict",
+      "source_file": "wb_1/CROSS_SOURCE_RECONCILIATION/conflicts.json",
+      "resolved_count": 3,
+      "unresolved_ids": [],
+      "recommended_status": "verified"
+    },
+    {
+      "item_id": "CF-009",
+      "item_type": "conflict",
+      "source_file": "wb_1/CROSS_SOURCE_RECONCILIATION/conflicts.json",
+      "resolved_count": 4,
+      "unresolved_ids": [],
+      "recommended_status": "verified"
+    },
+    {
+      "item_id": "ADJ-003",
+      "item_type": "adjustment",
+      "source_file": "wb_1/EARNINGS_CHALLENGE_ANALYZER/ebitda_bridge.json",
+      "resolved_count": 2,
+      "unresolved_ids": [
+        "E-062"
+      ],
+      "recommended_status": "partially_verified"
+    },
+    {
+      "item_id": "ADJ-004",
+      "item_type": "adjustment",
+      "source_file": "wb_1/EARNINGS_CHALLENGE_ANALYZER/ebitda_bridge.json",
+      "resolved_count": 0,
+      "unresolved_ids": [
+        "E-055",
+        "E-060",
+        "E-062"
+      ],
+      "recommended_status": "not_supported"
+    },
+    {
+      "item_id": "ADJ-005",
+      "item_type": "adjustment",
+      "source_file": "wb_1/EARNINGS_CHALLENGE_ANALYZER/ebitda_bridge.json",
+      "resolved_count": 0,
+      "unresolved_ids": [
+        "E-055",
+        "E-060",
+        "E-062"
+      ],
+      "recommended_status": "not_supported"
+    },
+    {
+      "item_id": "ADJ-006",
+      "item_type": "adjustment",
+      "source_file": "wb_1/EARNINGS_CHALLENGE_ANALYZER/ebitda_bridge.json",
+      "resolved_count": 0,
+      "unresolved_ids": [
+        "E-055",
+        "E-059",
+        "E-062"
+      ],
+      "recommended_status": "not_supported"
+    },
+    {
+      "item_id": "ADJ-007",
+      "item_type": "adjustment",
+      "source_file": "wb_1/EARNINGS_CHALLENGE_ANALYZER/ebitda_bridge.json",
+      "resolved_count": 1,
+      "unresolved_ids": [
+        "E-055",
+        "E-062"
+      ],
+      "recommended_status": "partially_verified"
+    },
+    {
+      "item_id": "ADJ-009",
+      "item_type": "adjustment",
+      "source_file": "wb_1/EARNINGS_CHALLENGE_ANALYZER/ebitda_bridge.json",
+      "resolved_count": 0,
+      "unresolved_ids": [
+        "E-055",
+        "E-059",
+        "E-062"
+      ],
+      "recommended_status": "not_supported"
+    },
+    {
+      "item_id": "ADJ-010",
+      "item_type": "adjustment",
+      "source_file": "wb_1/EARNINGS_CHALLENGE_ANALYZER/ebitda_bridge.json",
+      "resolved_count": 0,
+      "unresolved_ids": [
+        "E-055",
+        "E-056",
+        "E-057",
+        "E-062",
+        "E-065",
+        "E-066"
+      ],
+      "recommended_status": "not_supported"
+    }
+  ],
+  "value_checks": [
+    {
+      "item_id": "CLM-01",
+      "field": "computed_value",
+      "value": 27.44,
+      "evidence_id": "E-006",
+      "match": true
+    },
+    {
+      "item_id": "CLM-02",
+      "field": "computed_value",
+      "value": 100.52,
+      "evidence_id": null,
+      "match": false
+    },
+    {
+      "item_id": "CLM-03",
+      "field": "computed_value",
+      "value": 87.4,
+      "evidence_id": "E-010",
+      "match": true
+    },
+    {
+      "item_id": "CLM-04",
+      "field": "computed_value",
+      "value": 8.89,
+      "evidence_id": "E-009",
+      "match": true
+    },
+    {
+      "item_id": "CLM-05",
+      "field": "computed_value",
+      "value": 5460000.0,
+      "evidence_id": "E-067",
+      "match": true
+    },
+    {
+      "item_id": "CLM-06",
+      "field": "computed_value",
+      "value": 53.8,
+      "evidence_id": "E-097",
+      "match": true
+    },
+    {
+      "item_id": "CLM-09",
+      "field": "computed_value",
+      "value": 11.34,
+      "evidence_id": "E-005",
+      "match": true
+    },
+    {
+      "item_id": "CLM-10",
+      "field": "computed_value",
+      "value": 6.2,
+      "evidence_id": "E-014",
+      "match": true
+    },
+    {
+      "item_id": "CLM-11",
+      "field": "computed_value",
+      "value": 1.0,
+      "evidence_id": null,
+      "match": false
+    },
+    {
+      "item_id": "CLM-12",
+      "field": "computed_value",
+      "value": 97.67,
+      "evidence_id": "E-009",
+      "match": true
+    },
+    {
+      "item_id": "RF-001",
+      "field": "ev_impact_usd",
+      "value": -25064516,
+      "evidence_id": "E-099",
+      "match": true
+    },
+    {
+      "item_id": "RF-002",
+      "field": "arr_at_risk_usd",
+      "value": 10547040.61,
+      "evidence_id": null,
+      "match": false
+    },
+    {
+      "item_id": "RF-002",
+      "field": "ev_impact_usd",
+      "value": -17623765,
+      "evidence_id": "E-101",
+      "match": true
+    },
+    {
+      "item_id": "RF-003",
+      "field": "ev_impact_usd",
+      "value": -19693548,
+      "evidence_id": "E-103",
+      "match": true
+    },
+    {
+      "item_id": "RF-004",
+      "field": "ev_impact_usd",
+      "value": -16709677,
+      "evidence_id": "E-105",
+      "match": true
+    },
+    {
+      "item_id": "RF-005",
+      "field": "ev_impact_usd",
+      "value": -14919355,
+      "evidence_id": "E-107",
+      "match": true
+    },
+    {
+      "item_id": "RF-006",
+      "field": "arr_at_risk_usd",
+      "value": 4681407.34,
+      "evidence_id": null,
+      "match": false
+    },
+    {
+      "item_id": "RF-006",
+      "field": "ev_impact_usd",
+      "value": -11665779,
+      "evidence_id": "E-110",
+      "match": true
+    },
+    {
+      "item_id": "RF-007",
+      "field": "arr_at_risk_usd",
+      "value": 4681407.34,
+      "evidence_id": null,
+      "match": false
+    },
+    {
+      "item_id": "RF-007",
+      "field": "ev_impact_usd",
+      "value": -6704983,
+      "evidence_id": "E-112",
+      "match": true
+    },
+    {
+      "item_id": "RF-008",
+      "field": "ev_impact_usd",
+      "value": -6445161,
+      "evidence_id": "E-114",
+      "match": true
+    },
+    {
+      "item_id": "RF-009",
+      "field": "ev_impact_usd",
+      "value": -1030205,
+      "evidence_id": "E-115",
+      "match": true
+    }
+  ],
+  "files_checked": [
+    {
+      "file": "wb_1/REVENUE_QUALITY_ANALYZER/revenue_quality_scorecard.json",
+      "evidence_found": 14
+    },
+    {
+      "file": "wb_1/CONTRACT_INTELLIGENCE_ANALYZER/clause_register.json",
+      "evidence_found": 43
+    },
+    {
+      "file": "wb_1/EARNINGS_CHALLENGE_ANALYZER/ebitda_bridge.json",
+      "evidence_found": 14
+    },
+    {
+      "file": "wb_1/CROSS_SOURCE_RECONCILIATION/conflicts.json",
+      "evidence_found": 29
+    },
+    {
+      "file": "wb_1/CLAIMS_ADJUDICATOR/claims_scoreboard.json",
+      "evidence_found": 15
+    },
+    {
+      "file": "wb_1/RED_FLAG_PRICING/red_flag_register.json",
+      "evidence_found": 27
+    },
+    {
+      "file": "wb_1/RED_FLAG_PRICING/red_flag_summary.json",
+      "evidence_found": 10
+    }
+  ],
+  "files_missing": [],
+  "self_check": {
+    "V1": true,
+    "V2": false,
+    "V3": true,
+    "V4": true,
+    "V5": true,
+    "V6": true
+  }
+}
