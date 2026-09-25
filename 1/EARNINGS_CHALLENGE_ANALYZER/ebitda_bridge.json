@@ -1,7 +1,7 @@
 {
-  "status": "SUCCESS",
+  "status": "PARTIAL",
   "upstream_inputs": {
-    "doc_catalog_retrieved": true,
+    "agent2_doc_catalog_retrieved": true,
     "doc_catalog_source": "1/DOCUMENT_TRIAGE_ORCHESTRATOR/doc_catalog.json",
     "doc_catalog_status": "PARTIAL",
     "documents_catalogued": 10,
@@ -9,8 +9,8 @@
     "qoe_schedule_retrieved": true,
     "board_minutes_retrieved": true,
     "cim_retrieved": true,
-    "customer_contract_summary_retrieved": true,
-    "it_overview_retrieved": true
+    "enterprise_value_source": "NOT_FOUND_IN_AUTHORITATIVE_DEAL_EVIDENCE",
+    "enterprise_value_search_note": "Searched mgmt_claim table for EV/transaction value metrics; searched CIM (DOC-01), QoE schedule (DOC-08), and all available VDR documents. No explicit Enterprise Value, purchase price, or transaction consideration was found in any authoritative current-run deal input. EV set to null per Enterprise Value Control."
   },
   "schema_discovery": {
     "catalog": "workspace",
@@ -22,8 +22,31 @@
         "logical_role": "Management EBITDA Adjustment Source",
         "relevant_columns": ["adjustment_id", "fiscal_year", "category", "amount_usd", "mgmt_rationale", "source_doc_ref"],
         "join_keys": ["adjustment_id"],
-        "discovery_status": "DISCOVERED_FROM_DDL_AND_VALIDATED_IN_SQL",
-        "row_count": 10
+        "discovery_status": "DISCOVERED_FROM_DDL_AND_VALIDATED_IN_SQL"
+      },
+      {
+        "object_name": "workspace.aava_deal_studio.fact_invoice",
+        "object_type": "TABLE",
+        "logical_role": "Revenue Transaction Source (Invoice Header)",
+        "relevant_columns": ["invoice_id", "customer_id", "contract_id", "invoice_date", "invoice_amount_usd", "billing_frequency"],
+        "join_keys": ["invoice_id", "customer_id"],
+        "discovery_status": "DISCOVERED_FROM_DDL_AND_VALIDATED_IN_SQL"
+      },
+      {
+        "object_name": "workspace.aava_deal_studio.fact_invoice_line",
+        "object_type": "TABLE",
+        "logical_role": "Revenue Transaction Source (Invoice Line)",
+        "relevant_columns": ["invoice_line_id", "invoice_id", "product_id", "line_amount_usd", "revenue_type", "service_period_start", "service_period_end"],
+        "join_keys": ["invoice_line_id", "invoice_id", "product_id"],
+        "discovery_status": "DISCOVERED_FROM_DDL_AND_VALIDATED_IN_SQL"
+      },
+      {
+        "object_name": "workspace.aava_deal_studio.dim_product",
+        "object_type": "TABLE",
+        "logical_role": "Product Source",
+        "relevant_columns": ["product_id", "product_name", "product_family", "delivery_model", "list_price_usd"],
+        "join_keys": ["product_id"],
+        "discovery_status": "DISCOVERED_FROM_DDL_AND_VALIDATED_IN_SQL"
       },
       {
         "object_name": "workspace.aava_deal_studio.dim_customer",
@@ -31,44 +54,15 @@
         "logical_role": "Customer Dimension",
         "relevant_columns": ["customer_id", "customer_name", "industry", "country", "segment", "parent_customer_id", "first_order_date"],
         "join_keys": ["customer_id"],
-        "discovery_status": "DISCOVERED_FROM_DDL_AND_VALIDATED_IN_SQL",
-        "row_count": 214
-      },
-      {
-        "object_name": "workspace.aava_deal_studio.dim_product",
-        "object_type": "TABLE",
-        "logical_role": "Product Dimension",
-        "relevant_columns": ["product_id", "product_name", "product_family", "delivery_model", "list_price_usd"],
-        "join_keys": ["product_id"],
-        "discovery_status": "DISCOVERED_FROM_DDL_AND_VALIDATED_IN_SQL",
-        "row_count": 18
+        "discovery_status": "DISCOVERED_FROM_DDL_AND_VALIDATED_IN_SQL"
       },
       {
         "object_name": "workspace.aava_deal_studio.dim_contract",
         "object_type": "TABLE",
-        "logical_role": "Contract Dimension",
-        "relevant_columns": ["contract_id", "customer_id", "contract_start_date", "contract_end_date", "acv_usd", "status"],
+        "logical_role": "Contract Source",
+        "relevant_columns": ["contract_id", "customer_id", "contract_start_date", "contract_end_date", "acv_usd", "tcv_usd", "auto_renew_flag", "status"],
         "join_keys": ["contract_id", "customer_id"],
-        "discovery_status": "DISCOVERED_FROM_DDL_AND_VALIDATED_IN_SQL",
-        "row_count": 214
-      },
-      {
-        "object_name": "workspace.aava_deal_studio.fact_invoice",
-        "object_type": "TABLE",
-        "logical_role": "Revenue Transaction Source",
-        "relevant_columns": ["invoice_id", "customer_id", "contract_id", "invoice_date", "invoice_amount_usd"],
-        "join_keys": ["invoice_id", "customer_id"],
-        "discovery_status": "DISCOVERED_FROM_DDL_AND_VALIDATED_IN_SQL",
-        "row_count": 3167
-      },
-      {
-        "object_name": "workspace.aava_deal_studio.fact_invoice_line",
-        "object_type": "TABLE",
-        "logical_role": "Invoice Line / Product Revenue Source",
-        "relevant_columns": ["invoice_line_id", "invoice_id", "product_id", "line_amount_usd", "revenue_type", "service_period_start", "service_period_end"],
-        "join_keys": ["invoice_line_id", "invoice_id", "product_id"],
-        "discovery_status": "DISCOVERED_FROM_DDL_AND_VALIDATED_IN_SQL",
-        "row_count": 9427
+        "discovery_status": "DISCOVERED_FROM_DDL_AND_VALIDATED_IN_SQL"
       },
       {
         "object_name": "workspace.aava_deal_studio.fact_subscription_month",
@@ -76,8 +70,7 @@
         "logical_role": "Subscription ARR Source",
         "relevant_columns": ["customer_id", "snapshot_month", "arr_usd", "status"],
         "join_keys": ["customer_id", "snapshot_month"],
-        "discovery_status": "DISCOVERED_FROM_DDL_AND_VALIDATED_IN_SQL",
-        "row_count": 7704
+        "discovery_status": "DISCOVERED_FROM_DDL_AND_VALIDATED_IN_SQL"
       },
       {
         "object_name": "workspace.aava_deal_studio.mgmt_claim",
@@ -85,8 +78,7 @@
         "logical_role": "Management Claims Source",
         "relevant_columns": ["claim_id", "claim_text", "metric_key", "claimed_value", "period", "cim_page"],
         "join_keys": ["claim_id"],
-        "discovery_status": "DISCOVERED_FROM_DDL_AND_VALIDATED_IN_SQL",
-        "row_count": 12
+        "discovery_status": "DISCOVERED_FROM_DDL_AND_VALIDATED_IN_SQL"
       }
     ]
   },
@@ -101,7 +93,8 @@
       "reported_ebitda_stated": 4280000,
       "mgmt_adjusted_ebitda_stated": 12400000,
       "fy2025_adjustments_listed": ["ADJ-003", "ADJ-004", "ADJ-005", "ADJ-006", "ADJ-007", "ADJ-009", "ADJ-010"],
-      "historical_adjustments_listed": ["ADJ-001", "ADJ-002"]
+      "historical_adjustments_listed": ["ADJ-001 (FY2023)", "ADJ-002 (FY2024)"],
+      "note": "Management explicitly notes the same one-time legal settlement line appears in FY2023, FY2024, and FY2025, advising these relate to separate matters."
     },
     "board_minutes": {
       "doc_id": "DOC-09",
@@ -109,10 +102,12 @@
       "title": "Board of Directors — Minutes (Extract), 22 October 2025",
       "date": "2025-10-22",
       "key_findings": [
-        "Item 7: CFO reported the third annual settlement under an ongoing series of commercial disputes with former channel partners concluded at $2.1M, consistent with prior two years. Board asked whether provision should be made for FY2026.",
-        "Item 4: Vantage Grocers ARR at risk flagged.",
-        "Item 5: Northwind MSA change-of-control consent required.",
-        "Item 6: Pinnacle Outdoor discount above threshold; MFN review requested."
+        "Item 7: CFO reported the third annual settlement under an ongoing series of commercial disputes with former channel partners concluded at $2.1M, consistent with prior two years. Board asked whether provision should be made for FY2026. CFO responded matters are being treated as non-recurring for sale process purposes.",
+        "Item 4: Vantage Grocers Severity 1 incidents elevated since April; FY2027 renewal under active review; full ARR at risk.",
+        "Item 5: Northwind MSA expires 2026-06-30 with no auto-renewal; Section 14.2 treats change of control as assignment requiring Northwind prior written consent.",
+        "Item 6: Pinnacle Outdoor discount above standard threshold; Vantage MFN provision to be reviewed.",
+        "Item 9: European expansion plan; director asked whether Atlas Distribution arrangement permits direct sales in Europe.",
+        "Item 11: Receivables from three largest customers extended materially during the year."
       ]
     },
     "cim": {
@@ -120,26 +115,26 @@
       "file": "01_CIM_Excerpt_Harborline.md",
       "title": "Harborline Systems, Inc. — CIM Excerpt",
       "date": "2025-11-14",
-      "adjusted_ebitda_stated": 12400000,
-      "adjusted_ebitda_margin_stated": "32%",
-      "enterprise_value_stated": null,
-      "ev_search_result": "No explicit Enterprise Value, transaction value, or purchase price found in CIM excerpt. Page 18 states Adjusted EBITDA of $12.4M at 32% margin but does not state an EV or implied multiple."
+      "key_findings": [
+        "Page 18: Adjusted EBITDA of $12.4M represents a 32% margin.",
+        "Page 27: All customer contracts are freely assignable on a change of control — contradicted by Board Minutes Item 5 (Northwind Section 14.2).",
+        "Page 27: No contract contains most-favoured-nation pricing — potentially contradicted by Board Minutes Item 6 (Vantage MFN provision review).",
+        "No Enterprise Value, purchase price, or transaction consideration stated."
+      ]
     },
-    "enterprise_value_search": {
-      "sources_searched": ["DOC-01 CIM", "DOC-08 QoE Schedule", "mgmt_claim structured table", "mgmt_ebitda_adjustment structured table"],
-      "result": "No Enterprise Value, transaction value, purchase price, or entry multiple found in any authoritative current-run deal input or VDR document.",
-      "ev_available": false
-    }
+    "enterprise_value_search_result": "No Enterprise Value found in any authoritative current-run deal document or structured source. EV and implied multiples set to null."
   },
   "analysis_period": {
     "primary_period": "FY2025",
     "historical_periods_reviewed": ["FY2023", "FY2024"],
-    "basis": "Management QoE schedule dated 2025-11-08 states Reported EBITDA FY2025 of $4,280,000. FY2025 adjustments applied by management are ADJ-003 through ADJ-010 (excluding ADJ-008). Historical periods FY2023 and FY2024 reviewed for recurrence testing."
+    "basis": "Management QoE schedule (DOC-08) states Reported EBITDA FY2025 and applies FY2025 adjustments. Historical periods FY2023 and FY2024 reviewed for recurrence testing."
   },
   "reported_ebitda_usd": 4280000,
   "mgmt_adjusted_ebitda_usd": 12400000,
-  "team_adjusted_ebitda_usd": 6710000,
-  "earnings_challenge_usd": 5690000,
+  "team_adjusted_ebitda_usd": null,
+  "team_adjusted_ebitda_note": "Team Adjusted EBITDA cannot be presented as a single definitive value because two adjustments (ADJ-007 and ADJ-010) remain Challenged with accepted_amount_usd = null. See bridge_reconciliation for quantified cases.",
+  "earnings_challenge_usd": null,
+  "earnings_challenge_note": "Earnings challenge cannot be precisely stated while ADJ-007 and ADJ-010 remain unresolved. Conservative quantified case: $5,690,000 challenge vs management adjusted EBITDA. See bridge_reconciliation.",
   "implied_multiple": {
     "enterprise_value_usd": null,
     "reported": null,
@@ -147,30 +142,33 @@
     "team": null,
     "calculation_evidence": [
       {
-        "evidence_id": "SQL-EV-025",
-        "purpose": "Enterprise Value search and implied multiple calculation",
-        "physical_objects": ["workspace.aava_deal_studio.mgmt_claim"],
-        "sql_query": "SELECT claim_id, claim_text, metric_key, claimed_value, period, cim_page FROM workspace.aava_deal_studio.mgmt_claim WHERE LOWER(claim_text) LIKE '%enterprise value%' OR LOWER(claim_text) LIKE '%transaction value%' OR LOWER(claim_text) LIKE '%purchase price%' OR LOWER(metric_key) LIKE '%ev%' OR LOWER(metric_key) LIKE '%enterprise%' OR LOWER(claim_text) LIKE '%multiple%'",
-        "result_summary": "No Enterprise Value, transaction value, purchase price, or entry multiple found in mgmt_claim table. CIM excerpt (DOC-01) states Adjusted EBITDA of $12.4M at 32% margin on page 18 but does not state an EV. No authoritative deal input provides an EV.",
-        "status": "EV_NOT_FOUND_IN_ANY_AUTHORITATIVE_SOURCE"
+        "evidence_id": "SQL-EV-011",
+        "note": "mgmt_claim table searched for enterprise value, transaction value, purchase price, EV, enterprise, and multiple metric keys. No EV record found.",
+        "status": "EV_NOT_FOUND"
       }
     ],
-    "note": "Enterprise Value was actively searched in all available authoritative current-run deal inputs including the CIM excerpt, management QoE schedule, and structured mgmt_claim table. No EV was found. Implied multiples are set to null per Enterprise Value Control. This is recorded as an unresolved item."
+    "unresolved_reason": "Enterprise Value not found in any authoritative current-run deal input, structured source, or VDR document. All implied multiples set to null per Enterprise Value Control. EV must be supplied by an authoritative deal input before multiples can be calculated."
   },
   "bridge_reconciliation": {
     "reported_ebitda_usd": 4280000,
     "management_adjustments_total_usd": 8120000,
     "mgmt_adjusted_ebitda_usd": 12400000,
-    "accepted_adjustments_total_usd": 2430000,
-    "challenged_or_rejected_adjustments_total_usd": 5690000,
-    "challenged_null_adjustments_total_usd": 2190000,
-    "team_adjusted_ebitda_usd": 6710000,
-    "earnings_challenge_usd": 5690000,
     "management_bridge_reconciles": true,
-    "team_bridge_reconciles": true,
     "reconciliation_difference_usd": 0,
-    "team_bridge_note": "Team Adjusted EBITDA of $6,710,000 reflects only quantified accepted adjustments (ADJ-004, ADJ-006, ADJ-009 totalling $2,430,000). ADJ-007 ($540,000) and ADJ-010 ($1,650,000) are Challenged with accepted_amount_usd = null and are excluded from the team bridge. If either challenged adjustment is subsequently resolved and partially or fully accepted, Team Adjusted EBITDA would increase accordingly.",
-    "sql_evidence_references": ["SQL-EV-004", "SQL-EV-022", "SQL-EV-026"]
+    "accepted_adjustments_total_usd": 2430000,
+    "rejected_adjustments_total_usd": 3500000,
+    "challenged_null_adjustments_total_usd": 2190000,
+    "challenged_or_rejected_adjustments_total_usd": 5690000,
+    "quantified_team_adjusted_ebitda_usd": 6710000,
+    "quantified_team_adjusted_ebitda_note": "Conservative base case: Reported EBITDA + accepted adjustments only (ADJ-004 + ADJ-006 + ADJ-009). Excludes challenged adjustments ADJ-007 and ADJ-010 whose accepted amounts cannot be quantified without unsupported assumptions.",
+    "hard_rejection_ebitda_usd": 8900000,
+    "hard_rejection_ebitda_note": "Management Adjusted EBITDA minus hard-rejected adjustments (ADJ-003 + ADJ-005 = $3,500,000). Preserves challenged adjustments ADJ-007 and ADJ-010 as unresolved.",
+    "unresolved_challenged_adjustments_usd": 2190000,
+    "unresolved_challenged_items": ["ADJ-007", "ADJ-010"],
+    "earnings_challenge_vs_quantified_usd": 5690000,
+    "team_bridge_reconciles": false,
+    "team_bridge_reconciles_note": "Team bridge cannot fully reconcile while ADJ-007 and ADJ-010 accepted amounts remain null.",
+    "sql_evidence_references": ["SQL-EV-006", "SQL-EV-016", "SQL-EV-020"]
   },
   "adjustments": [
     {
@@ -183,42 +181,44 @@
       "verdict": "Rejected",
       "accepted_amount_usd": 0,
       "challenged_or_rejected_amount_usd": 2100000,
-      "reasoning": "The identical settlement category, identical amount ($2,100,000), and identical rationale ('Settlement of commercial dispute - non-recurring') appear in each of FY2023 (ADJ-001), FY2024 (ADJ-002), and FY2025 (ADJ-003). SQL-EV-023 confirms three occurrences across three consecutive fiscal years, each at exactly $2,100,000. Board minutes (DOC-09, Item 7) provide contemporaneous governance evidence that directly contradicts management's non-recurring classification: the CFO reported 'the third annual settlement under the ongoing series of commercial disputes with former channel partners had been concluded at $2.1M, consistent with the prior two years' and the Board asked 'whether provision should be made for a further settlement in FY2026.' The Board's own language — 'third annual settlement', 'ongoing series', 'consistent with prior two years', and the question about FY2026 provision — establishes that this is a recurring economic pattern, not a one-time event. The underlying economic event (settlement payment) is real and the amount is confirmed, but the EBITDA add-back is rejected because the evidence demonstrates an ongoing recurring pattern that is inappropriate for normalized historical EBITDA.",
+      "reasoning": "The identical settlement category, identical amount ($2,100,000), and identical rationale ('Settlement of commercial dispute - non-recurring') appear in each of FY2023 (ADJ-001), FY2024 (ADJ-002), and FY2025 (ADJ-003). Board Minutes (DOC-09, Item 7) explicitly state: 'the third annual settlement under the ongoing series of commercial disputes with former channel partners had been concluded at $2.1M, consistent with the prior two years. The Board asked whether provision should be made for a further settlement in FY2026.' This is contemporaneous board-level evidence that the settlements form an ongoing series, not isolated non-recurring events. The CFO's own characterisation ('matters are being treated as non-recurring for the purposes of the sale process') confirms the non-recurring label is a sale-process presentation choice, not an independent factual determination. Three consecutive years of identical amounts constitutes a recurring economic pattern. The add-back is rejected as inappropriate for normalized historical EBITDA.",
       "tests": {
         "existence": {
           "result": "CONFIRMED",
-          "detail": "Board minutes (DOC-09, Item 7) confirm the FY2025 settlement was concluded at $2.1M. Structured data (SQL-EV-002) confirms ADJ-003 in the adjustment table."
+          "detail": "Settlement confirmed by Board Minutes Item 7 (DOC-09). Economic event is real."
         },
         "amount": {
-          "result": "CONFIRMED_AT_MANAGEMENT_AMOUNT",
-          "detail": "Board minutes state '$2.1M, consistent with the prior two years.' Structured data shows $2,100,000. Amount is confirmed."
+          "result": "CONSISTENT_ACROSS_SOURCES",
+          "detail": "Amount of $2,100,000 consistent across structured data (mgmt_ebitda_adjustment), QoE schedule (DOC-08), and Board Minutes (DOC-09)."
         },
         "period": {
           "result": "PERIOD_CONFIRMED",
-          "detail": "ADJ-003 is recorded as FY2025 in structured data and QoE schedule. Board minutes dated October 2025 confirm the settlement was concluded in the current period."
+          "detail": "Board Minutes dated 22 October 2025 confirm FY2025 settlement concluded."
         },
         "recurrence": {
           "result": "RECURRING_CONFIRMED",
-          "detail": "SQL-EV-023: Three occurrences across FY2023, FY2024, FY2025, each at exactly $2,100,000. Board minutes (DOC-09, Item 7) describe 'the third annual settlement under the ongoing series of commercial disputes' and the Board asked about FY2026 provision. This is a recurring annual cost pattern.",
-          "sql_evidence": "SQL-EV-023"
+          "detail": "SQL-EV-003 and SQL-EV-013: Identical category, identical amount ($2,100,000) in FY2023, FY2024, and FY2025. Three consecutive years. Board Minutes explicitly describe 'third annual settlement under the ongoing series of commercial disputes.' Board asked about FY2026 provision.",
+          "sql_evidence": "SQL-EV-003",
+          "years_observed": 3,
+          "amounts_observed": [2100000, 2100000, 2100000]
         },
         "duplication": {
-          "result": "NOT_DUPLICATED",
-          "detail": "ADJ-001 and ADJ-002 are historical-period adjustments not applied to FY2025. ADJ-003 is the sole FY2025 legal settlement adjustment."
+          "result": "NO_DUPLICATION",
+          "detail": "Each year's settlement is a separate row. No duplication within FY2025."
         },
         "underlying_data": {
-          "result": "NO_STRUCTURED_TRANSACTION_DATA",
-          "detail": "No invoice or transaction record for the settlement payment exists in the structured sources. The settlement is a cost item, not a revenue transaction."
+          "result": "RECURRING_PATTERN_CONFIRMED",
+          "detail": "Structured data shows three consecutive identical adjustments. No structured data contradicts the existence of the settlement, but the pattern contradicts the non-recurring classification."
         },
         "document_support": {
           "result": "CONTRADICTS_MANAGEMENT_CLASSIFICATION",
-          "detail": "DOC-09 Board Minutes Item 7: 'The CFO reported that the third annual settlement under the ongoing series of commercial disputes with former channel partners had been concluded at $2.1M, consistent with the prior two years. The Board asked whether provision should be made for a further settlement in FY2026.' This directly contradicts management's non-recurring classification.",
-          "evidence_id": "DOC-EV-001"
+          "detail": "Board Minutes (DOC-09, Item 7) describe an 'ongoing series' of disputes and a third annual settlement. The CFO's own statement that matters are 'being treated as non-recurring for the purposes of the sale process' is an explicit acknowledgement that the non-recurring label is a sale-process choice, not an independent factual determination.",
+          "key_quote": "the third annual settlement under the ongoing series of commercial disputes with former channel partners had been concluded at $2.1M, consistent with the prior two years"
         }
       },
-      "evidence": ["DOC-EV-001", "SQL-EV-002", "SQL-EV-023"],
+      "evidence": ["SQL-EV-003", "SQL-EV-013", "DOC-EV-001", "DOC-EV-002"],
       "confidence": 0.95,
-      "what_would_raise_confidence": "Settlement agreement documents for FY2023, FY2024, and FY2025 confirming whether the disputes are truly separate matters or part of a continuing series. Legal counsel opinion on likelihood of further settlements."
+      "what_would_raise_confidence": "Settlement agreements for FY2023, FY2024, and FY2025 identifying distinct counterparties and distinct legal matters would be required to support a non-recurring classification. Board minutes for FY2026 confirming no further settlements would also be relevant."
     },
     {
       "adjustment_id": "ADJ-004",
@@ -230,41 +230,40 @@
       "verdict": "Accepted",
       "accepted_amount_usd": 1250000,
       "challenged_or_rejected_amount_usd": 0,
-      "reasoning": "Owner compensation normalisation is a standard and conceptually appropriate QoE adjustment for private equity transactions. Management states the adjustment is supported by a third-party compensation benchmark dated September 2025. The adjustment amount ($1,250,000) is consistent across the management QoE schedule and structured data. No available evidence contradicts the amount or the QoE treatment. The adjustment is not recurring in the QoE sense — it represents the above-market portion of founder compensation that would not persist under new ownership at market rates. No historical recurrence of this adjustment category appears in the structured data for prior years. The absence of the third-party benchmark document in the data room reduces confidence but does not override acceptance given the conceptual appropriateness of the adjustment, the consistency of the amount across authoritative sources, and the absence of contradicting evidence. The evidence limitation is disclosed and reflected in confidence.",
+      "reasoning": "Owner compensation normalisation is a standard and conceptually appropriate QoE adjustment for private company transactions where founder compensation may differ from market rates. Management references a third-party compensation benchmark (Sep-2025). The adjustment appears once in FY2025 only (no recurrence in FY2023 or FY2024 structured data), consistent with a transaction-specific normalisation. The amount ($1,250,000) is the excess above market rate and is not contradicted by any available structured data or VDR evidence. No board minutes or other documents contradict this adjustment. The adjustment is accepted based on the totality of available evidence: management QoE schedule, structured adjustment record, absence of contradicting evidence, and conceptual appropriateness. Confidence is reduced because the third-party benchmark itself is not in the data room.",
       "tests": {
         "existence": {
           "result": "CONFIRMED",
-          "detail": "Adjustment present in both structured data (SQL-EV-001) and management QoE schedule (DOC-08). Owner compensation normalisation is a standard QoE adjustment category."
+          "detail": "Founder/owner compensation above market is a standard condition in founder-led businesses. Adjustment exists in structured data and QoE schedule."
         },
         "amount": {
-          "result": "MANAGEMENT_AMOUNT_CONSISTENT_ACROSS_SOURCES",
-          "detail": "$1,250,000 appears consistently in structured data and QoE schedule. Third-party benchmark referenced by management (Sep-2025) is not in the data room. No alternative amount derivable from available evidence."
+          "result": "MANAGEMENT_SUPPORTED_ONLY",
+          "detail": "Amount of $1,250,000 sourced from management QoE schedule and structured data. Third-party benchmark referenced but not available in data room for independent verification."
         },
         "period": {
-          "result": "PERIOD_CONFIRMED",
-          "detail": "ADJ-004 is recorded as FY2025 in structured data and QoE schedule. Owner compensation is an annual recurring cost; the above-market portion is appropriately adjusted in the analysis period."
+          "result": "PERIOD_APPROPRIATE",
+          "detail": "Appears only in FY2025. Consistent with a transaction-normalisation adjustment."
         },
         "recurrence": {
-          "result": "NOT_RECURRING_IN_PRIOR_PERIODS",
-          "detail": "No owner compensation normalisation adjustment appears in FY2023 or FY2024 structured data. This is the first occurrence in the available history."
+          "result": "NOT_RECURRING",
+          "detail": "SQL-EV-003 and full adjustment history: No owner compensation normalisation adjustment appears in FY2023 or FY2024 structured data. Single occurrence in FY2025."
         },
         "duplication": {
-          "result": "NO_DUPLICATION_IDENTIFIED",
-          "detail": "No other adjustment in FY2025 covers owner or founder compensation. ADJ-009 covers executive search fees which is a distinct category."
+          "result": "NO_DUPLICATION",
+          "detail": "No other adjustment in FY2025 covers owner compensation. No duplication identified."
         },
         "underlying_data": {
-          "result": "NOT_DIRECTLY_TESTABLE",
-          "detail": "Payroll or compensation data is not available in the structured sources. The adjustment cannot be independently reconstructed from available data."
+          "result": "NO_CONTRADICTING_DATA",
+          "detail": "No structured data contradicts the existence of above-market founder compensation or the normalisation amount."
         },
         "document_support": {
           "result": "MANAGEMENT_REFERENCE_ONLY",
-          "detail": "Management QoE schedule (DOC-08) references a third-party compensation benchmark dated Sep-2025. This document is not present in the data room. No VDR document contradicts the adjustment.",
-          "evidence_id": "DOC-EV-002"
+          "detail": "Third-party compensation benchmark (Sep-2025) referenced in QoE schedule but not available in data room. No VDR document contradicts the adjustment."
         }
       },
-      "evidence": ["DOC-EV-002", "SQL-EV-001"],
+      "evidence": ["SQL-EV-002", "DOC-EV-003"],
       "confidence": 0.72,
-      "what_would_raise_confidence": "Third-party compensation benchmark document (Sep-2025) referenced by management. Payroll records showing actual founder compensation versus market rate. Prior-year compensation data to confirm the above-market differential is consistent."
+      "what_would_raise_confidence": "Third-party compensation benchmark report (Sep-2025) showing market rate for the role and the excess above market. Payroll records confirming actual founder compensation in FY2025."
     },
     {
       "adjustment_id": "ADJ-005",
@@ -272,45 +271,44 @@
       "category": "Pro-forma cost savings (not yet actioned)",
       "description": "Planned headcount reduction of 14 FTE scheduled for Q1 FY2026. No notice has yet been served.",
       "amount_usd": 1400000,
-      "management_rationale": "Planned headcount reduction of 14 FTE scheduled for Q1 FY2026. No notice has yet been served.",
+      "management_rationale": "Planned headcount reduction in Q1 FY2026. No notice has yet been served.",
       "verdict": "Rejected",
       "accepted_amount_usd": 0,
       "challenged_or_rejected_amount_usd": 1400000,
-      "reasoning": "Management explicitly states in the QoE schedule that (a) the headcount reduction is planned for Q1 FY2026, (b) no notice has yet been served, and (c) the savings have not yet been actioned. This is a prospective, future-period cost saving that has not occurred in the FY2025 analysis period. Adding back a cost saving that has not yet been achieved to FY2025 normalized EBITDA is inappropriate for a historical earnings quality analysis. The adjustment is not a normalization of an actual FY2025 cost — it is a forward-looking pro-forma projection. No structured data or VDR evidence supports that the headcount reduction has been implemented. The rejection is based on management's own disclosure that the event belongs to a future period and has not been actioned.",
+      "reasoning": "Management's own QoE schedule explicitly states: 'No notice has yet been served.' The cost saving is prospective and has not occurred in FY2025. The adjustment represents a future-period cost reduction that has not been actioned, committed, or evidenced by any available VDR document. No board resolution, restructuring plan, or employee notification is available in the data room. Pro-forma cost savings that have not been actioned in the analyzed period are not appropriate for normalized historical EBITDA. The adjustment is rejected as a prospective, unactioned cost saving with no evidence of commitment or execution in FY2025.",
       "tests": {
         "existence": {
-          "result": "NOT_YET_OCCURRED",
-          "detail": "Management explicitly states the reduction is 'scheduled for Q1 FY2026' and 'no notice has yet been served.' The cost saving does not exist in FY2025."
+          "result": "UNCONFIRMED",
+          "detail": "No evidence in any VDR document or structured data that the headcount reduction has been initiated, approved by the board, or communicated to employees. Management's own schedule acknowledges no notice has been served."
         },
         "amount": {
-          "result": "UNVERIFIABLE_PROSPECTIVE",
-          "detail": "$1,400,000 is management's estimate of future savings. No payroll data or headcount records are available to verify the amount. The amount is prospective and assumption-dependent."
+          "result": "UNSUPPORTED",
+          "detail": "Amount of $1,400,000 is management's estimate of future savings. No payroll data, headcount schedule, or restructuring plan available to independently verify."
         },
         "period": {
           "result": "WRONG_PERIOD",
-          "detail": "The savings relate to Q1 FY2026 and beyond. They do not belong in FY2025 normalized EBITDA."
+          "detail": "Savings are scheduled for Q1 FY2026. No cost reduction has occurred in FY2025."
         },
         "recurrence": {
           "result": "NOT_APPLICABLE",
-          "detail": "No prior-period pro-forma cost savings adjustment appears in the structured data. This is the first occurrence."
+          "detail": "No historical precedent for this adjustment in FY2023 or FY2024 structured data."
         },
         "duplication": {
-          "result": "NO_DUPLICATION_IDENTIFIED",
-          "detail": "No other adjustment covers the same planned headcount reduction."
+          "result": "NO_DUPLICATION",
+          "detail": "No other adjustment covers the same headcount reduction."
         },
         "underlying_data": {
-          "result": "NO_EVIDENCE_OF_IMPLEMENTATION",
-          "detail": "No structured data supports that the headcount reduction has been implemented in FY2025. Subscription and revenue data shows continued growth through FY2025 with no cost reduction signal."
+          "result": "NO_SUPPORTING_DATA",
+          "detail": "No structured data supports the existence of a committed headcount reduction. Board minutes do not reference a planned restructuring."
         },
         "document_support": {
-          "result": "MANAGEMENT_DISCLOSURE_SUPPORTS_REJECTION",
-          "detail": "Management QoE schedule (DOC-08) explicitly states 'Planned headcount reduction of 14 FTE scheduled for Q1 FY2026. No notice has yet been served.' This is management's own disclosure that the event is prospective and unactioned.",
-          "evidence_id": "DOC-EV-003"
+          "result": "NO_SUPPORTING_DOCUMENT",
+          "detail": "No board resolution, restructuring plan, employee notification, or other document evidencing commitment to the headcount reduction is available in the data room. Management's own schedule acknowledges no notice has been served."
         }
       },
-      "evidence": ["DOC-EV-003", "SQL-EV-001"],
-      "confidence": 0.97,
-      "what_would_raise_confidence": "Evidence that the headcount reduction was actually implemented in FY2025 (e.g., termination notices, payroll records showing reduced headcount). Board resolution approving the restructuring with FY2025 effective dates."
+      "evidence": ["DOC-EV-003"],
+      "confidence": 0.92,
+      "what_would_raise_confidence": "Board resolution approving the restructuring, signed redundancy notices, HR restructuring plan with named roles and cost schedule, or evidence that the reduction has been executed post-period."
     },
     {
       "adjustment_id": "ADJ-006",
@@ -322,41 +320,40 @@
       "verdict": "Accepted",
       "accepted_amount_usd": 870000,
       "challenged_or_rejected_amount_usd": 0,
-      "reasoning": "Transaction costs (sell-side adviser fees) are a standard and universally accepted QoE adjustment. These are deal-specific, non-recurring costs that would not be incurred in a normalized operating environment. The adjustment is present consistently in both structured data and the management QoE schedule at $870,000. No evidence contradicts the amount or the QoE treatment. The absence of the underlying invoice in the data room reduces confidence marginally but does not override acceptance given the conceptual clarity of the adjustment and the consistency of the amount across authoritative sources. ADJ-008 (FY2024 aborted refinancing costs of $180,000) is a separate historical transaction cost and does not duplicate ADJ-006.",
+      "reasoning": "Transaction costs (sell-side adviser fees) are a standard and well-established QoE add-back. These costs are directly attributable to the current sale process and are non-recurring by nature — they will not recur in a normalized post-transaction business. The adjustment is distinct from ADJ-008 (FY2024 aborted refinancing costs, $180,000), which relates to a different event in a prior period. No duplication exists within FY2025. The amount ($870,000) is consistent across structured data and the QoE schedule. No VDR document contradicts this adjustment. Accepted based on the totality of available evidence and standard QoE treatment for transaction costs.",
       "tests": {
         "existence": {
           "result": "CONFIRMED",
-          "detail": "Adjustment present in both structured data and QoE schedule. Sell-side adviser engagement is consistent with the active sale process evidenced by the CIM (DOC-01) dated November 2025."
+          "detail": "Sell-side adviser engagement is consistent with the current sale process. Adjustment exists in structured data and QoE schedule."
         },
         "amount": {
-          "result": "MANAGEMENT_AMOUNT_CONSISTENT_ACROSS_SOURCES",
-          "detail": "$870,000 appears consistently in structured data and QoE schedule. No invoice in data room but amount is consistent and no contradicting evidence exists."
+          "result": "MANAGEMENT_SUPPORTED",
+          "detail": "Amount of $870,000 consistent across structured data and QoE schedule. No invoice in data room but amount is consistent with sell-side advisory fees for a transaction of this scale."
         },
         "period": {
-          "result": "PERIOD_CONFIRMED",
-          "detail": "FY2025 is the appropriate period for sell-side adviser fees incurred in connection with the current sale process."
+          "result": "PERIOD_APPROPRIATE",
+          "detail": "FY2025 is the period of the sale process. Transaction costs are appropriately attributed to FY2025."
         },
         "recurrence": {
           "result": "NOT_RECURRING",
-          "detail": "ADJ-008 (FY2024) covers aborted refinancing costs — a different transaction event. No sell-side adviser fee adjustment appears in FY2023. ADJ-006 is not recurring."
+          "detail": "No transaction cost adjustment in FY2023 structured data. ADJ-008 (FY2024, $180,000) relates to aborted refinancing — a different event. FY2025 sell-side fees are non-recurring."
         },
         "duplication": {
           "result": "NO_DUPLICATION",
-          "detail": "ADJ-008 is a FY2024 historical adjustment for aborted refinancing costs, not applied to FY2025. ADJ-006 is the sole FY2025 transaction cost adjustment."
+          "detail": "SQL-EV-019: ADJ-006 (FY2025, sell-side fees, $870,000) and ADJ-008 (FY2024, aborted refinancing, $180,000) are different events in different periods. No duplication within FY2025."
         },
         "underlying_data": {
-          "result": "NOT_DIRECTLY_TESTABLE",
-          "detail": "No invoice or payment record for adviser fees in structured sources. Transaction costs are not captured in invoice/subscription tables."
+          "result": "NO_CONTRADICTING_DATA",
+          "detail": "No structured data contradicts the existence or amount of sell-side adviser fees."
         },
         "document_support": {
-          "result": "CONSISTENT_WITH_ACTIVE_SALE_PROCESS",
-          "detail": "CIM (DOC-01) is dated November 2025, confirming an active sale process. Sell-side adviser fees are consistent with this context.",
-          "evidence_id": "DOC-EV-004"
+          "result": "CONSISTENT_WITH_SALE_PROCESS",
+          "detail": "CIM (DOC-01) and QoE schedule (DOC-08) confirm an active sale process. Sell-side adviser fees are consistent with this context."
         }
       },
-      "evidence": ["DOC-EV-004", "SQL-EV-001"],
-      "confidence": 0.80,
-      "what_would_raise_confidence": "Sell-side adviser engagement letter and invoice confirming the $870,000 fee. Confirmation that the fee has been or will be invoiced in FY2025."
+      "evidence": ["SQL-EV-002", "SQL-EV-019", "DOC-EV-003"],
+      "confidence": 0.78,
+      "what_would_raise_confidence": "Sell-side adviser engagement letter and invoice confirming the $870,000 fee amount."
     },
     {
       "adjustment_id": "ADJ-007",
@@ -368,88 +365,85 @@
       "verdict": "Challenged",
       "accepted_amount_usd": null,
       "challenged_or_rejected_amount_usd": null,
-      "reasoning": "The Legacy product family exists in the structured product dimension (PRD-016 'Legacy On-Prem Licence' and PRD-017 'Legacy Maintenance'). However, SQL-EV-007 and SQL-EV-021 return zero revenue from Legacy products in any period across all available invoice and invoice-line data. There is no structured evidence of Legacy product revenue or losses in FY2025 or any prior year. This creates a material evidential gap: management claims $540,000 of trading losses on this product line, but the transaction data shows no Legacy product activity at all. The underlying event (product sunset) is plausible given the product exists in the product dimension, but the absence of any Legacy product revenue or cost data in the structured sources means the $540,000 loss amount cannot be independently verified or contradicted. The adjustment is Challenged because: (1) the product exists in the product master, supporting the existence of the product line; (2) the absence of Legacy revenue in structured data is consistent with a product being wound down; but (3) the $540,000 loss amount has no structured data support and cannot be independently quantified; and (4) it is unclear whether the losses represent direct product costs, allocated overhead, or customer-specific write-offs. The accepted amount cannot be quantified without an unsupported assumption.",
+      "reasoning": "The Legacy On-Prem product family (PRD-016: Legacy On-Prem Licence, PRD-017: Legacy Maintenance) exists in the product master (dim_product). However, SQL-EV-008 and SQL-EV-022 confirm zero invoice line revenue for both Legacy products across all periods in the structured data — no Legacy product revenue appears in fact_invoice_line for any year. SQL-EV-023 confirms FY2025 revenue is entirely from Platform, Professional Services, and Managed Services product families, with no Legacy family revenue. This means the structured data neither confirms nor independently quantifies the $540,000 loss amount — the absence of Legacy revenue in invoice lines could indicate the product has already ceased generating revenue, or that losses are cost-side (hosting, support, maintenance costs) not captured in the revenue tables. No VDR document provides a formal discontinuation commitment, board resolution, sunset timeline, or cost schedule for the Legacy On-Prem product. The QoE schedule asserts the product 'is being sunset' but no authoritative document confirms this commitment or establishes when costs will cease. The adjustment cannot be accepted (no formal discontinuation commitment or cost evidence) but cannot be rejected (the product exists, losses may be real cost-side items, and discontinuation is plausible). Verdict: Challenged. Accepted amount: null — no independently supportable amount can be quantified without an unsupported assumption about the cost composition of the $540,000 loss.",
       "tests": {
         "existence": {
-          "result": "PRODUCT_EXISTS_NO_TRANSACTION_DATA",
-          "detail": "SQL-EV-006 confirms PRD-016 (Legacy On-Prem Licence) and PRD-017 (Legacy Maintenance) exist in dim_product. SQL-EV-007 and SQL-EV-021 return zero rows for Legacy product revenue across all invoice_line records in all periods."
+          "result": "PRODUCT_EXISTS_REVENUE_ABSENT",
+          "detail": "Legacy On-Prem Licence (PRD-016) and Legacy Maintenance (PRD-017) exist in dim_product. SQL-EV-008 and SQL-EV-022 confirm zero invoice line revenue for these products across all periods. Product exists but generates no invoiced revenue in structured data."
         },
         "amount": {
           "result": "UNVERIFIABLE",
-          "detail": "$540,000 loss amount has no structured data support. No Legacy product revenue or cost records exist in fact_invoice_line. The loss composition (direct costs, allocated overhead, write-offs) is unknown."
+          "detail": "The $540,000 loss amount cannot be independently verified from available structured data. Revenue tables show no Legacy product revenue. Cost-side data is not available in the structured schema."
         },
         "period": {
-          "result": "PERIOD_PLAUSIBLE_BUT_UNVERIFIABLE",
-          "detail": "FY2025 is stated as the period. No transaction data exists to confirm or deny the period attribution."
+          "result": "PERIOD_UNVERIFIABLE",
+          "detail": "Cannot confirm the loss occurred in FY2025 from available structured data."
         },
         "recurrence": {
-          "result": "NO_PRIOR_OCCURRENCE",
-          "detail": "No discontinued product line adjustment appears in FY2023 or FY2024 structured data. This is the first occurrence."
+          "result": "NO_HISTORICAL_PRECEDENT",
+          "detail": "No discontinued product line adjustment appears in FY2023 or FY2024 structured data."
         },
         "duplication": {
-          "result": "NO_DUPLICATION_IDENTIFIED",
-          "detail": "No other FY2025 adjustment covers Legacy product losses."
+          "result": "NO_DUPLICATION",
+          "detail": "No other FY2025 adjustment covers Legacy On-Prem losses."
         },
         "underlying_data": {
-          "result": "NO_LEGACY_PRODUCT_REVENUE_OR_COST_IN_STRUCTURED_DATA",
-          "detail": "SQL-EV-007: Zero rows returned for Legacy product revenue in FY2025. SQL-EV-021: Zero rows returned for Legacy product revenue across all years. Products PRD-016 and PRD-017 exist in dim_product but have no associated invoice line activity.",
-          "sql_evidence": ["SQL-EV-007", "SQL-EV-021"]
+          "result": "LEGACY_REVENUE_ABSENT_FROM_INVOICE_DATA",
+          "detail": "SQL-EV-004, SQL-EV-008, SQL-EV-022, SQL-EV-023: Zero Legacy product family revenue in fact_invoice_line across all periods. FY2025 revenue is entirely Platform, Professional Services, and Managed Services. This is consistent with a product that has ceased generating revenue but does not confirm that associated costs have ceased or that the $540,000 loss amount is accurate."
         },
         "document_support": {
-          "result": "MANAGEMENT_ASSERTION_ONLY",
-          "detail": "Management QoE schedule (DOC-08) states losses on Legacy On-Prem product being sunset. No board minutes or other VDR document references the Legacy product sunset or associated losses.",
-          "evidence_id": "DOC-EV-005"
+          "result": "NO_FORMAL_DISCONTINUATION_EVIDENCE",
+          "detail": "No board resolution, product sunset plan, customer notification, or operational document confirming formal commitment to discontinue Legacy On-Prem is available in the data room. QoE schedule (DOC-08) asserts sunset but this is management-prepared. IT Overview (DOC-10) does not reference Legacy On-Prem discontinuation."
         }
       },
-      "evidence": ["DOC-EV-005", "SQL-EV-006", "SQL-EV-007", "SQL-EV-021"],
-      "confidence": 0.35,
-      "what_would_raise_confidence": "Management accounts or cost ledger showing the composition of the $540,000 Legacy product losses. Evidence of Legacy product customer contracts or support obligations generating costs. Board or management decision document authorising the product sunset. Any invoice or cost record associated with PRD-016 or PRD-017."
+      "evidence": ["SQL-EV-004", "SQL-EV-008", "SQL-EV-022", "SQL-EV-023", "DOC-EV-003"],
+      "confidence": 0.45,
+      "what_would_raise_confidence": "Board resolution or management decision document formally committing to Legacy On-Prem discontinuation with an effective date. Cost schedule showing the $540,000 loss composition (hosting, support, maintenance costs). Evidence that these costs will cease upon discontinuation. Customer notification of end-of-life. Timeline for wind-down."
     },
     {
       "adjustment_id": "ADJ-009",
       "fiscal_year": "FY2025",
       "category": "Non-recurring recruitment",
-      "description": "Executive search fees for CRO and VP Engineering. Invoices available.",
+      "description": "Executive search fees for CRO and VP Engineering.",
       "amount_usd": 310000,
       "management_rationale": "Executive search fees for CRO and VP Engineering. Invoices available.",
       "verdict": "Accepted",
       "accepted_amount_usd": 310000,
       "challenged_or_rejected_amount_usd": 0,
-      "reasoning": "Executive search fees for specific named C-suite and VP-level roles (CRO and VP Engineering) are a standard non-recurring QoE adjustment. These are one-time costs associated with specific senior hires that would not recur in a normalized operating environment. Management states invoices are available. The adjustment is present consistently in both structured data and the QoE schedule at $310,000. No prior-period executive search adjustment appears in the structured data. No VDR evidence contradicts the adjustment. The invoices referenced by management are not in the data room, which reduces confidence, but the conceptual appropriateness of the adjustment, the consistency of the amount, and the absence of contradicting evidence support acceptance. The board minutes (DOC-09) reference a CRO in Item 4, corroborating the existence of the CRO role.",
+      "reasoning": "Executive search fees for specific named C-suite and VP-level roles (CRO and VP Engineering) are non-recurring by nature — once the roles are filled, the search fees do not recur. Management states invoices are available. The adjustment appears once in FY2025 only; no similar recruitment adjustment appears in FY2023 or FY2024 structured data. The amount ($310,000) is consistent with executive search fees for two senior roles. No VDR document contradicts this adjustment. Accepted based on the totality of available evidence: management QoE schedule, structured adjustment record, non-recurring nature of executive search fees, and absence of contradicting evidence. Confidence is reduced because the referenced invoices are not in the data room.",
       "tests": {
         "existence": {
-          "result": "CONFIRMED",
-          "detail": "Adjustment present in both structured data and QoE schedule. Board minutes (DOC-09, Item 4) reference the CRO reporting to the Board, corroborating the existence of the CRO hire."
+          "result": "PLAUSIBLE",
+          "detail": "Executive search for CRO and VP Engineering is a plausible one-time event. Management states invoices are available."
         },
         "amount": {
-          "result": "MANAGEMENT_AMOUNT_CONSISTENT_ACROSS_SOURCES",
-          "detail": "$310,000 appears consistently in structured data and QoE schedule. Management states invoices are available but they are not in the data room."
+          "result": "MANAGEMENT_SUPPORTED",
+          "detail": "Amount of $310,000 consistent across structured data and QoE schedule. Invoices referenced but not available in data room."
         },
         "period": {
-          "result": "PERIOD_CONFIRMED",
-          "detail": "FY2025 is the appropriate period for executive search fees incurred during the year."
+          "result": "PERIOD_APPROPRIATE",
+          "detail": "FY2025 is the stated period. No contradicting period evidence."
         },
         "recurrence": {
           "result": "NOT_RECURRING",
-          "detail": "No executive search or recruitment adjustment appears in FY2023 or FY2024 structured data. This is the first occurrence."
+          "detail": "No recruitment adjustment in FY2023 or FY2024 structured data. Single occurrence in FY2025."
         },
         "duplication": {
           "result": "NO_DUPLICATION",
-          "detail": "No other FY2025 adjustment covers recruitment or executive search costs."
+          "detail": "No other FY2025 adjustment covers executive search fees."
         },
         "underlying_data": {
-          "result": "NOT_DIRECTLY_TESTABLE",
-          "detail": "No recruitment cost records in structured sources. Executive search fees are not captured in invoice/subscription tables."
+          "result": "NO_CONTRADICTING_DATA",
+          "detail": "No structured data contradicts the existence or amount of executive search fees."
         },
         "document_support": {
-          "result": "PARTIALLY_CORROBORATED",
-          "detail": "Board minutes (DOC-09, Item 4) reference the CRO reporting to the Board, corroborating the CRO role exists. Management states invoices are available but they are not in the data room.",
-          "evidence_id": "DOC-EV-006"
+          "result": "MANAGEMENT_REFERENCE_ONLY",
+          "detail": "Invoices referenced in QoE schedule (DOC-08) but not available in data room. No VDR document contradicts the adjustment."
         }
       },
-      "evidence": ["DOC-EV-006", "SQL-EV-001"],
-      "confidence": 0.75,
-      "what_would_raise_confidence": "Executive search firm invoices for CRO and VP Engineering searches. Offer letters or employment agreements confirming the hires were made in FY2025. Confirmation that both roles were new hires rather than replacements for ongoing positions."
+      "evidence": ["SQL-EV-002", "DOC-EV-003"],
+      "confidence": 0.70,
+      "what_would_raise_confidence": "Executive search firm invoices for CRO and VP Engineering searches confirming the $310,000 total. Confirmation that both roles have been filled."
     },
     {
       "adjustment_id": "ADJ-010",
@@ -461,95 +455,102 @@
       "verdict": "Challenged",
       "accepted_amount_usd": null,
       "challenged_or_rejected_amount_usd": null,
-      "reasoning": "SQL-EV-009 confirms 20 customers with first_order_date in FY2025, generating $1,878,956 of FY2025 in-year revenue. The underlying new logo events are real and confirmed by structured data. However, the annualisation adjustment is Challenged for the following reasons: (1) Annualisation basis is assumption-dependent: management's $1,650,000 figure cannot be independently reconstructed from authoritative evidence without assuming a run-rate. The implied annualisation gap from active contracted ACV minus FY2025 revenue (SQL-EV-018) is approximately $799,620 — materially different from management's $1,650,000. This discrepancy cannot be resolved without understanding management's specific annualisation methodology. (2) Contract data quality issues: multiple new logo customers have contracts with end dates already expired (e.g., CUST-0143 Glenmoor Markets contract expired 2022-09-28, CUST-0145 Pinnacle Grocers expired 2025-02-28, CUST-0131 Silverbrook Brands expired 2022-04-28), raising questions about whether these customers have valid ongoing contractual commitments supporting annualisation. (3) Churned customers: SQL-EV-015 shows CUST-0143 (Glenmoor Markets) and CUST-0145 (Pinnacle Grocers) have churned status by December 2025, meaning their annualised contribution should not be included. (4) Cascade Foods Holdings (CUST-0006) dominates the new logo cohort with $1,206,022 of FY2025 revenue against a contracted ACV of $1,950,000 and an active contract through 2028-05-31. This customer's annualisation gap ($743,978) is independently supportable from the contracted ACV, but including it alone would not reach management's $1,650,000 figure. (5) The adjustment is a forward-looking normalization requiring assumptions about future revenue continuation that are not fully established by available evidence for the full cohort. The accepted amount cannot be quantified without resolving the methodology discrepancy and excluding churned customers.",
+      "reasoning": "Step 1 — Underlying Event: SQL-EV-005 confirms 20 customers with first_order_date >= 2025-01-01 invoiced in FY2025, with total FY2025 invoiced revenue of $1,878,956. The underlying new logo events are real. Step 2 — Timing: New logos were won throughout FY2025 (January through December), with varying partial-year contributions. Step 3 — Continuation/Commitment: SQL-EV-015 shows contracts for new FY2025 logos. Cascade Foods Holdings (CUST-0006) has an executed MSA (CTR-00006, ACV $1,950,000, contract start 2025-06-01, end 2028-05-31, auto-renew Y, status Active) — this is the strongest contractual commitment. However, several other new logos have contracts with start dates predating their first_order_date, expired contracts, or contracts with no auto-renew, raising questions about the reliability of annualisation for the full cohort. Step 4 — Overlap/Double Counting: CUST-0006 (Cascade Foods Holdings) has parent_customer_id = CUST-0005 (Cascade Foods). SQL-EV-021 shows Cascade Foods (CUST-0005) revenue declined from $1,972,869 in FY2024 to $407,201 in FY2025, while Cascade Foods Holdings (CUST-0006) generated $1,206,022 in FY2025. The combined FY2025 revenue of both entities ($1,613,223) is broadly consistent with Cascade Foods' prior-year revenue ($1,972,869), suggesting CUST-0006 may represent a corporate restructuring or re-engagement of an existing economic relationship rather than a genuinely new logo. This creates a material overlap risk for the annualisation. Step 5 — Verdict: The adjustment is Challenged. The underlying new logo events are real and some contractual commitment exists (particularly for Cascade Foods Holdings). However, the annualisation methodology is assumption-dependent (requires assumed run-rate continuation for each logo), the Cascade Foods Holdings/Cascade Foods relationship creates a material overlap risk, and the management amount of $1,650,000 cannot be independently reconstructed from authoritative evidence without unsupported assumptions. Accepted amount: null — no independently supportable annualised amount can be quantified without assuming run-rate continuation for each logo, which is not established by authoritative evidence for the full cohort.",
       "tests": {
         "existence": {
-          "result": "UNDERLYING_EVENTS_CONFIRMED",
-          "detail": "SQL-EV-009 confirms 20 new logo customers with first_order_date in FY2025 generating $1,878,956 of FY2025 revenue. No pre-2025 invoice activity found for any of these customers (SQL-EV-017), confirming they are genuinely new logos."
+          "result": "CONFIRMED",
+          "detail": "SQL-EV-005: 20 new logo customers with first_order_date >= 2025-01-01 invoiced in FY2025. Total FY2025 invoiced revenue $1,878,956. Underlying new logo events are real."
         },
         "amount": {
-          "result": "MANAGEMENT_AMOUNT_NOT_INDEPENDENTLY_RECONSTRUCTABLE",
-          "detail": "Management states $1,650,000. SQL-EV-018 shows the ACV-based annualisation gap for active new logos with contracts extending beyond 2025 is approximately $799,620 — materially less than management's figure. The discrepancy cannot be resolved without management's specific annualisation methodology. The $1,650,000 amount is assumption-dependent and cannot be independently verified.",
-          "sql_evidence": ["SQL-EV-009", "SQL-EV-018"]
+          "result": "ASSUMPTION_DEPENDENT",
+          "detail": "Management's $1,650,000 annualisation amount cannot be independently reconstructed. Total new logo FY2025 invoiced revenue is $1,878,956 (SQL-EV-007). The annualisation methodology (partial-period to full-year) requires assumed run-rate continuation for each logo, which is not established by authoritative evidence for the full cohort. The management amount is less than total FY2025 invoiced revenue, suggesting management may have applied a partial-year uplift to a subset of logos, but the methodology is not documented."
         },
         "period": {
-          "result": "TIMING_ISSUES_IDENTIFIED",
-          "detail": "New logos were won at various points during FY2025 (January through December). The partial-year revenue gap is real but the annualisation methodology and eligible customer set are unclear."
+          "result": "PERIOD_APPROPRIATE_FOR_CONCEPT",
+          "detail": "New logos won in FY2025 with partial-year contributions. Annualisation concept is period-appropriate but methodology is undocumented."
         },
         "recurrence": {
           "result": "NOT_APPLICABLE",
-          "detail": "No prior-period new logo annualisation adjustment appears in FY2023 or FY2024 structured data."
+          "detail": "No pro-forma new logo adjustment in FY2023 or FY2024 structured data."
         },
         "duplication": {
-          "result": "NO_DIRECT_DUPLICATION",
-          "detail": "No other FY2025 adjustment covers new logo revenue. However, Cascade Foods Holdings (CUST-0006) is referenced in the CIM (DOC-01, page 14) as a notable FY2025 expansion. The CIM does not separately quantify this as an adjustment, so no duplication is identified."
+          "result": "OVERLAP_RISK_IDENTIFIED",
+          "detail": "SQL-EV-021: Cascade Foods Holdings (CUST-0006, parent = CUST-0005 Cascade Foods) generated $1,206,022 in FY2025 while Cascade Foods (CUST-0005) declined from $1,972,869 (FY2024) to $407,201 (FY2025). Combined FY2025 revenue of both entities ($1,613,223) is broadly consistent with Cascade Foods prior-year revenue, suggesting CUST-0006 may represent a re-engagement of an existing economic relationship. DOC-06 (Cascade Foods Holdings MSA) notes a 2025 re-engagement after lapse of a prior agreement. This creates a material overlap risk: treating CUST-0006 as a new logo may overstate the genuine new logo contribution."
         },
         "underlying_data": {
-          "result": "PARTIAL_SUPPORT_WITH_MATERIAL_ISSUES",
-          "detail": "SQL-EV-016 shows new logo detail. Key issues: (a) CUST-0143 and CUST-0145 show churned status by Dec-2025 — their annualised contribution should be excluded; (b) multiple customers have expired contracts with no clear renewal evidence; (c) Cascade Foods Holdings has a strong active contract (ACV $1,950,000, active through 2028) supporting partial annualisation; (d) the remaining cohort has mixed contract quality. The implied annualisation gap from active, non-expired, non-churned contracts is approximately $799,620 per SQL-EV-018, but this itself requires an assumption that ACV equals annualised revenue.",
-          "sql_evidence": ["SQL-EV-009", "SQL-EV-013", "SQL-EV-015", "SQL-EV-016", "SQL-EV-017", "SQL-EV-018"]
+          "result": "PARTIAL_SUPPORT",
+          "detail": "SQL-EV-005: 20 new logos, $1,878,956 FY2025 invoiced. SQL-EV-015: Contracts exist for new logos; Cascade Foods Holdings has strongest commitment (ACV $1,950,000, active, auto-renew). SQL-EV-017: Total new logo ACV $2,832,316 (Cascade Holdings $1,950,000; others $882,316). SQL-EV-018: Cascade Foods Holdings ARR active from June 2025 at ~$1,600,000-$1,629,017. Other new logos have smaller and less certain ARR profiles. SQL-EV-014: New logo FY2025 revenue excluding Cascade Holdings = $672,934 across 19 customers."
         },
         "document_support": {
-          "result": "PARTIAL_CORROBORATION",
-          "detail": "CIM (DOC-01, page 14) references Cascade Foods Holdings as a notable FY2025 expansion. DOC-06 (Cascade Foods MSA) confirms an active contract with ACV of $1,950,000 starting June 2025 through May 2028. No document supports the full $1,650,000 annualisation figure.",
-          "evidence_id": "DOC-EV-007"
+          "result": "PARTIAL_SUPPORT",
+          "detail": "DOC-06 (Cascade Foods Holdings MSA, CTR-00006): Executed agreement, ACV $1,950,000, start 2025-06-01, end 2028-05-31, auto-renew. Strongest contractual support for one logo. DOC-06 notes re-engagement after lapse of prior agreement — raises overlap question. No executed contracts in data room for the other 19 new logos beyond the dim_contract records."
         }
       },
-      "evidence": ["DOC-EV-007", "SQL-EV-009", "SQL-EV-013", "SQL-EV-015", "SQL-EV-016", "SQL-EV-017", "SQL-EV-018"],
-      "confidence": 0.30,
-      "what_would_raise_confidence": "Management's detailed annualisation workings showing the specific customers included, the annualisation methodology (ACV-based, run-rate, or other), and the per-customer contribution to the $1,650,000. Executed contracts for all new logos confirming committed ARR. Clarification on whether churned customers (CUST-0143, CUST-0145) are included in the adjustment. Confirmation that Cascade Foods Holdings' partial-year gap is the primary driver."
+      "evidence": ["SQL-EV-005", "SQL-EV-007", "SQL-EV-012", "SQL-EV-014", "SQL-EV-015", "SQL-EV-017", "SQL-EV-018", "SQL-EV-021", "DOC-EV-004", "DOC-EV-005"],
+      "confidence": 0.40,
+      "what_would_raise_confidence": "Management's annualisation methodology schedule showing which logos were included, their partial-period revenue, and the annualisation basis for each. Confirmation of whether Cascade Foods Holdings is treated as a new logo or a continuation of the Cascade Foods relationship. Executed contracts for all 20 new logos confirming committed ACV. Evidence that Cascade Foods (CUST-0005) revenue decline is unrelated to the CUST-0006 re-engagement."
     }
   ],
   "inconsistencies": [
     {
       "inconsistency_id": "INC-001",
-      "type": "STRUCTURED_DATA_ADJUSTMENT_ABSENT_FROM_QOE_SCHEDULE",
-      "description": "ADJ-008 (FY2024, Transaction costs - Aborted refinancing costs, $180,000) exists in the structured mgmt_ebitda_adjustment table but is absent from the management QoE schedule (DOC-08). The QoE schedule lists only ADJ-001 and ADJ-002 as historical adjustments and does not reference ADJ-008.",
-      "affected_adjustment_ids": ["ADJ-008"],
-      "structured_data_observation": "SQL-EV-012 confirms ADJ-008 exists in workspace.aava_deal_studio.mgmt_ebitda_adjustment with fiscal_year=FY2024, category='Transaction costs', amount_usd=180000, mgmt_rationale='Aborted refinancing costs.'",
-      "document_observation": "DOC-08 (QoE Adjustment Schedule) lists FY2024 adjustments as ADJ-002 only. ADJ-008 is not mentioned.",
-      "evidence_references": ["SQL-EV-012", "DOC-EV-008"],
-      "confidence": 0.90
-    },
-    {
-      "inconsistency_id": "INC-002",
       "type": "RECURRING_ITEM_CLASSIFIED_AS_NON_RECURRING",
-      "description": "The legal settlement adjustment (ADJ-001, ADJ-002, ADJ-003) appears in each of FY2023, FY2024, and FY2025 at exactly $2,100,000 with identical rationale. Management classifies each as non-recurring. Board minutes (DOC-09, Item 7) describe 'the third annual settlement under the ongoing series of commercial disputes' and the Board asked about FY2026 provision, directly contradicting the non-recurring classification.",
-      "affected_adjustment_ids": ["ADJ-001", "ADJ-002", "ADJ-003"],
-      "structured_data_observation": "SQL-EV-023: Three occurrences across three consecutive fiscal years, each at exactly $2,100,000. Category and rationale are identical across all three years.",
-      "document_observation": "DOC-09 Board Minutes Item 7: 'The CFO reported that the third annual settlement under the ongoing series of commercial disputes with former channel partners had been concluded at $2.1M, consistent with the prior two years. The Board asked whether provision should be made for a further settlement in FY2026.'",
-      "evidence_references": ["SQL-EV-002", "SQL-EV-023", "DOC-EV-001"],
+      "description": "The legal settlement adjustment (ADJ-003, FY2025) is classified as 'One-time' and 'Non-recurring' by management, but structured data shows identical category, identical amount ($2,100,000), and identical rationale in FY2023 (ADJ-001), FY2024 (ADJ-002), and FY2025 (ADJ-003). Board Minutes (DOC-09, Item 7) explicitly describe 'the third annual settlement under the ongoing series of commercial disputes with former channel partners' and record a board question about FY2026 provision.",
+      "affected_adjustment_ids": ["ADJ-003"],
+      "structured_data_observation": "SQL-EV-003: Three rows in mgmt_ebitda_adjustment with category 'One-time legal settlement', amount_usd 2100000, in FY2023, FY2024, and FY2025 respectively.",
+      "document_observation": "DOC-09 (Board Minutes, Item 7): 'the third annual settlement under the ongoing series of commercial disputes with former channel partners had been concluded at $2.1M, consistent with the prior two years. The Board asked whether provision should be made for a further settlement in FY2026. The CFO responded that the matters are being treated as non-recurring for the purposes of the sale process.'",
+      "evidence_references": ["SQL-EV-003", "SQL-EV-013", "DOC-EV-001"],
       "confidence": 0.95
     },
     {
+      "inconsistency_id": "INC-002",
+      "type": "STRUCTURED_DATA_ADJUSTMENT_ABSENT_FROM_QOE_SCHEDULE",
+      "description": "ADJ-008 (FY2024, Transaction costs - Aborted refinancing costs, $180,000) exists in the structured mgmt_ebitda_adjustment table but is not listed in the management QoE schedule (DOC-08). The QoE schedule lists only ADJ-001 and ADJ-002 as historical adjustments, omitting ADJ-008.",
+      "affected_adjustment_ids": ["ADJ-008"],
+      "structured_data_observation": "SQL-EV-009: ADJ-008 present in mgmt_ebitda_adjustment with fiscal_year FY2024, category 'Transaction costs', amount_usd 180000, mgmt_rationale 'Aborted refinancing costs.'",
+      "document_observation": "DOC-08 (QoE Schedule): Lists ADJ-001 (FY2023) and ADJ-002 (FY2024) as historical adjustments. ADJ-008 (FY2024 transaction costs) is not mentioned.",
+      "evidence_references": ["SQL-EV-009", "DOC-EV-003"],
+      "confidence": 0.90
+    },
+    {
       "inconsistency_id": "INC-003",
-      "type": "LEGACY_PRODUCT_NO_TRANSACTION_DATA",
-      "description": "ADJ-007 claims $540,000 of trading losses on the Legacy On-Prem product. Legacy products (PRD-016, PRD-017) exist in dim_product but have zero associated revenue or cost activity in fact_invoice_line across all periods. The structured data neither confirms nor contradicts the loss amount.",
-      "affected_adjustment_ids": ["ADJ-007"],
-      "structured_data_observation": "SQL-EV-007 and SQL-EV-021: Zero rows returned for Legacy product revenue in FY2025 and all prior years across fact_invoice_line joined to dim_product where product_family='Legacy'.",
-      "document_observation": "DOC-08 states losses on Legacy On-Prem product being sunset. No board minutes or other VDR document references the Legacy product sunset or associated losses.",
-      "evidence_references": ["SQL-EV-006", "SQL-EV-007", "SQL-EV-021", "DOC-EV-005"],
-      "confidence": 0.80
+      "type": "CIM_REPRESENTATION_CONTRADICTED_BY_BOARD_EVIDENCE",
+      "description": "CIM (DOC-01, Page 27) states 'All customer contracts are freely assignable on a change of control and no consent is required from any counterparty in connection with a sale of the Company.' Board Minutes (DOC-09, Item 5) record that Northwind MSA Section 14.2 'treats a change of control of the Company as an assignment requiring Northwind's prior written consent.' This is a direct contradiction relevant to the largest single revenue relationship.",
+      "affected_adjustment_ids": [],
+      "structured_data_observation": "dim_contract: CTR-00001 (Northwind Retail Group, ACV $7,600,000, expiry 2026-06-30, no auto-renew). No change-of-control restriction field in structured data.",
+      "document_observation": "DOC-01 (CIM, Page 27): 'All customer contracts are freely assignable on a change of control.' DOC-09 (Board Minutes, Item 5): 'Section 14.2 treats a change of control of the Company as an assignment requiring Northwind's prior written consent.' DOC-07 (Management Contract Summary): 'None noted' for Northwind change of control restriction — consistent with CIM but contradicted by Board Minutes.",
+      "evidence_references": ["DOC-EV-006", "DOC-EV-007"],
+      "confidence": 0.92
     },
     {
       "inconsistency_id": "INC-004",
-      "type": "NEW_LOGO_ANNUALISATION_AMOUNT_INCONSISTENT_WITH_CONTRACT_DATA",
-      "description": "Management's ADJ-010 annualisation of $1,650,000 is materially inconsistent with the ACV-based annualisation gap derivable from active new logo contracts ($799,620 per SQL-EV-018). Additionally, two new logo customers (CUST-0143 Glenmoor Markets, CUST-0145 Pinnacle Grocers) show churned status by December 2025, suggesting they should not contribute to an annualised run-rate.",
-      "affected_adjustment_ids": ["ADJ-010"],
-      "structured_data_observation": "SQL-EV-018: ACV-based annualisation gap for active new logos with contracts extending beyond 2025 is $799,620. SQL-EV-015: CUST-0143 and CUST-0145 show churned status. SQL-EV-016: Multiple new logo customers have expired contracts.",
-      "document_observation": "Management QoE schedule (DOC-08) states $1,650,000 for annualising FY2025 new bookings without providing customer-level detail or methodology.",
-      "evidence_references": ["SQL-EV-009", "SQL-EV-013", "SQL-EV-015", "SQL-EV-016", "SQL-EV-018", "DOC-EV-007"],
-      "confidence": 0.75
+      "type": "CIM_REPRESENTATION_POTENTIALLY_CONTRADICTED_BY_BOARD_EVIDENCE",
+      "description": "CIM (DOC-01, Page 27) states 'No contract contains most-favoured-nation pricing.' Board Minutes (DOC-09, Item 6) record that 'The General Counsel asked that the Vantage most-favoured-customer provision be reviewed in light of' the Pinnacle Outdoor discount. This implies a Vantage MFN provision may exist, contradicting the CIM representation.",
+      "affected_adjustment_ids": [],
+      "structured_data_observation": "dim_contract: CTR-00002 (Vantage Grocers, ACV $4,100,000). No MFN field in structured data.",
+      "document_observation": "DOC-01 (CIM, Page 27): 'No contract contains most-favoured-nation pricing.' DOC-09 (Board Minutes, Item 6): 'The General Counsel asked that the Vantage most-favoured-customer provision be reviewed in light of this.' DOC-07 (Management Contract Summary): 'None noted' for Vantage MFN.",
+      "evidence_references": ["DOC-EV-006", "DOC-EV-007"],
+      "confidence": 0.80
     },
     {
       "inconsistency_id": "INC-005",
-      "type": "CIM_REPRESENTATION_CONTRADICTED_BY_CONTRACT_EVIDENCE",
-      "description": "CIM (DOC-01, page 27) states 'All customer contracts are freely assignable on a change of control' and 'No contract contains most-favoured-nation pricing.' Board minutes (DOC-09, Item 5) confirm Northwind MSA Section 14.2 requires prior written consent for change of control. Board minutes (DOC-09, Item 6) reference a Vantage most-favoured-customer provision. These are inconsistencies relevant to the broader deal context but noted here as they affect the reliability of management representations generally.",
-      "affected_adjustment_ids": [],
-      "structured_data_observation": "Not directly testable from EBITDA adjustment structured data.",
-      "document_observation": "DOC-01 page 27 vs DOC-09 Items 5 and 6. These are material CIM misrepresentations noted for cross-agent reference.",
-      "evidence_references": ["DOC-EV-009", "DOC-EV-010"],
-      "confidence": 0.90
+      "type": "NEW_LOGO_CLASSIFICATION_OVERLAP_RISK",
+      "description": "Cascade Foods Holdings (CUST-0006) is treated as a new logo in ADJ-010 (pro-forma new logo annualisation). Structured data shows CUST-0006 has parent_customer_id = CUST-0005 (Cascade Foods), which was an existing customer since 2019. Cascade Foods (CUST-0005) revenue declined from $1,972,869 (FY2024) to $407,201 (FY2025) while Cascade Foods Holdings generated $1,206,022 in FY2025. The combined revenue of both entities in FY2025 ($1,613,223) is broadly consistent with Cascade Foods' prior-year revenue, suggesting economic continuity rather than a genuinely new logo.",
+      "affected_adjustment_ids": ["ADJ-010"],
+      "structured_data_observation": "SQL-EV-012 and SQL-EV-021: CUST-0006 parent_customer_id = CUST-0005. CUST-0005 FY2024 revenue $1,972,869, FY2025 revenue $407,201. CUST-0006 FY2025 revenue $1,206,022. Combined FY2025 = $1,613,223.",
+      "document_observation": "DOC-06 (Cascade Foods Holdings MSA): Notes 2025 re-engagement after lapse of prior agreement. DOC-07 (Management Contract Summary): Cascade Foods Holdings listed as 'New logo win FY2025.'",
+      "evidence_references": ["SQL-EV-012", "SQL-EV-021", "DOC-EV-004", "DOC-EV-005"],
+      "confidence": 0.75
+    },
+    {
+      "inconsistency_id": "INC-006",
+      "type": "LEGACY_PRODUCT_REVENUE_ABSENT_FROM_STRUCTURED_DATA",
+      "description": "ADJ-007 claims $540,000 in trading losses on the Legacy On-Prem product. Legacy products (PRD-016, PRD-017) exist in dim_product but have zero invoice line revenue in fact_invoice_line across all periods. FY2025 revenue is entirely from Platform, Professional Services, and Managed Services. The absence of Legacy revenue in structured data means the $540,000 loss amount cannot be independently verified or contradicted from available data.",
+      "affected_adjustment_ids": ["ADJ-007"],
+      "structured_data_observation": "SQL-EV-004, SQL-EV-008, SQL-EV-022, SQL-EV-023: Zero Legacy product family revenue in fact_invoice_line. FY2025 revenue: Platform $33,840,087, Professional Services $5,385,616, Managed Services $3,504,370. No Legacy revenue.",
+      "document_observation": "DOC-08 (QoE Schedule): Asserts Legacy On-Prem 'is being sunset.' No formal discontinuation document in data room.",
+      "evidence_references": ["SQL-EV-004", "SQL-EV-008", "SQL-EV-022", "SQL-EV-023", "DOC-EV-003"],
+      "confidence": 0.70
     }
   ],
   "claim_relevant_evidence": [
@@ -558,401 +559,344 @@
       "claim_text": "Adjusted EBITDA of $12.4M represents a 32% margin.",
       "management_reported_ebitda_usd": 4280000,
       "management_adjusted_ebitda_usd": 12400000,
-      "team_adjusted_ebitda_usd": 6710000,
       "management_adjustment_total_usd": 8120000,
+      "team_quantified_accepted_ebitda_usd": 6710000,
+      "team_hard_rejection_ebitda_usd": 8900000,
       "accepted_adjustment_total_usd": 2430000,
-      "challenged_null_adjustment_total_usd": 2190000,
       "rejected_adjustment_total_usd": 3500000,
-      "earnings_challenge_usd": 5690000,
-      "adjustments_analyzed": 7,
-      "accepted_count": 3,
-      "challenged_count": 2,
-      "rejected_count": 2,
-      "methodology": "Management Adjusted EBITDA of $12,400,000 is confirmed to reconcile arithmetically (Reported EBITDA $4,280,000 + FY2025 adjustments $8,120,000 = $12,400,000). Team Adjusted EBITDA of $6,710,000 reflects only quantified accepted adjustments (ADJ-004 $1,250,000 + ADJ-006 $870,000 + ADJ-009 $310,000 = $2,430,000). ADJ-003 ($2,100,000) is Rejected as recurring per board minutes evidence. ADJ-005 ($1,400,000) is Rejected as prospective/unactioned per management's own disclosure. ADJ-007 ($540,000) and ADJ-010 ($1,650,000) are Challenged with null accepted amounts due to insufficient evidence to quantify a defensible retained portion. If ADJ-007 and ADJ-010 are subsequently resolved and partially or fully accepted, Team Adjusted EBITDA would increase above $6,710,000.",
-      "evidence_references": ["DOC-EV-001", "DOC-EV-002", "DOC-EV-003", "DOC-EV-004", "DOC-EV-005", "DOC-EV-006", "DOC-EV-007", "SQL-EV-002", "SQL-EV-003", "SQL-EV-004", "SQL-EV-022", "SQL-EV-023", "SQL-EV-026"],
-      "final_verdict_note": "Agent 5 does not issue the final CLM-05 verdict. Final claim adjudication belongs to Agent 7."
+      "challenged_null_adjustment_total_usd": 2190000,
+      "earnings_challenge_vs_quantified_usd": 5690000,
+      "adjustments_accepted": ["ADJ-004", "ADJ-006", "ADJ-009"],
+      "adjustments_rejected": ["ADJ-003", "ADJ-005"],
+      "adjustments_challenged_null": ["ADJ-007", "ADJ-010"],
+      "key_findings": [
+        "Management bridge reconciles: Reported EBITDA $4,280,000 + FY2025 adjustments $8,120,000 = Management Adjusted EBITDA $12,400,000 (zero reconciliation difference).",
+        "ADJ-003 (legal settlement $2,100,000) rejected: Board Minutes confirm third annual settlement in ongoing series; recurring pattern across FY2023, FY2024, FY2025 at identical amounts.",
+        "ADJ-005 (pro-forma cost savings $1,400,000) rejected: Management's own schedule states no notice has been served; future-period unactioned saving.",
+        "ADJ-004 (owner comp $1,250,000) accepted: Standard QoE treatment; no contradicting evidence; single occurrence.",
+        "ADJ-006 (transaction costs $870,000) accepted: Non-recurring sell-side fees; standard QoE treatment.",
+        "ADJ-009 (recruitment $310,000) accepted: Non-recurring executive search; single occurrence.",
+        "ADJ-007 (discontinued product $540,000) challenged: Legacy products exist in product master but have zero revenue in structured data; no formal discontinuation commitment in data room.",
+        "ADJ-010 (pro-forma new logos $1,650,000) challenged: New logo events confirmed but annualisation is assumption-dependent; Cascade Foods Holdings overlap risk identified.",
+        "Enterprise Value not found in any authoritative deal document; implied multiples cannot be calculated."
+      ],
+      "methodology": "Independent testing of each management adjustment against structured Databricks data and VDR evidence. Recurrence tested using full adjustment history. Pro-forma adjustments tested against invoice, contract, subscription, and customer data. Document evidence cross-referenced against structured data.",
+      "final_clm05_verdict": "NOT_ISSUED — Agent 7 performs final claim adjudication."
     }
   ],
   "document_evidence": [
     {
       "evidence_id": "DOC-EV-001",
-      "document_id": "DOC-09",
+      "doc_id": "DOC-09",
       "document_name": "Board of Directors — Minutes (Extract), 22 October 2025",
       "page_marker": "Item 7",
       "section": "Legal",
-      "evidence_summary": "CFO reported the third annual settlement under the ongoing series of commercial disputes with former channel partners concluded at $2.1M, consistent with prior two years. Board asked whether provision should be made for FY2026. CFO responded matters are being treated as non-recurring for purposes of the sale process.",
-      "quote": "the third annual settlement under the ongoing series of commercial disputes with former channel partners had been concluded at $2.1M, consistent with the prior two years. The Board asked whether provision should be made for a further settlement in FY2026.",
-      "relevance": "Directly contradicts management's non-recurring classification of ADJ-003. Establishes recurring pattern and prospective risk.",
+      "evidence_summary": "CFO reported the third annual settlement under the ongoing series of commercial disputes with former channel partners concluded at $2.1M, consistent with prior two years. Board asked about FY2026 provision. CFO stated matters are being treated as non-recurring for the sale process.",
+      "key_quote": "the third annual settlement under the ongoing series of commercial disputes with former channel partners had been concluded at $2.1M, consistent with the prior two years. The Board asked whether provision should be made for a further settlement in FY2026. The CFO responded that the matters are being treated as non-recurring for the purposes of the sale process.",
       "confidence": 0.95
     },
     {
       "evidence_id": "DOC-EV-002",
-      "document_id": "DOC-08",
+      "doc_id": "DOC-08",
       "document_name": "Adjusted EBITDA Bridge — Management View",
-      "page_marker": "ADJ-004",
-      "section": "Owner compensation normalisation",
-      "evidence_summary": "Management states founder salary is above market and normalised to market rate, supported by a third-party compensation benchmark dated Sep-2025. Benchmark document not present in data room.",
-      "quote": "Founder salary above market; normalised to a market rate for the role. Supported by a third-party compensation benchmark dated Sep-2025.",
-      "relevance": "Establishes management's basis for ADJ-004. Benchmark document absence reduces confidence.",
-      "confidence": 0.72
+      "page_marker": "Note",
+      "section": "Management Note",
+      "evidence_summary": "Management explicitly acknowledges the same one-time legal settlement line appears in FY2023, FY2024, and FY2025, advising these relate to separate matters.",
+      "key_quote": "the same 'one-time legal settlement' line appears in each of FY2023, FY2024 and FY2025. Management advises these relate to separate matters.",
+      "confidence": 0.95
     },
     {
       "evidence_id": "DOC-EV-003",
-      "document_id": "DOC-08",
+      "doc_id": "DOC-08",
       "document_name": "Adjusted EBITDA Bridge — Management View",
-      "page_marker": "ADJ-005",
-      "section": "Pro-forma cost savings",
-      "evidence_summary": "Management explicitly states planned headcount reduction of 14 FTE is scheduled for Q1 FY2026 and no notice has yet been served. This is management's own disclosure that the event is prospective and unactioned.",
-      "quote": "Planned headcount reduction of 14 FTE scheduled for Q1 FY2026. No notice has yet been served.",
-      "relevance": "Management's own disclosure supports rejection of ADJ-005 as a prospective, unactioned future-period cost saving.",
-      "confidence": 0.97
+      "page_marker": "Adjustment Schedule",
+      "section": "FY2025 Adjustments",
+      "evidence_summary": "Management QoE schedule listing all FY2025 adjustments: ADJ-003 through ADJ-010 (excluding ADJ-008). Reported EBITDA FY2025 $4,280,000. Management Adjusted EBITDA FY2025 $12,400,000. FY2025 adjustments total $8,120,000. ADJ-005 explicitly states no notice has been served.",
+      "key_quote": "Pro-forma cost savings (not yet actioned): Planned headcount reduction of 14 FTE scheduled for Q1 FY2026. No notice has yet been served.",
+      "confidence": 0.90
     },
     {
       "evidence_id": "DOC-EV-004",
-      "document_id": "DOC-01",
-      "document_name": "Harborline Systems, Inc. — CIM Excerpt",
-      "page_marker": "Page 18",
-      "section": "Adjusted EBITDA",
-      "evidence_summary": "CIM states Adjusted EBITDA of $12.4M represents a 32% margin. Adjustments schedule set out in management QoE pack comprises non-recurring items, owner compensation normalisation, and identified pro-forma effects. No Enterprise Value stated.",
-      "quote": "Adjusted EBITDA of $12.4M represents a 32% margin.",
-      "relevance": "Confirms management's stated Adjusted EBITDA. No EV found in this document.",
-      "confidence": 0.90
-    },
-    {
-      "evidence_id": "DOC-EV-005",
-      "document_id": "DOC-08",
-      "document_name": "Adjusted EBITDA Bridge — Management View",
-      "page_marker": "ADJ-007",
-      "section": "Discontinued product line",
-      "evidence_summary": "Management states $540,000 of trading losses on Legacy On-Prem product being sunset. No supporting documentation provided. No board minutes or other VDR document references this product sunset.",
-      "quote": "Trading losses on the Legacy On-Prem product, which is being sunset.",
-      "relevance": "Management assertion for ADJ-007. No corroborating evidence in data room.",
-      "confidence": 0.35
-    },
-    {
-      "evidence_id": "DOC-EV-006",
-      "document_id": "DOC-09",
-      "document_name": "Board of Directors — Minutes (Extract), 22 October 2025",
-      "page_marker": "Item 4",
-      "section": "Customer Matters",
-      "evidence_summary": "CRO reported to the Board on Vantage Grocers service instability. Corroborates existence of CRO role, supporting ADJ-009 executive search fee for CRO.",
-      "quote": "The CRO reported continued service instability at Vantage Grocers.",
-      "relevance": "Corroborates existence of CRO role, supporting ADJ-009.",
-      "confidence": 0.75
-    },
-    {
-      "evidence_id": "DOC-EV-007",
-      "document_id": "DOC-06",
+      "doc_id": "DOC-06",
       "document_name": "MSA — Cascade Foods Holdings LLC",
-      "page_marker": "Contract terms",
-      "section": "Commercial terms",
-      "evidence_summary": "Executed MSA for Cascade Foods Holdings (CUST-0006) with contract start date 2025-06-01, end date 2028-05-31, ACV $1,950,000, status Active. Confirms committed contractual revenue supporting partial annualisation for this customer.",
-      "quote": "Contract start: 2025-06-01, end: 2028-05-31, ACV: $1,950,000",
-      "relevance": "Supports partial annualisation for Cascade Foods Holdings within ADJ-010, but does not support the full $1,650,000 management figure.",
+      "page_marker": null,
+      "section": "Agreement Terms",
+      "evidence_summary": "Executed MSA for Cascade Foods Holdings LLC (CUST-0006), dated 2025-06-01. Contract CTR-00006, ACV $1,950,000, TCV $5,850,000, end date 2028-05-31, auto-renew Y, status Active. Document notes 2025 re-engagement after lapse of prior agreement.",
+      "key_quote": null,
       "confidence": 0.85
     },
     {
-      "evidence_id": "DOC-EV-008",
-      "document_id": "DOC-08",
-      "document_name": "Adjusted EBITDA Bridge — Management View",
-      "page_marker": "Historical adjustments",
-      "section": "FY2023 and FY2024 adjustments",
-      "evidence_summary": "QoE schedule lists ADJ-001 (FY2023) and ADJ-002 (FY2024) as historical legal settlement adjustments. ADJ-008 (FY2024 aborted refinancing costs $180,000) is absent from the QoE schedule despite existing in structured data.",
-      "quote": "ADJ-001 FY2023 One-time legal settlement $2,100,000; ADJ-002 FY2024 One-time legal settlement $2,100,000",
-      "relevance": "Establishes INC-001 inconsistency — ADJ-008 absent from QoE schedule.",
-      "confidence": 0.90
+      "evidence_id": "DOC-EV-005",
+      "doc_id": "DOC-07",
+      "document_name": "Customer Contract Summary — Top Accounts",
+      "page_marker": null,
+      "section": "Contract Table",
+      "evidence_summary": "Management contract summary lists Cascade Foods Holdings (CTR-00006) as a new logo win FY2025 with ACV $1,950,000. Does not disclose parent relationship to Cascade Foods (CUST-0005).",
+      "key_quote": "New logo win FY2025",
+      "confidence": 0.75
     },
     {
-      "evidence_id": "DOC-EV-009",
-      "document_id": "DOC-01",
+      "evidence_id": "DOC-EV-006",
+      "doc_id": "DOC-01",
       "document_name": "Harborline Systems, Inc. — CIM Excerpt",
       "page_marker": "Page 27",
       "section": "Contracts",
-      "evidence_summary": "CIM states all customer contracts are freely assignable on change of control and no contract contains MFN pricing. Both representations are contradicted by board minutes and executed contracts.",
-      "quote": "All customer contracts are freely assignable on a change of control and no consent is required from any counterparty in connection with a sale of the Company. No contract contains most-favoured-nation pricing.",
-      "relevance": "CIM misrepresentation noted for cross-agent reference. Affects reliability of management representations generally.",
-      "confidence": 0.90
+      "evidence_summary": "CIM states all customer contracts are freely assignable on a change of control and no consent is required. Also states no contract contains most-favoured-nation pricing.",
+      "key_quote": "All customer contracts are freely assignable on a change of control and no consent is required from any counterparty in connection with a sale of the Company. No contract contains most-favoured-nation pricing.",
+      "confidence": 0.60
     },
     {
-      "evidence_id": "DOC-EV-010",
-      "document_id": "DOC-09",
+      "evidence_id": "DOC-EV-007",
+      "doc_id": "DOC-09",
       "document_name": "Board of Directors — Minutes (Extract), 22 October 2025",
       "page_marker": "Items 5 and 6",
-      "section": "Northwind and Pricing Governance",
-      "evidence_summary": "Item 5: Northwind MSA Section 14.2 treats change of control as assignment requiring prior written consent. Item 6: Vantage most-favoured-customer provision flagged for review in light of Pinnacle Outdoor discount.",
-      "quote": "Section 14.2 treats a change of control of the Company as an assignment requiring Northwind's prior written consent. The General Counsel asked that the Vantage most-favoured-customer provision be reviewed in light of this.",
-      "relevance": "Contradicts CIM representations on assignability and MFN. Relevant to INC-005.",
+      "section": "Customer Matters / Pricing Governance",
+      "evidence_summary": "Item 5: Northwind MSA Section 14.2 treats change of control as assignment requiring Northwind prior written consent — contradicts CIM Page 27. Item 6: General Counsel asked that Vantage most-favoured-customer provision be reviewed — implies MFN provision exists, potentially contradicting CIM Page 27.",
+      "key_quote": "Section 14.2 treats a change of control of the Company as an assignment requiring Northwind's prior written consent. The General Counsel asked that the Vantage most-favoured-customer provision be reviewed in light of this.",
       "confidence": 0.90
     }
   ],
   "sql_evidence": [
     {
       "evidence_id": "SQL-EV-001",
-      "purpose": "Validate all structured sources and retrieve all management EBITDA adjustments",
-      "physical_objects": ["workspace.aava_deal_studio.mgmt_ebitda_adjustment", "workspace.aava_deal_studio.dim_customer", "workspace.aava_deal_studio.dim_product", "workspace.aava_deal_studio.dim_contract", "workspace.aava_deal_studio.fact_invoice", "workspace.aava_deal_studio.fact_invoice_line", "workspace.aava_deal_studio.fact_subscription_month", "workspace.aava_deal_studio.fact_collection", "workspace.aava_deal_studio.mgmt_claim"],
-      "sql_query": "SELECT 'mgmt_ebitda_adjustment' AS table_name, COUNT(*) AS row_count FROM workspace.aava_deal_studio.mgmt_ebitda_adjustment UNION ALL SELECT 'dim_customer', COUNT(*) FROM workspace.aava_deal_studio.dim_customer UNION ALL SELECT 'dim_product', COUNT(*) FROM workspace.aava_deal_studio.dim_product UNION ALL SELECT 'dim_contract', COUNT(*) FROM workspace.aava_deal_studio.dim_contract UNION ALL SELECT 'fact_invoice', COUNT(*) FROM workspace.aava_deal_studio.fact_invoice UNION ALL SELECT 'fact_invoice_line', COUNT(*) FROM workspace.aava_deal_studio.fact_invoice_line UNION ALL SELECT 'fact_subscription_month', COUNT(*) FROM workspace.aava_deal_studio.fact_subscription_month UNION ALL SELECT 'fact_collection', COUNT(*) FROM workspace.aava_deal_studio.fact_collection UNION ALL SELECT 'mgmt_claim', COUNT(*) FROM workspace.aava_deal_studio.mgmt_claim",
-      "result_summary": "All 9 tables validated. mgmt_ebitda_adjustment: 10 rows; dim_customer: 214; dim_product: 18; dim_contract: 214; fact_invoice: 3167; fact_invoice_line: 9427; fact_subscription_month: 7704; fact_collection: 3167; mgmt_claim: 12.",
+      "purpose": "Verify CLM-05 management adjusted EBITDA claim from mgmt_claim table",
+      "physical_objects": ["workspace.aava_deal_studio.mgmt_claim"],
+      "sql_query": "SELECT claim_id, claim_text, metric_key, claimed_value, period, cim_page FROM workspace.aava_deal_studio.mgmt_claim WHERE claim_id = 'CLM-05'",
+      "result_summary": "CLM-05: Adjusted EBITDA of $12.4M represents a 32% margin. claimed_value = 12400000. Period FY2025. CIM page 18.",
       "status": "SUCCESS"
     },
     {
       "evidence_id": "SQL-EV-002",
-      "purpose": "Recurrence test - legal settlement adjustments across all fiscal years",
+      "purpose": "FY2025 management adjustments count and total",
       "physical_objects": ["workspace.aava_deal_studio.mgmt_ebitda_adjustment"],
-      "sql_query": "SELECT adjustment_id, fiscal_year, category, amount_usd, mgmt_rationale FROM workspace.aava_deal_studio.mgmt_ebitda_adjustment WHERE category = 'One-time legal settlement' ORDER BY fiscal_year",
-      "result_summary": "Three rows returned: ADJ-001 FY2023 $2,100,000; ADJ-002 FY2024 $2,100,000; ADJ-003 FY2025 $2,100,000. Identical category, identical amount, identical rationale across three consecutive years.",
+      "sql_query": "SELECT COUNT(*) as adj_count, SUM(amount_usd) as total_adj_usd FROM workspace.aava_deal_studio.mgmt_ebitda_adjustment WHERE fiscal_year = 'FY2025'",
+      "result_summary": "7 FY2025 adjustments totalling $8,120,000.",
       "status": "SUCCESS"
     },
     {
       "evidence_id": "SQL-EV-003",
-      "purpose": "FY2025 management adjustments total and count",
+      "purpose": "Recurrence test for legal settlement adjustments across all fiscal years",
       "physical_objects": ["workspace.aava_deal_studio.mgmt_ebitda_adjustment"],
-      "sql_query": "SELECT SUM(amount_usd) AS total_fy2025_adjustments, COUNT(*) AS adjustment_count FROM workspace.aava_deal_studio.mgmt_ebitda_adjustment WHERE fiscal_year = 'FY2025'",
-      "result_summary": "Total FY2025 adjustments: $8,120,000 across 7 adjustments (ADJ-003 through ADJ-010 excluding ADJ-008).",
+      "sql_query": "SELECT category, fiscal_year, adjustment_id, amount_usd, mgmt_rationale FROM workspace.aava_deal_studio.mgmt_ebitda_adjustment WHERE LOWER(category) LIKE '%legal%' OR LOWER(category) LIKE '%settlement%' ORDER BY fiscal_year, adjustment_id",
+      "result_summary": "Three rows: ADJ-001 (FY2023, $2,100,000), ADJ-002 (FY2024, $2,100,000), ADJ-003 (FY2025, $2,100,000). Identical category, identical amount, identical rationale across three consecutive years.",
       "status": "SUCCESS"
     },
     {
       "evidence_id": "SQL-EV-004",
-      "purpose": "Management EBITDA bridge reconciliation",
-      "physical_objects": [],
-      "sql_query": "SELECT 4280000 AS reported_ebitda_usd, 8120000 AS mgmt_adjustments_total_usd, 4280000 + 8120000 AS calculated_mgmt_adjusted_ebitda_usd, 12400000 AS stated_mgmt_adjusted_ebitda_usd, (4280000 + 8120000) - 12400000 AS reconciliation_difference_usd",
-      "result_summary": "Calculated Management Adjusted EBITDA: $12,400,000. Stated: $12,400,000. Reconciliation difference: $0. Bridge reconciles.",
+      "purpose": "Legacy product revenue test — invoice lines by product family and year",
+      "physical_objects": ["workspace.aava_deal_studio.fact_invoice_line", "workspace.aava_deal_studio.fact_invoice", "workspace.aava_deal_studio.dim_product"],
+      "sql_query": "SELECT p.product_family, p.product_name, p.product_id, SUBSTR(fil.service_period_start, 1, 4) as service_year, SUM(fil.line_amount_usd) as total_revenue_usd, COUNT(DISTINCT fi.customer_id) as customer_count, COUNT(fil.invoice_line_id) as line_count FROM workspace.aava_deal_studio.fact_invoice_line fil JOIN workspace.aava_deal_studio.fact_invoice fi ON fil.invoice_id = fi.invoice_id JOIN workspace.aava_deal_studio.dim_product p ON fil.product_id = p.product_id WHERE p.product_family = 'Legacy' GROUP BY p.product_family, p.product_name, p.product_id, SUBSTR(fil.service_period_start, 1, 4) ORDER BY service_year, p.product_name",
+      "result_summary": "Zero rows returned. No Legacy product family revenue in fact_invoice_line across any period.",
       "status": "SUCCESS"
     },
     {
       "evidence_id": "SQL-EV-005",
-      "purpose": "Identify Legacy On-Prem products in product dimension",
-      "physical_objects": ["workspace.aava_deal_studio.dim_product"],
-      "sql_query": "SELECT product_id, product_name, product_family, delivery_model, list_price_usd FROM workspace.aava_deal_studio.dim_product WHERE LOWER(product_name) LIKE '%on-prem%' OR LOWER(product_name) LIKE '%legacy%' OR LOWER(delivery_model) LIKE '%on-prem%' OR LOWER(product_family) LIKE '%legacy%'",
-      "result_summary": "Two Legacy products found: PRD-016 'Legacy On-Prem Licence' (Perpetual, $210,000 list price) and PRD-017 'Legacy Maintenance' (Subscription, $34,000 list price).",
+      "purpose": "New logo customers first invoiced in FY2025 — for ADJ-010 pro-forma test",
+      "physical_objects": ["workspace.aava_deal_studio.dim_customer", "workspace.aava_deal_studio.fact_invoice"],
+      "sql_query": "SELECT dc.customer_id, dc.customer_name, dc.first_order_date, MIN(fi.invoice_date) as first_invoice_date, SUM(fi.invoice_amount_usd) as total_invoiced_fy2025, COUNT(fi.invoice_id) as invoice_count FROM workspace.aava_deal_studio.dim_customer dc JOIN workspace.aava_deal_studio.fact_invoice fi ON dc.customer_id = fi.customer_id WHERE dc.first_order_date >= '2025-01-01' AND fi.invoice_date >= '2025-01-01' AND fi.invoice_date <= '2025-12-31' GROUP BY dc.customer_id, dc.customer_name, dc.first_order_date ORDER BY first_invoice_date",
+      "result_summary": "20 new logo customers with first_order_date >= 2025-01-01 invoiced in FY2025. Total FY2025 invoiced revenue $1,878,956.",
       "status": "SUCCESS"
     },
     {
       "evidence_id": "SQL-EV-006",
-      "purpose": "Full product list to identify all product families",
-      "physical_objects": ["workspace.aava_deal_studio.dim_product"],
-      "sql_query": "SELECT product_id, product_name, product_family, delivery_model, list_price_usd FROM workspace.aava_deal_studio.dim_product ORDER BY product_family, product_name",
-      "result_summary": "18 products across 4 families: Legacy (2), Managed Services (1), Platform (9), Professional Services (5).",
+      "purpose": "Management EBITDA bridge reconciliation",
+      "physical_objects": ["workspace.aava_deal_studio.mgmt_ebitda_adjustment"],
+      "sql_query": "SELECT 4280000 AS reported_ebitda_usd, SUM(amount_usd) AS fy2025_adj_total_usd, 4280000 + SUM(amount_usd) AS calc_mgmt_adjusted_ebitda_usd, 12400000 AS stated_mgmt_adjusted_ebitda_usd, (4280000 + SUM(amount_usd)) - 12400000 AS reconciliation_difference_usd FROM workspace.aava_deal_studio.mgmt_ebitda_adjustment WHERE fiscal_year = 'FY2025'",
+      "result_summary": "Reported EBITDA $4,280,000 + FY2025 adjustments $8,120,000 = $12,400,000. Stated management adjusted EBITDA $12,400,000. Reconciliation difference $0. Bridge reconciles.",
       "status": "SUCCESS"
     },
     {
       "evidence_id": "SQL-EV-007",
-      "purpose": "Legacy product revenue in FY2025 - test ADJ-007",
-      "physical_objects": ["workspace.aava_deal_studio.fact_invoice_line", "workspace.aava_deal_studio.dim_product", "workspace.aava_deal_studio.fact_invoice"],
-      "sql_query": "SELECT p.product_id, p.product_name, p.product_family, SUM(fil.line_amount_usd) AS total_revenue_usd, COUNT(DISTINCT fil.invoice_id) AS invoice_count FROM workspace.aava_deal_studio.fact_invoice_line fil JOIN workspace.aava_deal_studio.dim_product p ON fil.product_id = p.product_id JOIN workspace.aava_deal_studio.fact_invoice fi ON fil.invoice_id = fi.invoice_id WHERE p.product_family = 'Legacy' AND fi.invoice_date >= '2025-01-01' AND fi.invoice_date <= '2025-12-31' GROUP BY p.product_id, p.product_name, p.product_family",
-      "result_summary": "Zero rows returned. No Legacy product revenue found in FY2025 invoice line data.",
+      "purpose": "Total FY2025 new logo invoiced revenue for ADJ-010 context",
+      "physical_objects": ["workspace.aava_deal_studio.fact_invoice", "workspace.aava_deal_studio.dim_customer"],
+      "sql_query": "SELECT SUM(fi.invoice_amount_usd) AS total_new_logo_fy2025_invoiced_usd, COUNT(DISTINCT fi.customer_id) AS new_logo_count FROM workspace.aava_deal_studio.fact_invoice fi JOIN workspace.aava_deal_studio.dim_customer dc ON fi.customer_id = dc.customer_id WHERE dc.first_order_date >= '2025-01-01' AND fi.invoice_date >= '2025-01-01' AND fi.invoice_date <= '2025-12-31'",
+      "result_summary": "Total new logo FY2025 invoiced revenue $1,878,956. 20 new logo customers.",
       "status": "SUCCESS"
     },
     {
       "evidence_id": "SQL-EV-008",
-      "purpose": "Legacy product revenue across all years",
-      "physical_objects": ["workspace.aava_deal_studio.fact_invoice_line", "workspace.aava_deal_studio.dim_product", "workspace.aava_deal_studio.fact_invoice"],
-      "sql_query": "SELECT p.product_name, SUBSTR(fi.invoice_date, 1, 4) AS year, SUM(fil.line_amount_usd) AS total_revenue_usd, COUNT(DISTINCT fi.customer_id) AS customer_count FROM workspace.aava_deal_studio.fact_invoice_line fil JOIN workspace.aava_deal_studio.dim_product p ON fil.product_id = p.product_id JOIN workspace.aava_deal_studio.fact_invoice fi ON fil.invoice_id = fi.invoice_id WHERE p.product_family = 'Legacy' GROUP BY p.product_name, SUBSTR(fi.invoice_date, 1, 4) ORDER BY year, p.product_name",
-      "result_summary": "Zero rows returned. No Legacy product revenue found in any period across all invoice line data.",
+      "purpose": "Legacy product invoice lines — all periods",
+      "physical_objects": ["workspace.aava_deal_studio.fact_invoice_line", "workspace.aava_deal_studio.dim_product"],
+      "sql_query": "SELECT p.product_family, p.product_name, p.product_id, COUNT(fil.invoice_line_id) as line_count, SUM(fil.line_amount_usd) as total_revenue_usd FROM workspace.aava_deal_studio.fact_invoice_line fil JOIN workspace.aava_deal_studio.dim_product p ON fil.product_id = p.product_id WHERE p.product_family = 'Legacy' GROUP BY p.product_family, p.product_name, p.product_id",
+      "result_summary": "Zero rows returned. No Legacy product family invoice lines in any period.",
       "status": "SUCCESS"
     },
     {
       "evidence_id": "SQL-EV-009",
-      "purpose": "New customer logos in FY2025 - test ADJ-010 pro-forma new logos",
-      "physical_objects": ["workspace.aava_deal_studio.dim_customer", "workspace.aava_deal_studio.fact_invoice"],
-      "sql_query": "SELECT c.customer_id, c.customer_name, c.first_order_date, MIN(fi.invoice_date) AS first_invoice_date, SUM(CASE WHEN fi.invoice_date >= '2025-01-01' AND fi.invoice_date <= '2025-12-31' THEN fi.invoice_amount_usd ELSE 0 END) AS fy2025_revenue_usd FROM workspace.aava_deal_studio.dim_customer c JOIN workspace.aava_deal_studio.fact_invoice fi ON c.customer_id = fi.customer_id WHERE c.first_order_date >= '2025-01-01' AND c.first_order_date <= '2025-12-31' GROUP BY c.customer_id, c.customer_name, c.first_order_date ORDER BY c.first_order_date",
-      "result_summary": "20 new logo customers identified with first_order_date in FY2025. Total FY2025 revenue from new logos: $1,878,956. Largest: Cascade Foods Holdings (CUST-0006) $1,206,022.",
+      "purpose": "ADJ-008 verification — structured data adjustment absent from QoE schedule",
+      "physical_objects": ["workspace.aava_deal_studio.mgmt_ebitda_adjustment"],
+      "sql_query": "SELECT adjustment_id, fiscal_year, category, amount_usd, mgmt_rationale, source_doc_ref FROM workspace.aava_deal_studio.mgmt_ebitda_adjustment WHERE adjustment_id = 'ADJ-008'",
+      "result_summary": "ADJ-008: FY2024, Transaction costs, $180,000, Aborted refinancing costs. Present in structured data but absent from DOC-08 QoE schedule.",
       "status": "SUCCESS"
     },
     {
       "evidence_id": "SQL-EV-010",
-      "purpose": "Total FY2025 in-year revenue from new logos",
-      "physical_objects": ["workspace.aava_deal_studio.dim_customer", "workspace.aava_deal_studio.fact_invoice"],
-      "sql_query": "SELECT SUM(fi.invoice_amount_usd) AS total_new_logo_fy2025_revenue_usd, COUNT(DISTINCT c.customer_id) AS new_logo_count FROM workspace.aava_deal_studio.dim_customer c JOIN workspace.aava_deal_studio.fact_invoice fi ON c.customer_id = fi.customer_id WHERE c.first_order_date >= '2025-01-01' AND c.first_order_date <= '2025-12-31' AND fi.invoice_date >= '2025-01-01' AND fi.invoice_date <= '2025-12-31'",
-      "result_summary": "Total new logo FY2025 revenue: $1,878,956. 20 new logo customers.",
+      "purpose": "Total FY2025 revenue from all invoices",
+      "physical_objects": ["workspace.aava_deal_studio.fact_invoice"],
+      "sql_query": "SELECT SUM(fi.invoice_amount_usd) AS total_fy2025_revenue_usd, COUNT(DISTINCT fi.customer_id) AS customer_count, COUNT(fi.invoice_id) AS invoice_count FROM workspace.aava_deal_studio.fact_invoice fi WHERE fi.invoice_date >= '2025-01-01' AND fi.invoice_date <= '2025-12-31'",
+      "result_summary": "Total FY2025 revenue $42,730,073. 198 customers. 1,152 invoices.",
       "status": "SUCCESS"
     },
     {
       "evidence_id": "SQL-EV-011",
-      "purpose": "New logo contracts - ACV and commitment for annualisation basis",
-      "physical_objects": ["workspace.aava_deal_studio.dim_customer", "workspace.aava_deal_studio.dim_contract"],
-      "sql_query": "SELECT c.customer_id, c.customer_name, c.first_order_date, dc.contract_id, dc.acv_usd, dc.contract_start_date, dc.contract_end_date, dc.status FROM workspace.aava_deal_studio.dim_customer c JOIN workspace.aava_deal_studio.dim_contract dc ON c.customer_id = dc.customer_id WHERE c.first_order_date >= '2025-01-01' AND c.first_order_date <= '2025-12-31' ORDER BY c.first_order_date",
-      "result_summary": "20 new logo contracts returned. Mixed contract quality: some active with future end dates, some expired. Cascade Foods Holdings has ACV $1,950,000 active through 2028-05-31.",
+      "purpose": "Search mgmt_claim for Enterprise Value or transaction value",
+      "physical_objects": ["workspace.aava_deal_studio.mgmt_claim"],
+      "sql_query": "SELECT claim_id, claim_text, metric_key, claimed_value, period, cim_page FROM workspace.aava_deal_studio.mgmt_claim WHERE LOWER(claim_text) LIKE '%enterprise value%' OR LOWER(claim_text) LIKE '%transaction value%' OR LOWER(claim_text) LIKE '%purchase price%' OR LOWER(metric_key) LIKE '%ev%' OR LOWER(metric_key) LIKE '%enterprise%' OR LOWER(metric_key) LIKE '%multiple%'",
+      "result_summary": "4 rows returned (CLM-02, CLM-03, CLM-09, CLM-12) — all matched on metric_key patterns (net_revenue_retention_pct, recurring_revenue_pct, revenue_cagr_pct, gross_revenue_retention_pct). No Enterprise Value, transaction value, or purchase price found.",
       "status": "SUCCESS"
     },
     {
       "evidence_id": "SQL-EV-012",
-      "purpose": "ADJ-008 presence in structured data - absent from QoE schedule",
-      "physical_objects": ["workspace.aava_deal_studio.mgmt_ebitda_adjustment"],
-      "sql_query": "SELECT adjustment_id, fiscal_year, category, amount_usd, mgmt_rationale, source_doc_ref FROM workspace.aava_deal_studio.mgmt_ebitda_adjustment WHERE adjustment_id = 'ADJ-008'",
-      "result_summary": "ADJ-008 confirmed: FY2024, Transaction costs, $180,000, Aborted refinancing costs. Present in structured data but absent from management QoE schedule (DOC-08).",
+      "purpose": "Cascade Foods Holdings vs Cascade Foods relationship and revenue test",
+      "physical_objects": ["workspace.aava_deal_studio.dim_customer", "workspace.aava_deal_studio.fact_invoice"],
+      "sql_query": "SELECT dc.customer_id, dc.customer_name, dc.parent_customer_id, dc.first_order_date, SUM(CASE WHEN fi.invoice_date >= '2025-01-01' AND fi.invoice_date <= '2025-12-31' THEN fi.invoice_amount_usd ELSE 0 END) AS fy2025_revenue, SUM(CASE WHEN fi.invoice_date >= '2024-01-01' AND fi.invoice_date <= '2024-12-31' THEN fi.invoice_amount_usd ELSE 0 END) AS fy2024_revenue, SUM(CASE WHEN fi.invoice_date >= '2023-01-01' AND fi.invoice_date <= '2023-12-31' THEN fi.invoice_amount_usd ELSE 0 END) AS fy2023_revenue FROM workspace.aava_deal_studio.dim_customer dc LEFT JOIN workspace.aava_deal_studio.fact_invoice fi ON dc.customer_id = fi.customer_id WHERE dc.customer_id IN ('CUST-0005', 'CUST-0006') GROUP BY dc.customer_id, dc.customer_name, dc.parent_customer_id, dc.first_order_date",
+      "result_summary": "CUST-0005 (Cascade Foods): FY2023 $2,004,390, FY2024 $1,972,869, FY2025 $407,201. CUST-0006 (Cascade Foods Holdings, parent=CUST-0005): FY2023 $0, FY2024 $0, FY2025 $1,206,022.",
       "status": "SUCCESS"
     },
     {
       "evidence_id": "SQL-EV-013",
-      "purpose": "New logo contracted ACV for active contracts extending beyond FY2025",
-      "physical_objects": ["workspace.aava_deal_studio.dim_customer", "workspace.aava_deal_studio.dim_contract"],
-      "sql_query": "SELECT SUM(dc.acv_usd) AS total_acv_new_logos_usd, COUNT(DISTINCT dc.customer_id) AS customer_count FROM workspace.aava_deal_studio.dim_customer c JOIN workspace.aava_deal_studio.dim_contract dc ON c.customer_id = dc.customer_id WHERE c.first_order_date >= '2025-01-01' AND c.first_order_date <= '2025-12-31' AND dc.status = 'Active' AND dc.contract_end_date > '2025-12-31'",
-      "result_summary": "7 new logo customers with active contracts extending beyond FY2025. Total contracted ACV: $2,248,981.",
+      "purpose": "Legal settlement recurrence statistics",
+      "physical_objects": ["workspace.aava_deal_studio.mgmt_ebitda_adjustment"],
+      "sql_query": "SELECT COUNT(DISTINCT fiscal_year) AS years_with_settlement, COUNT(*) AS total_settlement_rows, MIN(CAST(amount_usd AS BIGINT)) AS min_amount, MAX(CAST(amount_usd AS BIGINT)) AS max_amount, SUM(CAST(amount_usd AS BIGINT)) AS total_amount, MIN(fiscal_year) AS first_year, MAX(fiscal_year) AS last_year FROM workspace.aava_deal_studio.mgmt_ebitda_adjustment WHERE LOWER(category) LIKE '%legal%' OR LOWER(category) LIKE '%settlement%'",
+      "result_summary": "3 years with settlement, 3 rows, min/max amount both $2,100,000, total $6,300,000, FY2023 to FY2025.",
       "status": "SUCCESS"
     },
     {
       "evidence_id": "SQL-EV-014",
-      "purpose": "Cascade Foods Holdings detail - largest new logo FY2025",
-      "physical_objects": ["workspace.aava_deal_studio.dim_customer", "workspace.aava_deal_studio.dim_contract", "workspace.aava_deal_studio.fact_invoice"],
-      "sql_query": "SELECT c.customer_id, c.customer_name, c.first_order_date, dc.contract_id, dc.acv_usd, dc.contract_start_date, dc.contract_end_date, dc.status, SUM(fi.invoice_amount_usd) AS fy2025_invoiced_usd FROM workspace.aava_deal_studio.dim_customer c JOIN workspace.aava_deal_studio.dim_contract dc ON c.customer_id = dc.customer_id JOIN workspace.aava_deal_studio.fact_invoice fi ON c.customer_id = fi.customer_id WHERE c.customer_id = 'CUST-0006' AND fi.invoice_date >= '2025-01-01' AND fi.invoice_date <= '2025-12-31' GROUP BY c.customer_id, c.customer_name, c.first_order_date, dc.contract_id, dc.acv_usd, dc.contract_start_date, dc.contract_end_date, dc.status",
-      "result_summary": "Cascade Foods Holdings: ACV $1,950,000, contract active 2025-06-01 to 2028-05-31, FY2025 invoiced $1,206,022.",
+      "purpose": "New logo FY2025 revenue excluding Cascade Foods Holdings",
+      "physical_objects": ["workspace.aava_deal_studio.fact_invoice", "workspace.aava_deal_studio.dim_customer"],
+      "sql_query": "SELECT SUM(fi.invoice_amount_usd) AS new_logo_excl_cascade_usd, COUNT(DISTINCT fi.customer_id) AS customer_count FROM workspace.aava_deal_studio.fact_invoice fi JOIN workspace.aava_deal_studio.dim_customer dc ON fi.customer_id = dc.customer_id WHERE dc.first_order_date >= '2025-01-01' AND fi.invoice_date >= '2025-01-01' AND fi.invoice_date <= '2025-12-31' AND dc.customer_id != 'CUST-0006'",
+      "result_summary": "19 new logos excluding Cascade Foods Holdings: total FY2025 invoiced revenue $672,934.",
       "status": "SUCCESS"
     },
     {
       "evidence_id": "SQL-EV-015",
-      "purpose": "Subscription ARR for new FY2025 logos - status and ARR",
-      "physical_objects": ["workspace.aava_deal_studio.fact_subscription_month", "workspace.aava_deal_studio.dim_customer"],
-      "sql_query": "SELECT fsm.customer_id, c.customer_name, MAX(fsm.snapshot_month) AS latest_snapshot, MAX(fsm.arr_usd) AS latest_arr_usd, fsm.status FROM workspace.aava_deal_studio.fact_subscription_month fsm JOIN workspace.aava_deal_studio.dim_customer c ON fsm.customer_id = c.customer_id WHERE c.first_order_date >= '2025-01-01' AND c.first_order_date <= '2025-12-31' GROUP BY fsm.customer_id, c.customer_name, fsm.status ORDER BY latest_arr_usd DESC",
-      "result_summary": "61 rows. Key findings: CUST-0143 (Glenmoor Markets) and CUST-0145 (Pinnacle Grocers) show churned status by Dec-2025. Cascade Foods Holdings shows active ARR of $1,629,017 at Dec-2025.",
+      "purpose": "Contracts for FY2025 new logos — ACV and commitment",
+      "physical_objects": ["workspace.aava_deal_studio.dim_customer", "workspace.aava_deal_studio.dim_contract"],
+      "sql_query": "SELECT dc.customer_id, dc.customer_name, dc.first_order_date, ct.contract_id, ct.contract_start_date, ct.contract_end_date, ct.acv_usd, ct.tcv_usd, ct.auto_renew_flag, ct.status FROM workspace.aava_deal_studio.dim_customer dc JOIN workspace.aava_deal_studio.dim_contract ct ON dc.customer_id = ct.customer_id WHERE dc.first_order_date >= '2025-01-01' ORDER BY dc.first_order_date, dc.customer_id",
+      "result_summary": "20 contracts for FY2025 new logos. Cascade Foods Holdings (CTR-00006): ACV $1,950,000, active, auto-renew Y, end 2028-05-31. Other logos have smaller ACVs ($7,351 to $116,940) with mixed contract statuses (some expired, some active).",
       "status": "SUCCESS"
     },
     {
       "evidence_id": "SQL-EV-016",
-      "purpose": "New logo detail with contract and revenue data for annualisation analysis",
-      "physical_objects": ["workspace.aava_deal_studio.dim_customer", "workspace.aava_deal_studio.fact_invoice", "workspace.aava_deal_studio.dim_contract"],
-      "sql_query": "SELECT c.customer_id, c.customer_name, c.first_order_date, MIN(fi.invoice_date) AS actual_first_invoice, MAX(fi.invoice_date) AS last_invoice_fy2025, SUM(fi.invoice_amount_usd) AS fy2025_revenue_usd, dc.acv_usd AS contracted_acv, dc.status AS contract_status, dc.contract_end_date FROM workspace.aava_deal_studio.dim_customer c JOIN workspace.aava_deal_studio.fact_invoice fi ON c.customer_id = fi.customer_id JOIN workspace.aava_deal_studio.dim_contract dc ON c.customer_id = dc.customer_id WHERE c.first_order_date >= '2025-01-01' AND c.first_order_date <= '2025-12-31' AND fi.invoice_date >= '2025-01-01' AND fi.invoice_date <= '2025-12-31' GROUP BY c.customer_id, c.customer_name, c.first_order_date, dc.acv_usd, dc.status, dc.contract_end_date ORDER BY fy2025_revenue_usd DESC",
-      "result_summary": "20 new logo customers with FY2025 revenue detail. Multiple customers have expired contracts. Cascade Foods Holdings dominates at $1,206,022 FY2025 revenue vs $1,950,000 ACV.",
+      "purpose": "Team Adjusted EBITDA calculation — quantified cases",
+      "physical_objects": [],
+      "sql_query": "SELECT 4280000 AS reported_ebitda_usd, 1250000 AS adj_004_accepted, 870000 AS adj_006_accepted, 310000 AS adj_009_accepted, 0 AS adj_003_accepted, 0 AS adj_005_accepted, NULL AS adj_007_accepted, NULL AS adj_010_accepted, 4280000 + 1250000 + 870000 + 310000 AS quantified_accepted_team_ebitda_usd, 12400000 - 2100000 - 1400000 AS hard_rejection_ebitda_usd, 2100000 + 1400000 AS hard_rejected_total_usd, 540000 + 1650000 AS unresolved_challenged_total_usd, 12400000 - (4280000 + 1250000 + 870000 + 310000) AS earnings_challenge_vs_quantified_usd",
+      "result_summary": "Quantified accepted team EBITDA: $6,710,000. Hard rejection EBITDA: $8,900,000. Hard rejected total: $3,500,000. Unresolved challenged total: $2,190,000. Earnings challenge vs quantified: $5,690,000.",
       "status": "SUCCESS"
     },
     {
       "evidence_id": "SQL-EV-017",
-      "purpose": "Check for pre-2025 invoice activity among new logo customers",
-      "physical_objects": ["workspace.aava_deal_studio.dim_customer", "workspace.aava_deal_studio.fact_invoice"],
-      "sql_query": "SELECT c.customer_id, c.customer_name, c.first_order_date, COUNT(fi.invoice_id) AS pre_2025_invoice_count, SUM(fi.invoice_amount_usd) AS pre_2025_revenue_usd FROM workspace.aava_deal_studio.dim_customer c JOIN workspace.aava_deal_studio.fact_invoice fi ON c.customer_id = fi.customer_id WHERE c.first_order_date >= '2025-01-01' AND c.first_order_date <= '2025-12-31' AND fi.invoice_date < '2025-01-01' GROUP BY c.customer_id, c.customer_name, c.first_order_date ORDER BY pre_2025_revenue_usd DESC",
-      "result_summary": "Zero rows returned. No pre-2025 invoice activity found for any new logo customer. All 20 customers are genuinely new to the invoice record in FY2025.",
+      "purpose": "New logo ACV totals for ADJ-010 context",
+      "physical_objects": ["workspace.aava_deal_studio.dim_customer", "workspace.aava_deal_studio.dim_contract"],
+      "sql_query": "SELECT SUM(ct.acv_usd) AS total_new_logo_acv_usd, SUM(CASE WHEN dc.customer_id = 'CUST-0006' THEN ct.acv_usd ELSE 0 END) AS cascade_holdings_acv, SUM(CASE WHEN dc.customer_id != 'CUST-0006' THEN ct.acv_usd ELSE 0 END) AS other_new_logos_acv, COUNT(DISTINCT dc.customer_id) AS customer_count FROM workspace.aava_deal_studio.dim_customer dc JOIN workspace.aava_deal_studio.dim_contract ct ON dc.customer_id = ct.customer_id WHERE dc.first_order_date >= '2025-01-01'",
+      "result_summary": "Total new logo ACV $2,832,316. Cascade Holdings ACV $1,950,000 (68.8%). Other 19 logos ACV $882,316.",
       "status": "SUCCESS"
     },
     {
       "evidence_id": "SQL-EV-018",
-      "purpose": "ACV-based annualisation gap for active new logos with contracts beyond FY2025",
-      "physical_objects": ["workspace.aava_deal_studio.dim_customer", "workspace.aava_deal_studio.dim_contract", "workspace.aava_deal_studio.fact_invoice"],
-      "sql_query": "SELECT SUM(dc.acv_usd) AS total_acv_active_new_logos, SUM(CASE WHEN fi_sum.fy2025_rev IS NOT NULL THEN fi_sum.fy2025_rev ELSE 0 END) AS total_fy2025_revenue, SUM(dc.acv_usd) - SUM(CASE WHEN fi_sum.fy2025_rev IS NOT NULL THEN fi_sum.fy2025_rev ELSE 0 END) AS implied_annualisation_gap FROM workspace.aava_deal_studio.dim_customer c JOIN workspace.aava_deal_studio.dim_contract dc ON c.customer_id = dc.customer_id LEFT JOIN (SELECT customer_id, SUM(invoice_amount_usd) AS fy2025_rev FROM workspace.aava_deal_studio.fact_invoice WHERE invoice_date >= '2025-01-01' AND invoice_date <= '2025-12-31' GROUP BY customer_id) fi_sum ON c.customer_id = fi_sum.customer_id WHERE c.first_order_date >= '2025-01-01' AND c.first_order_date <= '2025-12-31' AND dc.status = 'Active' AND dc.contract_end_date > '2025-12-31'",
-      "result_summary": "Active new logo ACV: $2,248,981. FY2025 revenue from same cohort: $1,449,360. Implied ACV-based annualisation gap: $799,620. This is materially less than management's $1,650,000 figure.",
+      "purpose": "Subscription ARR for new FY2025 logos",
+      "physical_objects": ["workspace.aava_deal_studio.fact_subscription_month", "workspace.aava_deal_studio.dim_customer"],
+      "sql_query": "SELECT dc.customer_id, dc.customer_name, fsm.snapshot_month, fsm.arr_usd, fsm.status FROM workspace.aava_deal_studio.fact_subscription_month fsm JOIN workspace.aava_deal_studio.dim_customer dc ON fsm.customer_id = dc.customer_id WHERE dc.first_order_date >= '2025-01-01' AND fsm.snapshot_month >= '2025-01' ORDER BY dc.customer_id, fsm.snapshot_month LIMIT 30",
+      "result_summary": "Cascade Foods Holdings ARR active from June 2025 at $1,600,000 growing to $1,629,017 by December 2025. Foxglove Merchants ARR $73,981 from December 2025 only. Other new logos show prospect status through most of FY2025.",
       "status": "SUCCESS"
     },
     {
       "evidence_id": "SQL-EV-019",
-      "purpose": "Enterprise Value search in mgmt_claim structured table",
-      "physical_objects": ["workspace.aava_deal_studio.mgmt_claim"],
-      "sql_query": "SELECT claim_id, claim_text, metric_key, claimed_value, period, cim_page FROM workspace.aava_deal_studio.mgmt_claim WHERE LOWER(claim_text) LIKE '%enterprise value%' OR LOWER(claim_text) LIKE '%transaction value%' OR LOWER(claim_text) LIKE '%purchase price%' OR LOWER(metric_key) LIKE '%ev%' OR LOWER(metric_key) LIKE '%enterprise%' OR LOWER(claim_text) LIKE '%multiple%'",
-      "result_summary": "4 rows returned (CLM-02, CLM-03, CLM-09, CLM-12) matching on 'multiple' in claim text (NRR, CAGR, retention metrics). No Enterprise Value, transaction value, or purchase price found.",
+      "purpose": "Duplication test — transaction cost adjustments across all years",
+      "physical_objects": ["workspace.aava_deal_studio.mgmt_ebitda_adjustment"],
+      "sql_query": "SELECT adjustment_id, fiscal_year, category, amount_usd, mgmt_rationale FROM workspace.aava_deal_studio.mgmt_ebitda_adjustment WHERE LOWER(category) LIKE '%transaction%' ORDER BY fiscal_year, adjustment_id",
+      "result_summary": "ADJ-008 (FY2024, $180,000, aborted refinancing) and ADJ-006 (FY2025, $870,000, sell-side adviser fees). Different events, different periods. No duplication within FY2025.",
       "status": "SUCCESS"
     },
     {
       "evidence_id": "SQL-EV-020",
-      "purpose": "Total FY2025 revenue for context",
-      "physical_objects": ["workspace.aava_deal_studio.fact_invoice"],
-      "sql_query": "SELECT SUM(fi.invoice_amount_usd) AS total_fy2025_revenue_usd FROM workspace.aava_deal_studio.fact_invoice fi WHERE fi.invoice_date >= '2025-01-01' AND fi.invoice_date <= '2025-12-31'",
-      "result_summary": "Total FY2025 revenue: $42,730,073.",
+      "purpose": "Final bridge reconciliation — all amounts",
+      "physical_objects": ["workspace.aava_deal_studio.mgmt_ebitda_adjustment"],
+      "sql_query": "SELECT 4280000 AS reported_ebitda_usd, 8120000 AS mgmt_adjustments_total_usd, 12400000 AS mgmt_adjusted_ebitda_usd, 1250000 + 870000 + 310000 AS accepted_adjustments_total_usd, 2100000 + 1400000 AS rejected_adjustments_total_usd, 540000 + 1650000 AS challenged_null_adjustments_total_usd, 4280000 + (1250000 + 870000 + 310000) AS quantified_team_adjusted_ebitda_usd, 12400000 - (2100000 + 1400000) AS hard_rejection_ebitda_usd, 12400000 - (4280000 + 1250000 + 870000 + 310000) AS earnings_challenge_usd, (4280000 + 8120000) - 12400000 AS mgmt_bridge_diff",
+      "result_summary": "Accepted total $2,430,000. Rejected total $3,500,000. Challenged null total $2,190,000. Quantified team EBITDA $6,710,000. Hard rejection EBITDA $8,900,000. Earnings challenge $5,690,000. Management bridge difference $0.",
       "status": "SUCCESS"
     },
     {
       "evidence_id": "SQL-EV-021",
-      "purpose": "Legacy product revenue across all periods",
-      "physical_objects": ["workspace.aava_deal_studio.fact_invoice_line", "workspace.aava_deal_studio.dim_product", "workspace.aava_deal_studio.fact_invoice"],
-      "sql_query": "SELECT p.product_id, p.product_name, p.product_family, SUBSTR(fi.invoice_date,1,4) AS year, SUM(fil.line_amount_usd) AS revenue_usd, COUNT(DISTINCT fi.customer_id) AS customer_count FROM workspace.aava_deal_studio.fact_invoice_line fil JOIN workspace.aava_deal_studio.dim_product p ON fil.product_id = p.product_id JOIN workspace.aava_deal_studio.fact_invoice fi ON fil.invoice_id = fi.invoice_id WHERE p.product_family = 'Legacy' GROUP BY p.product_id, p.product_name, p.product_family, SUBSTR(fi.invoice_date,1,4) ORDER BY year DESC",
-      "result_summary": "Zero rows returned. No Legacy product revenue in any period across all invoice line data.",
+      "purpose": "Cascade Foods vs Cascade Foods Holdings revenue comparison — overlap test",
+      "physical_objects": ["workspace.aava_deal_studio.fact_invoice"],
+      "sql_query": "SELECT 'CUST-0005' AS customer_id, 'Cascade Foods' AS customer_name, SUM(CASE WHEN fi.invoice_date >= '2023-01-01' AND fi.invoice_date <= '2023-12-31' THEN fi.invoice_amount_usd ELSE 0 END) AS fy2023_rev, SUM(CASE WHEN fi.invoice_date >= '2024-01-01' AND fi.invoice_date <= '2024-12-31' THEN fi.invoice_amount_usd ELSE 0 END) AS fy2024_rev, SUM(CASE WHEN fi.invoice_date >= '2025-01-01' AND fi.invoice_date <= '2025-12-31' THEN fi.invoice_amount_usd ELSE 0 END) AS fy2025_rev FROM workspace.aava_deal_studio.fact_invoice fi WHERE fi.customer_id = 'CUST-0005' UNION ALL SELECT 'CUST-0006', 'Cascade Foods Holdings', ...",
+      "result_summary": "Cascade Foods (CUST-0005): FY2023 $2,004,390, FY2024 $1,972,869, FY2025 $407,201. Cascade Foods Holdings (CUST-0006): FY2025 $1,206,022. Combined FY2025 $1,613,223 vs Cascade Foods FY2024 $1,972,869. Overlap risk confirmed.",
       "status": "SUCCESS"
     },
     {
       "evidence_id": "SQL-EV-022",
-      "purpose": "Team Adjusted EBITDA calculation with accepted adjustments",
-      "physical_objects": [],
-      "sql_query": "SELECT 4280000 AS reported_ebitda_usd, 1250000 AS adj_004_owner_comp_accepted, 870000 AS adj_006_transaction_costs_accepted, 310000 AS adj_009_recruitment_accepted, 0 AS adj_003_legal_settlement_accepted, 0 AS adj_005_proforma_savings_accepted, 1250000 + 870000 + 310000 AS total_quantified_accepted_usd, 4280000 + (1250000 + 870000 + 310000) AS team_adjusted_ebitda_quantified_usd, 4280000 + 8120000 AS mgmt_adjusted_ebitda_usd, (4280000 + 8120000) - (4280000 + 1250000 + 870000 + 310000) AS earnings_challenge_usd",
-      "result_summary": "Total quantified accepted adjustments: $2,430,000. Team Adjusted EBITDA (quantified): $6,710,000. Management Adjusted EBITDA: $12,400,000. Earnings challenge: $5,690,000.",
+      "purpose": "Legacy product invoice lines — specific product IDs PRD-016 and PRD-017",
+      "physical_objects": ["workspace.aava_deal_studio.fact_invoice_line", "workspace.aava_deal_studio.dim_product"],
+      "sql_query": "SELECT fil.product_id, p.product_name, p.product_family, COUNT(fil.invoice_line_id) AS line_count, SUM(fil.line_amount_usd) AS total_line_amount FROM workspace.aava_deal_studio.fact_invoice_line fil JOIN workspace.aava_deal_studio.dim_product p ON fil.product_id = p.product_id WHERE fil.product_id IN ('PRD-016', 'PRD-017') GROUP BY fil.product_id, p.product_name, p.product_family",
+      "result_summary": "Zero rows returned. No invoice lines for PRD-016 (Legacy On-Prem Licence) or PRD-017 (Legacy Maintenance).",
       "status": "SUCCESS"
     },
     {
       "evidence_id": "SQL-EV-023",
-      "purpose": "Recurrence count and amount analysis for legal settlement category",
-      "physical_objects": ["workspace.aava_deal_studio.mgmt_ebitda_adjustment"],
-      "sql_query": "SELECT category, COUNT(*) AS occurrence_count, COUNT(DISTINCT fiscal_year) AS distinct_years, MIN(amount_usd) AS min_amount, MAX(amount_usd) AS max_amount, SUM(amount_usd) AS total_amount FROM workspace.aava_deal_studio.mgmt_ebitda_adjustment WHERE category = 'One-time legal settlement' GROUP BY category",
-      "result_summary": "One-time legal settlement: 3 occurrences, 3 distinct years (FY2023, FY2024, FY2025), min/max amount both $2,100,000, total $6,300,000.",
-      "status": "SUCCESS"
-    },
-    {
-      "evidence_id": "SQL-EV-024",
-      "purpose": "Subscription ARR trend by year for context on ADJ-005 headcount reduction",
-      "physical_objects": ["workspace.aava_deal_studio.fact_subscription_month"],
-      "sql_query": "SELECT SUBSTR(snapshot_month,1,4) AS year, COUNT(DISTINCT customer_id) AS active_customers, SUM(arr_usd) AS total_arr FROM workspace.aava_deal_studio.fact_subscription_month WHERE status = 'active' GROUP BY SUBSTR(snapshot_month,1,4) ORDER BY year",
-      "result_summary": "Active customers: 158 (2023), 189 (2024), 197 (2025). Total ARR growing each year. No cost reduction signal in revenue data.",
-      "status": "SUCCESS"
-    },
-    {
-      "evidence_id": "SQL-EV-025",
-      "purpose": "Enterprise Value null confirmation and implied multiple calculation",
-      "physical_objects": [],
-      "sql_query": "SELECT NULL AS enterprise_value_usd, NULL AS reported_multiple, NULL AS mgmt_multiple, NULL AS team_multiple, 'Enterprise Value not found in any authoritative structured source or VDR document' AS ev_status",
-      "result_summary": "Enterprise Value: null. All implied multiples: null. EV not found in any authoritative current-run deal input.",
-      "status": "SUCCESS"
-    },
-    {
-      "evidence_id": "SQL-EV-026",
-      "purpose": "Final bridge validation",
-      "physical_objects": [],
-      "sql_query": "SELECT 4280000 AS reported_ebitda_usd, 8120000 AS mgmt_total_adjustments_usd, 4280000 + 8120000 AS mgmt_adjusted_ebitda_usd, 2430000 AS accepted_adjustments_total_usd, 2100000 + 1400000 AS total_rejected_usd, 540000 + 1650000 AS total_challenged_null_usd, 8120000 - 2430000 AS total_not_accepted_usd, 4280000 + 2430000 AS team_adjusted_ebitda_usd, 12400000 - (4280000 + 2430000) AS earnings_challenge_usd, CASE WHEN (4280000 + 8120000) = 12400000 THEN 'RECONCILES' ELSE 'DOES NOT RECONCILE' END AS mgmt_bridge_status, CASE WHEN (4280000 + 2430000) = 6710000 THEN 'RECONCILES' ELSE 'DOES NOT RECONCILE' END AS team_bridge_status",
-      "result_summary": "Management bridge: RECONCILES ($12,400,000). Team bridge: RECONCILES ($6,710,000). Earnings challenge: $5,690,000. Total rejected: $3,500,000. Total challenged null: $2,190,000.",
+      "purpose": "FY2025 revenue by product family",
+      "physical_objects": ["workspace.aava_deal_studio.fact_invoice_line", "workspace.aava_deal_studio.fact_invoice", "workspace.aava_deal_studio.dim_product"],
+      "sql_query": "SELECT p.product_family, SUM(fil.line_amount_usd) AS total_revenue_usd, COUNT(fil.invoice_line_id) AS line_count FROM workspace.aava_deal_studio.fact_invoice_line fil JOIN workspace.aava_deal_studio.fact_invoice fi ON fil.invoice_id = fi.invoice_id JOIN workspace.aava_deal_studio.dim_product p ON fil.product_id = p.product_id WHERE fi.invoice_date >= '2025-01-01' AND fi.invoice_date <= '2025-12-31' GROUP BY p.product_family ORDER BY total_revenue_usd DESC",
+      "result_summary": "FY2025 revenue: Platform $33,840,087 (2,609 lines), Professional Services $5,385,616 (504 lines), Managed Services $3,504,370 (271 lines). No Legacy family revenue.",
       "status": "SUCCESS"
     }
   ],
   "unresolved_items": [
     {
       "item_id": "UNRES-001",
-      "description": "Enterprise Value not found in any authoritative current-run deal input or VDR document. Implied EBITDA multiples (reported, management-adjusted, team-adjusted) cannot be calculated. All three multiples are set to null.",
-      "impact": "Implied multiples unavailable. Cannot calculate entry multiple or earnings challenge in EV terms.",
-      "resolution": "Provide authoritative deal Enterprise Value from transaction documentation, LOI, or deal term sheet."
+      "type": "ENTERPRISE_VALUE_NOT_FOUND",
+      "description": "Enterprise Value not found in any authoritative current-run deal input, structured source, or VDR document. Implied EBITDA multiples cannot be calculated.",
+      "impact": "implied_multiple.reported, implied_multiple.mgmt, and implied_multiple.team all set to null.",
+      "resolution": "Enterprise Value must be supplied by an authoritative deal input or document before multiples can be calculated."
     },
     {
       "item_id": "UNRES-002",
-      "description": "ADJ-007 (Discontinued product line, $540,000): Legacy products exist in dim_product but have zero invoice line activity in any period. The $540,000 loss amount cannot be verified or quantified from available structured data. Accepted amount remains null.",
-      "impact": "ADJ-007 is Challenged with null accepted amount. $540,000 is excluded from Team Adjusted EBITDA pending resolution.",
-      "resolution": "Provide management accounts or cost ledger showing composition of Legacy product losses. Provide any invoice or cost record associated with PRD-016 or PRD-017."
+      "type": "CHALLENGED_ADJUSTMENT_UNQUANTIFIED",
+      "description": "ADJ-007 (Discontinued product line, $540,000): Accepted amount cannot be quantified. Legacy product exists in product master but has zero revenue in structured data. No formal discontinuation commitment, cost schedule, or sunset plan available in data room.",
+      "impact": "ADJ-007 accepted_amount_usd = null. Contributes to team_adjusted_ebitda_usd = null.",
+      "resolution": "Board resolution or management decision document formally committing to Legacy On-Prem discontinuation with effective date. Cost schedule showing $540,000 loss composition. Evidence that costs will cease upon discontinuation."
     },
     {
       "item_id": "UNRES-003",
-      "description": "ADJ-010 (Pro-forma new logos, $1,650,000): Management's annualisation methodology is not disclosed. The ACV-based annualisation gap for active new logos is $799,620 — materially less than $1,650,000. Two new logo customers (CUST-0143, CUST-0145) have churned. Multiple customers have expired contracts. Accepted amount remains null.",
-      "impact": "ADJ-010 is Challenged with null accepted amount. $1,650,000 is excluded from Team Adjusted EBITDA pending resolution.",
-      "resolution": "Provide management's detailed annualisation workings with per-customer breakdown and methodology. Clarify which customers are included and confirm churned customers are excluded."
+      "type": "CHALLENGED_ADJUSTMENT_UNQUANTIFIED",
+      "description": "ADJ-010 (Pro-forma new logos, $1,650,000): Accepted amount cannot be quantified. Annualisation methodology is assumption-dependent. Cascade Foods Holdings overlap risk unresolved. Management annualisation schedule not available.",
+      "impact": "ADJ-010 accepted_amount_usd = null. Contributes to team_adjusted_ebitda_usd = null.",
+      "resolution": "Management annualisation methodology schedule. Confirmation of Cascade Foods Holdings treatment (new logo vs continuation). Executed contracts for all 20 new logos. Evidence that Cascade Foods (CUST-0005) revenue decline is unrelated to CUST-0006 re-engagement."
     },
     {
       "item_id": "UNRES-004",
-      "description": "ADJ-008 (FY2024, Aborted refinancing costs, $180,000) exists in structured data but is absent from the management QoE schedule. It is a historical adjustment not applied to FY2025 and does not affect the FY2025 bridge, but the omission from the QoE schedule is an unexplained inconsistency.",
-      "impact": "No impact on FY2025 EBITDA bridge. Inconsistency noted for completeness.",
-      "resolution": "Management to confirm whether ADJ-008 was intentionally omitted from the QoE schedule and whether it was applied in the FY2024 reported EBITDA."
-    },
-    {
-      "item_id": "UNRES-005",
-      "description": "Third-party compensation benchmark (Sep-2025) referenced in ADJ-004 is not present in the data room. The $1,250,000 owner compensation normalisation amount cannot be independently verified.",
-      "impact": "ADJ-004 accepted at management amount with reduced confidence (0.72). If the benchmark shows a different market rate, the accepted amount may need revision.",
-      "resolution": "Provide the third-party compensation benchmark document dated September 2025."
+      "type": "STRUCTURED_DATA_ADJUSTMENT_ABSENT_FROM_QOE_SCHEDULE",
+      "description": "ADJ-008 (FY2024, Transaction costs - Aborted refinancing, $180,000) present in structured data but absent from management QoE schedule (DOC-08). Not a FY2025 adjustment but represents an inconsistency between structured data and document evidence.",
+      "impact": "No impact on FY2025 EBITDA bridge. Recorded as inconsistency INC-002.",
+      "resolution": "Management explanation of why ADJ-008 was omitted from the QoE schedule."
     }
   ],
   "data_quality": [
     {
-      "issue_id": "DQ-001",
-      "description": "Legacy products (PRD-016, PRD-017) exist in dim_product but have zero associated revenue in fact_invoice_line across all periods. This may indicate the products were never invoiced through the structured billing system, or that the invoice line data is incomplete for legacy billing.",
-      "affected_objects": ["workspace.aava_deal_studio.dim_product", "workspace.aava_deal_studio.fact_invoice_line"],
-      "impact": "Cannot independently verify ADJ-007 Legacy product losses from structured data.",
+      "item_id": "DQ-001",
+      "type": "LEGACY_PRODUCT_REVENUE_ABSENT",
+      "description": "Legacy product family (PRD-016, PRD-017) exists in dim_product but has zero invoice line revenue in fact_invoice_line across all periods. This prevents independent verification of the ADJ-007 loss amount. The absence may reflect that losses are cost-side items not captured in revenue tables, or that the product has already ceased generating revenue.",
+      "affected_adjustments": ["ADJ-007"],
       "severity": "MEDIUM"
     },
     {
-      "issue_id": "DQ-002",
-      "description": "Multiple new logo customers (first_order_date in FY2025) have dim_contract records with contract_end_date in prior years (e.g., 2022, 2023, 2024), suggesting either stale contract records or that these customers are operating without current executed contracts.",
-      "affected_objects": ["workspace.aava_deal_studio.dim_contract", "workspace.aava_deal_studio.dim_customer"],
-      "impact": "Reduces reliability of ACV-based annualisation for ADJ-010. Contracts with expired end dates cannot support forward-looking annualisation.",
-      "severity": "MEDIUM"
+      "item_id": "DQ-002",
+      "type": "COST_DATA_NOT_AVAILABLE",
+      "description": "No cost or expense structured data is available in the schema (no cost table, P&L table, or expense table). This prevents independent reconstruction of reported EBITDA from structured data and limits the ability to verify cost-side adjustments (ADJ-005, ADJ-007).",
+      "affected_adjustments": ["ADJ-005", "ADJ-007"],
+      "severity": "HIGH"
     },
     {
-      "issue_id": "DQ-003",
-      "description": "IT Systems Overview (DOC-10) notes that revenue reporting is prepared in spreadsheets from manual SQL extracts maintained by one analyst, with no data warehouse. This creates systemic data quality risk across all structured sources.",
-      "affected_objects": ["All structured tables"],
-      "impact": "Reduces overall confidence in structured data completeness and accuracy. Particularly relevant for Legacy product data gaps.",
-      "severity": "LOW"
+      "item_id": "DQ-003",
+      "type": "THIRD_PARTY_DOCUMENTS_NOT_IN_DATA_ROOM",
+      "description": "Several management-referenced supporting documents are not available in the data room: (1) Third-party compensation benchmark (Sep-2025) for ADJ-004; (2) Executive search invoices for ADJ-009; (3) Sell-side adviser engagement letter/invoice for ADJ-006; (4) Settlement agreements for ADJ-001/ADJ-002/ADJ-003.",
+      "affected_adjustments": ["ADJ-003", "ADJ-004", "ADJ-006", "ADJ-009"],
+      "severity": "MEDIUM"
     }
   ],
   "validation": {
     "agent2_retrieval_attempted": true,
-    "agent2_retrieval_status": "SUCCESS",
     "ddl_inspected": true,
     "physical_objects_discovered_dynamically": true,
     "structured_sources_sql_validated": true,
@@ -962,46 +906,30 @@
     "structured_adjustments_reconciled_against_qoe": true,
     "recurrence_testing_completed": true,
     "product_revenue_tests_completed": true,
-    "every_adjustment_has_verdict": true,
+    "every_adjustment_has_one_valid_verdict": true,
     "every_verdict_has_reasoning": true,
     "every_material_finding_has_evidence": true,
     "all_financial_arithmetic_from_sql": true,
     "management_bridge_tested": true,
-    "management_bridge_reconciles": true,
     "team_bridge_tested": true,
-    "team_bridge_reconciles": true,
-    "implied_multiples_sql_calculated": true,
-    "implied_multiples_available": false,
+    "implied_multiples_sql_calculated": false,
+    "implied_multiples_null_reason": "Enterprise Value not found in authoritative deal evidence",
     "inconsistencies_preserved": true,
     "unresolved_items_preserved": true,
-    "final_clm05_verdict_issued": false,
-    "adjustment_level_ev_impact_calculated": false,
-    "investment_recommendation_made": false,
-    "expected_result_hardcoded": false,
+    "no_final_clm05_verdict_issued": true,
+    "no_adjustment_level_ev_impact_calculated": true,
+    "no_investment_recommendation_made": true,
+    "no_expected_result_hardcoded": true,
     "accepted_adjustments_have_totality_of_evidence_support": true,
-    "no_adjustment_accepted_solely_on_management_sources": true,
-    "missing_corroboration_reflected_in_confidence": true,
+    "no_adjustment_accepted_solely_on_management_prepared_sources": true,
+    "missing_secondary_corroboration_reflected_in_confidence": true,
     "no_adjustment_accepted_on_commercial_plausibility_alone": true,
-    "rejected_adjustments_have_exclusion_evidence": true,
+    "every_rejected_adjustment_has_exclusion_evidence": true,
     "event_existence_and_addback_eligibility_evaluated_separately": true,
-    "challenged_null_amounts_not_converted_to_zero": true,
-    "team_ebitda_not_presented_as_precise_when_null_exists": true,
+    "challenged_adjustments_with_unquantifiable_amounts_use_null": true,
+    "no_null_accepted_amount_silently_converted_to_zero": true,
+    "team_ebitda_not_presented_as_precise_when_unresolved": true,
     "enterprise_value_actively_searched": true,
-    "enterprise_value_not_assumed_or_estimated": true,
-    "adjustment_verdicts": {
-      "ADJ-003": "Rejected",
-      "ADJ-004": "Accepted",
-      "ADJ-005": "Rejected",
-      "ADJ-006": "Accepted",
-      "ADJ-007": "Challenged",
-      "ADJ-009": "Accepted",
-      "ADJ-010": "Challenged"
-    },
-    "total_adjustments_analyzed": 7,
-    "accepted_count": 3,
-    "challenged_count": 2,
-    "rejected_count": 2,
-    "bridge_complete": true,
-    "bridge_note": "Team Adjusted EBITDA of $6,710,000 reflects quantified accepted adjustments only. ADJ-007 and ADJ-010 are Challenged with null accepted amounts and excluded from the bridge. Resolution of these items could increase Team Adjusted EBITDA."
+    "enterprise_value_not_assumed_or_reverse_engineered": true
   }
 }
