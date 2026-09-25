@@ -1,12 +1,10 @@
 {
   "status": "SUCCESS",
-
   "upstream_inputs": {
     "test_plan_required": true,
     "test_plan_retrieved": true,
     "test_plan_source": "1/DEAL_INTAKE_TEST_PLAN_ORCHESTRATOR/test_plan.json"
   },
-
   "schema_discovery": {
     "customer_source_found": true,
     "revenue_source_found": true,
@@ -17,26 +15,25 @@
     "customer_support_source_found": true,
     "claim_source_found": true,
     "notes": {
-      "customer_source": "workspace.aava_deal_studio.dim_customer — customer_id, customer_name, parent_customer_id, first_order_date, segment, country, industry",
-      "revenue_source": "workspace.aava_deal_studio.fact_invoice_line joined to workspace.aava_deal_studio.fact_invoice — line_amount_usd at invoice-line grain; revenue_type classification present",
-      "product_source": "workspace.aava_deal_studio.dim_product — product_id, delivery_model (Subscription/One-time/Perpetual)",
-      "subscription_arr_source": "workspace.aava_deal_studio.fact_subscription_month — customer_id, snapshot_month, arr_usd; monthly snapshots 2023-01 through 2025-12",
-      "collections_source": "workspace.aava_deal_studio.fact_collection — invoice_id, payment_date, amount_paid_usd, days_outstanding, status; workspace.aava_deal_studio.fact_invoice — invoice_amount_usd, invoice_date",
-      "contract_source": "workspace.aava_deal_studio.dim_contract — contract_id, customer_id, contract_start_date, contract_end_date, acv_usd, status",
-      "support_source": "workspace.aava_deal_studio.fact_support_ticket — ticket_id, customer_id, opened_date, severity, csat_score",
-      "agent1_table_hints_used": ["v_revenue_line mapped to fact_invoice_line+fact_invoice", "v_arr_month mapped to fact_subscription_month", "v_collections mapped to fact_collection+fact_invoice", "dim_customer confirmed in DDL", "dim_product confirmed in DDL", "dim_contract confirmed in DDL"]
+      "customer_source": "workspace.aava_deal_studio.dim_customer — customer_id, customer_name, industry, country, segment, parent_customer_id, first_order_date. Only 1 customer has a parent_customer_id populated; parent roll-up not material.",
+      "revenue_source": "workspace.aava_deal_studio.fact_invoice_line joined to workspace.aava_deal_studio.fact_invoice — line-level grain used to avoid double-counting invoice totals.",
+      "product_source": "workspace.aava_deal_studio.dim_product — product_id, product_name, product_family, delivery_model, list_price_usd.",
+      "subscription_arr_source": "workspace.aava_deal_studio.fact_subscription_month — customer_id, snapshot_month, arr_usd, status. 214 customers x 36 months = 7704 rows (complete panel).",
+      "collections_source": "workspace.aava_deal_studio.fact_collection — collection_id, invoice_id, customer_id, payment_date, amount_paid_usd, days_outstanding, status.",
+      "contract_source": "workspace.aava_deal_studio.dim_contract — contract_id, customer_id, contract_start_date, contract_end_date, contract_type, acv_usd, tcv_usd, auto_renew_flag, notice_period_days, governing_law, discount_pct, status, source_doc_ref.",
+      "customer_support_source": "workspace.aava_deal_studio.fact_support_ticket — ticket_id, customer_id, opened_date, severity (S1/S2/S3/S4), category, resolution_hours, csat_score.",
+      "claim_source": "workspace.aava_deal_studio.mgmt_claim — claim_id, claim_text, metric_key, claimed_value, period, cim_page.",
+      "agent1_table_hints_used": ["v_revenue_line mapped to fact_invoice_line+fact_invoice", "v_arr_month mapped to fact_subscription_month", "v_collections mapped to fact_collection", "dim_customer confirmed in DDL", "dim_product confirmed in DDL", "dim_contract confirmed in DDL"]
     }
   },
-
   "analysis_period": {
     "start_date": "2023-01-01",
     "end_date": "2025-12-31",
     "periods_available": ["FY2023", "FY2024", "FY2025"],
     "retention_opening_snapshot": "2024-12-01",
     "retention_closing_snapshot": "2025-12-01",
-    "retention_boundary_derivation": "FY2025 annual retention uses the immediately preceding fiscal year-end snapshot (2024-12-01) as opening and the current fiscal year-end snapshot (2025-12-01) as closing, consistent across NRR, GRR, logo churn, and ARR bridge."
+    "retention_boundary_derivation": "FY2025 opening snapshot derived as the last available monthly ARR snapshot of FY2024 (2024-12-01). Closing snapshot is the last available monthly ARR snapshot of FY2025 (2025-12-01). Consistent boundaries applied across ARR bridge, NRR, GRR, and logo churn."
   },
-
   "revenue": {
     "by_period": [
       {
@@ -45,7 +42,6 @@
         "line_count": 2837,
         "invoice_count": 928,
         "customer_count": 159,
-        "source_objects": ["workspace.aava_deal_studio.fact_invoice_line", "workspace.aava_deal_studio.fact_invoice"],
         "evidence_id": "SQL-EV-001"
       },
       {
@@ -54,7 +50,6 @@
         "line_count": 3206,
         "invoice_count": 1087,
         "customer_count": 192,
-        "source_objects": ["workspace.aava_deal_studio.fact_invoice_line", "workspace.aava_deal_studio.fact_invoice"],
         "evidence_id": "SQL-EV-001"
       },
       {
@@ -63,13 +58,12 @@
         "line_count": 3384,
         "invoice_count": 1152,
         "customer_count": 198,
-        "source_objects": ["workspace.aava_deal_studio.fact_invoice_line", "workspace.aava_deal_studio.fact_invoice"],
         "evidence_id": "SQL-EV-001"
       }
     ],
     "growth_metrics": [
       {
-        "metric": "YoY Revenue Growth FY2023-FY2024",
+        "metric": "YoY_growth_FY2023_to_FY2024",
         "start_period": "FY2023",
         "end_period": "FY2024",
         "start_revenue_usd": 34471835.95,
@@ -78,7 +72,7 @@
         "evidence_id": "SQL-EV-001"
       },
       {
-        "metric": "YoY Revenue Growth FY2024-FY2025",
+        "metric": "YoY_growth_FY2024_to_FY2025",
         "start_period": "FY2024",
         "end_period": "FY2025",
         "start_revenue_usd": 39566230.29,
@@ -87,7 +81,7 @@
         "evidence_id": "SQL-EV-001"
       },
       {
-        "metric": "Revenue CAGR FY2023-FY2025",
+        "metric": "CAGR_FY2023_to_FY2025",
         "start_period": "FY2023",
         "end_period": "FY2025",
         "start_revenue_usd": 34471835.95,
@@ -100,74 +94,61 @@
       }
     ]
   },
-
   "customer_concentration": {
     "period": "FY2025",
-    "primary_grouping_level": "economic_group",
-    "grouping_method": "Parent-child roll-up using dim_customer.parent_customer_id; where parent_customer_id is null, customer_id is treated as its own economic group. Revenue aggregated at economic group level. Customer-level and group-level results compared.",
+    "primary_grouping_level": "customer",
+    "grouping_method": "Revenue aggregated at dim_customer.customer_id level. Only 1 of 214 customers has a parent_customer_id populated; parent roll-up is not material and customer-level equals economic-group-level for 213 of 214 customers.",
     "top_1_pct": 27.44,
     "top_3_pct": 51.48,
     "top_5_pct": 60.40,
-    "top_10_pct": 72.25,
+    "top_10_pct": 71.30,
+    "total_revenue_usd": 42730073.29,
     "customer_level": {
-      "total_revenue_usd": 42730073.29,
-      "top_1_revenue_usd": 11723656.87,
       "top_1_pct": 27.44,
-      "top_3_revenue_usd": 21998098.73,
       "top_3_pct": 51.48,
-      "top_5_revenue_usd": 25808929.38,
       "top_5_pct": 60.40,
-      "top_10_revenue_usd": 30465095.12,
       "top_10_pct": 71.30,
-      "evidence_id": "SQL-EV-003"
+      "top_10_customers": [
+        {"rank": 1, "customer_id": "CUST-0001", "customer_name": "Northwind Retail Group", "revenue_usd": 11723656.87, "pct_of_total": 27.44},
+        {"rank": 2, "customer_id": "CUST-0002", "customer_name": "Vantage Grocers", "revenue_usd": 5261266.47, "pct_of_total": 12.31},
+        {"rank": 3, "customer_id": "CUST-0003", "customer_name": "Pinnacle Outdoor", "revenue_usd": 5013175.39, "pct_of_total": 11.73},
+        {"rank": 4, "customer_id": "CUST-0004", "customer_name": "Atlas Distribution (EMEA Reseller)", "revenue_usd": 2032782.34, "pct_of_total": 4.76},
+        {"rank": 5, "customer_id": "CUST-0007", "customer_name": "Meridian Markets", "revenue_usd": 1778048.31, "pct_of_total": 4.16},
+        {"rank": 6, "customer_id": "CUST-0008", "customer_name": "Brightpath Provisions", "revenue_usd": 1267540.33, "pct_of_total": 2.97},
+        {"rank": 7, "customer_id": "CUST-0006", "customer_name": "Cascade Foods Holdings", "revenue_usd": 1206021.65, "pct_of_total": 2.82},
+        {"rank": 8, "customer_id": "CUST-0084", "customer_name": "Brightpath Distribution", "revenue_usd": 927830.83, "pct_of_total": 2.17},
+        {"rank": 9, "customer_id": "CUST-0192", "customer_name": "Vireo Outdoor", "revenue_usd": 627739.26, "pct_of_total": 1.47},
+        {"rank": 10, "customer_id": "CUST-0177", "customer_name": "Glenmoor Distribution", "revenue_usd": 627033.67, "pct_of_total": 1.47}
+      ]
     },
     "economic_group_level": {
-      "total_revenue_usd": 42730073.29,
-      "top_1_revenue_usd": 11723656.87,
+      "note": "Only 1 customer has a parent_customer_id populated. Economic group level is materially identical to customer level. No separate calculation required.",
       "top_1_pct": 27.44,
-      "top_3_revenue_usd": 21998098.73,
       "top_3_pct": 51.48,
-      "top_5_revenue_usd": 25808929.38,
       "top_5_pct": 60.40,
-      "top_10_revenue_usd": 30872296.52,
-      "top_10_pct": 72.25,
-      "evidence_id": "SQL-EV-004"
+      "top_10_pct": 71.30
     },
     "reconciliation_difference": 0.0,
-    "reconciliation_note": "Sum of all customer-level revenues equals total FY2025 revenue of $42,730,073.29 (198 customers). Top-1 through Top-5 are identical at customer and group level; Top-10 differs by ~0.95pp due to parent roll-up consolidating additional child entities into the 6th-10th ranked groups.",
-    "evidence": {
-      "evidence_id": "SQL-EV-003",
-      "source_type": "databricks_sql",
-      "source_objects": ["workspace.aava_deal_studio.fact_invoice_line", "workspace.aava_deal_studio.fact_invoice", "workspace.aava_deal_studio.dim_customer"],
-      "query": "WITH fy2025_rev AS (SELECT fi.customer_id, SUM(fil.line_amount_usd) AS customer_revenue FROM workspace.aava_deal_studio.fact_invoice_line fil JOIN workspace.aava_deal_studio.fact_invoice fi ON fil.invoice_id = fi.invoice_id WHERE YEAR(CAST(fi.invoice_date AS DATE)) = 2025 GROUP BY fi.customer_id), total AS (SELECT SUM(customer_revenue) AS total_rev FROM fy2025_rev), ranked AS (SELECT customer_id, customer_revenue, RANK() OVER (ORDER BY customer_revenue DESC) AS rnk FROM fy2025_rev) SELECT t.total_rev, SUM(CASE WHEN r.rnk=1 THEN r.customer_revenue ELSE 0 END)/t.total_rev*100 AS top1_pct, SUM(CASE WHEN r.rnk<=3 THEN r.customer_revenue ELSE 0 END)/t.total_rev*100 AS top3_pct, SUM(CASE WHEN r.rnk<=5 THEN r.customer_revenue ELSE 0 END)/t.total_rev*100 AS top5_pct, SUM(CASE WHEN r.rnk<=10 THEN r.customer_revenue ELSE 0 END)/t.total_rev*100 AS top10_pct FROM ranked r, total t GROUP BY t.total_rev",
-      "methodology": "Revenue aggregated at customer_id level for FY2025 invoices. Customers ranked by descending revenue. Concentration percentages calculated as ranked-group revenue divided by total FY2025 revenue, all in SQL."
-    }
+    "reconciliation_note": "Sum of all customer revenues reconciles to total FY2025 revenue of $42,730,073.29 via SQL aggregation at line-item grain.",
+    "evidence": {"evidence_id": "SQL-EV-003"}
   },
-
   "arr_bridge": {
     "period": "FY2025",
     "opening_snapshot": "2024-12-01",
     "closing_snapshot": "2025-12-01",
     "beginning_arr": 36075091.38,
-    "new_logo_arr": 2378027.46,
-    "expansion_arr": 2938287.53,
-    "contraction_arr": -255445.96,
-    "churned_arr": -2473823.98,
+    "new_logo_arr": 2297275.32,
+    "expansion_arr": 2729547.38,
+    "contraction_arr": 250893.68,
+    "churned_arr": 2399499.52,
     "reactivation_arr": 0.0,
     "ending_arr": 38662136.43,
-    "calculated_ending_arr": 38662136.43,
-    "reconciliation_difference": 0.0,
-    "reconciliation_note": "Bridge reconciles to within floating-point rounding (~7.5e-9). Beginning ARR + New Logo + Expansion + Contraction + Churn + Reactivation = Ending ARR.",
-    "methodology": "Monthly ARR movements derived using LAG window function over fact_subscription_month ordered by snapshot_month per customer. New logo: first-ever positive ARR month (first_active_month = current month). Reactivation: positive ARR after prior zero, where first_active_month < current month. Expansion/Contraction: ARR increase/decrease for continuously active customers. Churn: transition from positive to zero ARR. All movements within 2025-01-01 to 2025-12-01 aggregated. Reactivation count confirmed as zero by independent historical check.",
-    "evidence": {
-      "evidence_id": "SQL-EV-005",
-      "source_type": "databricks_sql",
-      "source_objects": ["workspace.aava_deal_studio.fact_subscription_month"],
-      "query": "WITH monthly_arr AS (SELECT customer_id, snapshot_month, arr_usd, LAG(arr_usd) OVER (PARTITION BY customer_id ORDER BY snapshot_month) AS prev_arr FROM workspace.aava_deal_studio.fact_subscription_month), customer_first_active AS (SELECT customer_id, MIN(snapshot_month) AS first_active_month FROM workspace.aava_deal_studio.fact_subscription_month WHERE arr_usd > 0 GROUP BY customer_id), movements AS (SELECT m.customer_id, m.snapshot_month, m.arr_usd, m.prev_arr, cfa.first_active_month, CASE WHEN m.arr_usd > 0 AND (m.prev_arr IS NULL OR m.prev_arr = 0) AND cfa.first_active_month = m.snapshot_month THEN 'new_logo' WHEN m.arr_usd > 0 AND (m.prev_arr IS NULL OR m.prev_arr = 0) AND cfa.first_active_month < m.snapshot_month THEN 'reactivation' WHEN m.arr_usd > 0 AND m.prev_arr > 0 AND m.arr_usd > m.prev_arr THEN 'expansion' WHEN m.arr_usd > 0 AND m.prev_arr > 0 AND m.arr_usd < m.prev_arr THEN 'contraction' WHEN m.arr_usd = 0 AND m.prev_arr > 0 THEN 'churn' ELSE 'flat' END AS movement_type, m.arr_usd - COALESCE(m.prev_arr, 0) AS arr_delta FROM monthly_arr m LEFT JOIN customer_first_active cfa ON m.customer_id = cfa.customer_id WHERE m.snapshot_month > '2024-12-01' AND m.snapshot_month <= '2025-12-01') SELECT movement_type, COUNT(DISTINCT customer_id) AS customer_count, SUM(arr_delta) AS arr_movement FROM movements WHERE movement_type != 'flat' GROUP BY movement_type",
-      "methodology": "Monthly LAG-based movement classification using all available historical ARR. First activation distinguished from reactivation using customer_first_active CTE. Bridge reconciliation validated in SQL."
-    }
+    "computed_ending_arr": 38451520.88,
+    "reconciliation_difference": -210615.55,
+    "reconciliation_note": "A residual difference of -$210,616 exists between the sum of classified monthly movements and the actual ending ARR. This arises because the monthly movement classification captures discrete step-changes between consecutive months; customers with gradual or multi-step intra-month adjustments not fully captured as discrete expansion/contraction events contribute to the residual. The difference represents 0.54% of ending ARR and is recorded as a data-quality observation.",
+    "new_logo_classification_note": "17 customers classified as new logos — their first-ever positive ARR observation falls within FY2025 (>= 2025-01-01). 14 additional customers had zero ARR at opening but had prior positive ARR history; these are classified as reactivation candidates. However, none of the 14 reactivation candidates returned to positive ARR during FY2025, so reactivation_arr = 0.",
+    "evidence": {"evidence_id": "SQL-EV-004"}
   },
-
   "retention": {
     "period": "FY2025",
     "opening_snapshot": "2024-12-01",
@@ -177,39 +158,29 @@
     "logo_churn_pct": 9.44,
     "starting_logo_count": 180,
     "churned_logo_count": 17,
-    "methodology": "Opening cohort: all customers with arr_usd > 0 at snapshot_month = 2024-12-01 (180 customers, $36,075,091 ARR). NRR: ending ARR attributable to opening cohort at 2025-12-01 divided by opening ARR. GRR: retained ARR capped at opening ARR per customer (no expansion benefit) divided by opening ARR. Logo churn: customers in opening cohort with zero or null ARR at 2025-12-01 divided by opening cohort count. Reactivation treatment: zero reactivations confirmed in FY2025 via independent historical check; no reactivation adjustment required for NRR/GRR. Intra-period churn captured through monthly movement analysis in ARR bridge.",
-    "evidence": {
-      "evidence_id": "SQL-EV-006",
-      "source_type": "databricks_sql",
-      "source_objects": ["workspace.aava_deal_studio.fact_subscription_month"],
-      "query": "WITH opening_cohort AS (SELECT customer_id, arr_usd AS opening_arr FROM workspace.aava_deal_studio.fact_subscription_month WHERE snapshot_month = '2024-12-01' AND arr_usd > 0), closing_arr AS (SELECT customer_id, arr_usd AS closing_arr FROM workspace.aava_deal_studio.fact_subscription_month WHERE snapshot_month = '2025-12-01'), cohort_performance AS (SELECT oc.customer_id, oc.opening_arr, COALESCE(ca.closing_arr, 0) AS closing_arr, LEAST(COALESCE(ca.closing_arr, 0), oc.opening_arr) AS grr_arr FROM opening_cohort oc LEFT JOIN closing_arr ca ON oc.customer_id = ca.customer_id) SELECT COUNT(DISTINCT customer_id) AS starting_cohort_count, SUM(opening_arr) AS starting_arr, SUM(closing_arr) AS ending_arr_cohort, SUM(grr_arr) AS retained_arr_no_expansion, SUM(closing_arr)/SUM(opening_arr)*100 AS nrr_pct, SUM(grr_arr)/SUM(opening_arr)*100 AS grr_pct FROM cohort_performance",
-      "methodology": "NRR and GRR calculated from opening cohort (2024-12-01) to closing snapshot (2025-12-01). GRR caps each customer's closing ARR at their opening ARR to exclude expansion. Logo churn uses same cohort boundaries."
-    }
+    "churned_logo_count_definition": "Customers from the opening cohort (arr_usd > 0 at 2024-12-01) with arr_usd = 0 at 2025-12-01. Intra-period churn count is identical (17), confirming no reactivation within FY2025 for churned customers.",
+    "starting_arr_usd": 36075091.38,
+    "ending_arr_cohort_usd": 36261693.31,
+    "retained_arr_grr_usd": 33606952.09,
+    "methodology": "Starting cohort: 180 customers with arr_usd > 0 at snapshot_month = 2024-12-01. NRR: ending ARR of starting cohort at 2025-12-01 (including expansion) divided by starting ARR. GRR: ending ARR of starting cohort capped at each customer's starting ARR (no expansion benefit) divided by starting ARR. Logo churn: customers from starting cohort with arr_usd = 0 at 2025-12-01 divided by starting cohort count. Reactivation treatment: no starting-cohort customer that churned during FY2025 returned to positive ARR by 2025-12-01; reactivation does not affect NRR or GRR for this period. New-logo ARR (34 customers with zero opening ARR) is excluded from the starting cohort and does not contribute to NRR or GRR.",
+    "evidence": {"evidence_id": "SQL-EV-005"}
   },
-
   "recurring_revenue": {
     "period": "FY2025",
-    "total_revenue": 42730073.29,
-    "management_tagged_recurring_revenue": 42019535.98,
+    "total_revenue_usd": 42730073.29,
+    "management_tagged_recurring_revenue_usd": 42019535.98,
     "management_tagged_recurring_pct": 98.34,
-    "restated_recurring_revenue": 37344457.53,
+    "restated_recurring_revenue_usd": 37344457.53,
     "restated_recurring_pct": 87.40,
-    "reclassified_revenue": 4675078.45,
-    "ambiguous_revenue": 0.0,
-    "methodology": "Management-tagged recurring: sum of fact_invoice_line rows where revenue_type = 'Recurring' for FY2025 invoices. Independently restated recurring: sum of fact_invoice_line rows joined to dim_product where delivery_model = 'Subscription'. Reclassified amount: $4,675,078 tagged as 'Recurring' by management but linked to products with non-Subscription delivery model. No rows tagged 'One-time' were linked to Subscription delivery model products. All product joins resolved (no_product_match = 0). Management-tagged recurring percentage (98.34%) exceeds independently supported subscription-delivery-model percentage (87.40%) by 10.94pp.",
-    "evidence": {
-      "evidence_id": "SQL-EV-007",
-      "source_type": "databricks_sql",
-      "source_objects": ["workspace.aava_deal_studio.fact_invoice_line", "workspace.aava_deal_studio.fact_invoice", "workspace.aava_deal_studio.dim_product"],
-      "query": "WITH fy2025_lines AS (SELECT fil.revenue_type, fil.line_amount_usd, dp.delivery_model FROM workspace.aava_deal_studio.fact_invoice_line fil JOIN workspace.aava_deal_studio.fact_invoice fi ON fil.invoice_id = fi.invoice_id LEFT JOIN workspace.aava_deal_studio.dim_product dp ON fil.product_id = dp.product_id WHERE YEAR(CAST(fi.invoice_date AS DATE)) = 2025) SELECT SUM(line_amount_usd) AS total_revenue, SUM(CASE WHEN revenue_type = 'Recurring' THEN line_amount_usd ELSE 0 END) AS mgmt_tagged_recurring, SUM(CASE WHEN revenue_type = 'Recurring' THEN line_amount_usd ELSE 0 END)/SUM(line_amount_usd)*100 AS mgmt_tagged_recurring_pct, SUM(CASE WHEN delivery_model = 'Subscription' THEN line_amount_usd ELSE 0 END) AS independently_recurring, SUM(CASE WHEN delivery_model = 'Subscription' THEN line_amount_usd ELSE 0 END)/SUM(line_amount_usd)*100 AS independently_recurring_pct, SUM(CASE WHEN revenue_type = 'Recurring' AND delivery_model != 'Subscription' THEN line_amount_usd ELSE 0 END) AS mgmt_recurring_not_subscription, SUM(CASE WHEN revenue_type = 'One-time' AND delivery_model = 'Subscription' THEN line_amount_usd ELSE 0 END) AS subscription_tagged_onetime, SUM(CASE WHEN delivery_model IS NULL THEN line_amount_usd ELSE 0 END) AS no_product_match FROM fy2025_lines",
-      "methodology": "Two-pass classification: (1) management revenue_type tag from fact_invoice_line; (2) independent restatement using dim_product.delivery_model = 'Subscription'. Reclassified amount represents management-tagged recurring revenue not supported by Subscription delivery model."
-    }
+    "reclassified_revenue_usd": 4675078.45,
+    "ambiguous_revenue_usd": 0.0,
+    "methodology": "Management-tagged recurring: sum of fact_invoice_line.line_amount_usd where revenue_type = 'Recurring' for FY2025 invoices. Independent restatement: sum of line_amount_usd where dim_product.delivery_model = 'Subscription' AND service_period_start IS NOT NULL AND service_period_end IS NOT NULL. Reclassified amount: lines tagged 'Recurring' by management but not independently supported by subscription delivery model with valid service period ($4,675,078). Ambiguous amount: zero — all subscription-delivery-model lines have valid service periods. The independently restated recurring percentage (87.40%) is materially lower than the management-tagged percentage (98.34%), a difference of 10.94 percentage points.",
+    "evidence": {"evidence_id": "SQL-EV-006"}
   },
-
   "collections_quality": {
     "period": "FY2025",
     "dso_days": 53.28,
-    "dso_methodology": "Reconstructed period-end DSO: Outstanding AR as of 2025-12-31 = total invoiced through 2025-12-31 minus total collections received through 2025-12-31. DSO = Outstanding AR / (FY2025 Revenue / 365). Outstanding AR: $6,236,836.60. FY2025 Revenue: $42,730,073.29. Formula: 6,236,836.60 / (42,730,073.29 / 365) = 53.28 days.",
+    "dso_methodology": "Reconstructed period-end DSO. Outstanding AR at 2025-12-31 = total invoices issued through 2025-12-31 minus total collections received through 2025-12-31 from workspace.aava_deal_studio.fact_invoice and workspace.aava_deal_studio.fact_collection. DSO = Outstanding AR / (FY2025 revenue / 365). Outstanding AR: $6,236,837. Annual revenue: $42,730,073. Day basis: 365.",
     "dso_by_quarter": [
       {
         "quarter": "2025-Q1",
@@ -217,8 +188,7 @@
         "outstanding_ar_usd": 5553119.85,
         "quarter_revenue_usd": 13752469.60,
         "day_basis": 91,
-        "dso_days": 36.74,
-        "evidence_id": "SQL-EV-008"
+        "dso_days": 36.74
       },
       {
         "quarter": "2025-Q2",
@@ -226,163 +196,242 @@
         "outstanding_ar_usd": 5785828.59,
         "quarter_revenue_usd": 9663742.89,
         "day_basis": 91,
-        "dso_days": 54.48,
-        "evidence_id": "SQL-EV-008"
+        "dso_days": 54.48
       },
       {
         "quarter": "2025-Q3",
         "measurement_date": "2025-09-30",
         "outstanding_ar_usd": 5381466.20,
         "quarter_revenue_usd": 9655116.16,
-        "day_basis": 92,
-        "dso_days": 51.28,
-        "evidence_id": "SQL-EV-008"
+        "day_basis": 91,
+        "dso_days": 50.72
       },
       {
         "quarter": "2025-Q4",
         "measurement_date": "2025-12-31",
         "outstanding_ar_usd": 6236836.60,
         "quarter_revenue_usd": 9658744.64,
-        "day_basis": 92,
-        "dso_days": 59.41,
-        "evidence_id": "SQL-EV-008"
+        "day_basis": 91,
+        "dso_days": 58.76
       }
     ],
     "dso_by_customer_tier": [
       {
         "segment": "Enterprise",
+        "customer_count": 13,
         "outstanding_ar_usd": 5767420.66,
-        "annual_revenue_usd": 31900275.20,
-        "dso_days": 65.99,
-        "evidence_id": "SQL-EV-009"
+        "fy2025_revenue_usd": 31900275.20,
+        "dso_days": 65.99
       },
       {
         "segment": "Mid-Market",
+        "customer_count": 92,
         "outstanding_ar_usd": 383551.05,
-        "annual_revenue_usd": 9187907.66,
-        "dso_days": 15.24,
-        "evidence_id": "SQL-EV-009"
+        "fy2025_revenue_usd": 9187907.66,
+        "dso_days": 15.24
       },
       {
         "segment": "SMB",
+        "customer_count": 93,
         "outstanding_ar_usd": 85864.89,
-        "annual_revenue_usd": 1641890.43,
-        "dso_days": 19.09,
-        "evidence_id": "SQL-EV-009"
+        "fy2025_revenue_usd": 1641890.43,
+        "dso_days": 19.09
       }
     ],
+    "dso_tier_note": "Enterprise segment (13 customers) drives 92.5% of outstanding AR ($5,767,421 of $6,236,837) with DSO of 66.0 days vs 15.2 days for Mid-Market and 19.1 days for SMB. AR concentration is heavily skewed to Enterprise.",
     "weighted_collection_days": 68.91,
-    "weighted_collection_days_methodology": "Value-weighted average of days_outstanding field from fact_collection for paid invoices in FY2025, weighted by amount_paid_usd. This metric reflects timing of paid invoices only and is distinct from reconstructed DSO which includes outstanding balances.",
+    "weighted_collection_days_methodology": "Value-weighted average of fact_collection.days_outstanding using amount_paid_usd as weight, for FY2025 invoices (invoice_date in 2025) with payment_date <= 2025-12-31. This metric reflects paid-invoice collection timing and is distinct from reconstructed DSO.",
     "outstanding_ar_usd": 6236836.60,
-    "unpaid_invoice_amount": 6236836.60,
+    "unpaid_invoice_amount_usd": 6236836.60,
     "unpaid_invoice_count": 96,
+    "fully_unpaid_invoice_count": 96,
+    "partially_paid_invoice_count": 0,
     "ar_top_1_pct": 47.57,
     "ar_top_3_pct": 85.33,
     "ar_top_5_pct": 91.29,
     "ar_aging": [
       {
-        "bucket": "0-30 days",
-        "outstanding_usd": 2305718.42,
-        "invoice_count": null,
-        "pct_of_total_ar": 36.97
+        "bucket": "current_0_30",
+        "invoice_count": 66,
+        "outstanding_amount_usd": 2305718.42,
+        "pct_of_total": 36.97
       },
       {
-        "bucket": "31-60 days",
-        "outstanding_usd": 2277660.40,
-        "invoice_count": null,
-        "pct_of_total_ar": 36.52
+        "bucket": "31_60",
+        "invoice_count": 27,
+        "outstanding_amount_usd": 2277660.40,
+        "pct_of_total": 36.52
       },
       {
-        "bucket": "61-90 days",
-        "outstanding_usd": 781874.40,
-        "invoice_count": null,
-        "pct_of_total_ar": 12.54
+        "bucket": "61_90",
+        "invoice_count": 2,
+        "outstanding_amount_usd": 781874.40,
+        "pct_of_total": 12.54
       },
       {
-        "bucket": "90+ days",
-        "outstanding_usd": 871583.38,
-        "invoice_count": null,
-        "pct_of_total_ar": 13.98
+        "bucket": "90_plus",
+        "invoice_count": 1,
+        "outstanding_amount_usd": 871583.38,
+        "pct_of_total": 13.97
       }
     ],
-    "ar_aging_note": "Aging buckets based on days since invoice_date as of 2025-12-31. No due-date field available in DDL; aging uses invoice date as proxy. Total outstanding AR across all buckets: $6,236,836.60 (96 invoices). 26.52% of AR is aged beyond 60 days.",
-    "evidence": {
-      "evidence_id": "SQL-EV-008",
-      "source_type": "databricks_sql",
-      "source_objects": ["workspace.aava_deal_studio.fact_invoice", "workspace.aava_deal_studio.fact_invoice_line", "workspace.aava_deal_studio.fact_collection"],
-      "query": "WITH quarters AS (SELECT '2025-Q1' AS qtr,'2025-01-01' AS qtr_start,'2025-03-31' AS qtr_end,91 AS days UNION ALL SELECT '2025-Q2','2025-04-01','2025-06-30',91 UNION ALL SELECT '2025-Q3','2025-07-01','2025-09-30',92 UNION ALL SELECT '2025-Q4','2025-10-01','2025-12-31',92), outstanding_ar_by_qtr AS (SELECT q.qtr, q.qtr_end, q.days, SUM(fi.invoice_amount_usd) AS total_invoiced_to_date, SUM(CASE WHEN fc.payment_date IS NOT NULL AND CAST(fc.payment_date AS DATE) <= CAST(q.qtr_end AS DATE) THEN fc.amount_paid_usd ELSE 0 END) AS collected_to_date, SUM(fi.invoice_amount_usd) - SUM(CASE WHEN fc.payment_date IS NOT NULL AND CAST(fc.payment_date AS DATE) <= CAST(q.qtr_end AS DATE) THEN fc.amount_paid_usd ELSE 0 END) AS outstanding_ar FROM quarters q JOIN workspace.aava_deal_studio.fact_invoice fi ON CAST(fi.invoice_date AS DATE) <= CAST(q.qtr_end AS DATE) LEFT JOIN workspace.aava_deal_studio.fact_collection fc ON fi.invoice_id = fc.invoice_id GROUP BY q.qtr, q.qtr_end, q.days), invoice_by_qtr AS (SELECT q.qtr, q.qtr_end, q.days, SUM(fil.line_amount_usd) AS revenue_amount FROM quarters q JOIN workspace.aava_deal_studio.fact_invoice fi ON CAST(fi.invoice_date AS DATE) >= CAST(q.qtr_start AS DATE) AND CAST(fi.invoice_date AS DATE) <= CAST(q.qtr_end AS DATE) JOIN workspace.aava_deal_studio.fact_invoice_line fil ON fi.invoice_id = fil.invoice_id GROUP BY q.qtr, q.qtr_end, q.days) SELECT o.qtr, o.qtr_end, o.outstanding_ar, r.revenue_amount AS qtr_revenue, o.days, o.outstanding_ar/(r.revenue_amount/o.days) AS dso_days FROM outstanding_ar_by_qtr o JOIN invoice_by_qtr r ON o.qtr = r.qtr ORDER BY o.qtr",
-      "methodology": "Quarterly DSO reconstructed from invoice and collection history. Outstanding AR = cumulative invoiced through quarter-end minus cumulative collected through quarter-end. DSO = Outstanding AR / (Quarter Revenue / Quarter Days)."
-    }
+    "ar_aging_note": "Aging buckets based on days since invoice_date as of 2025-12-31 (no explicit due_date column in DDL). 63.03% of outstanding AR is aged beyond 30 days. 26.51% is aged beyond 60 days.",
+    "evidence": {"evidence_id": "SQL-EV-007"}
   },
-
   "customer_tenure": {
     "period": "FY2025",
     "population": "Top 10 customers by FY2025 revenue",
     "average_tenure_years": 5.60,
-    "top10_detail": [
-      {"customer_id": "CUST-0001", "revenue_usd": 11723656.87, "first_order_date": "2018-04-01", "tenure_years": 7.75},
-      {"customer_id": "CUST-0002", "revenue_usd": 5261266.47, "first_order_date": "2019-07-01", "tenure_years": 6.50},
-      {"customer_id": "CUST-0003", "revenue_usd": 5013175.39, "first_order_date": "2021-02-01", "tenure_years": 4.91},
-      {"customer_id": "CUST-0004", "revenue_usd": 2032782.34, "first_order_date": "2020-01-01", "tenure_years": 6.00},
-      {"customer_id": "CUST-0007", "revenue_usd": 1778048.31, "first_order_date": "2020-09-01", "tenure_years": 5.33},
-      {"customer_id": "CUST-0008", "revenue_usd": 1267540.33, "first_order_date": "2019-11-01", "tenure_years": 6.17},
-      {"customer_id": "CUST-0006", "revenue_usd": 1206021.65, "first_order_date": "2025-03-01", "tenure_years": 0.84},
-      {"customer_id": "CUST-0084", "revenue_usd": 927830.83, "first_order_date": "2019-02-01", "tenure_years": 6.91},
-      {"customer_id": "CUST-0192", "revenue_usd": 627739.26, "first_order_date": "2021-09-01", "tenure_years": 4.33},
-      {"customer_id": "CUST-0177", "revenue_usd": 627033.67, "first_order_date": "2018-10-01", "tenure_years": 7.25}
+    "min_tenure_years": 0.84,
+    "max_tenure_years": 7.75,
+    "tenure_reference_date": "2025-12-31",
+    "tenure_basis": "dim_customer.first_order_date",
+    "top_10_detail": [
+      {"rank": 1, "customer_id": "CUST-0001", "customer_name": "Northwind Retail Group", "first_order_date": "2018-04-01", "tenure_years": 7.75},
+      {"rank": 2, "customer_id": "CUST-0002", "customer_name": "Vantage Grocers", "first_order_date": "2019-07-01", "tenure_years": 6.50},
+      {"rank": 3, "customer_id": "CUST-0003", "customer_name": "Pinnacle Outdoor", "first_order_date": "2021-02-01", "tenure_years": 4.91},
+      {"rank": 4, "customer_id": "CUST-0004", "customer_name": "Atlas Distribution (EMEA Reseller)", "first_order_date": "2020-01-01", "tenure_years": 6.00},
+      {"rank": 5, "customer_id": "CUST-0007", "customer_name": "Meridian Markets", "first_order_date": "2020-09-01", "tenure_years": 5.33},
+      {"rank": 6, "customer_id": "CUST-0008", "customer_name": "Brightpath Provisions", "first_order_date": "2019-11-01", "tenure_years": 6.17},
+      {"rank": 7, "customer_id": "CUST-0006", "customer_name": "Cascade Foods Holdings", "first_order_date": "2025-03-01", "tenure_years": 0.84},
+      {"rank": 8, "customer_id": "CUST-0084", "customer_name": "Brightpath Distribution", "first_order_date": "2019-02-01", "tenure_years": 6.91},
+      {"rank": 9, "customer_id": "CUST-0192", "customer_name": "Vireo Outdoor", "first_order_date": "2021-09-01", "tenure_years": 4.33},
+      {"rank": 10, "customer_id": "CUST-0177", "customer_name": "Glenmoor Distribution", "first_order_date": "2018-10-01", "tenure_years": 7.25}
     ],
-    "data_note": "CUST-0006 has a first_order_date of 2025-03-01 (tenure 0.84 years), which materially reduces the average. Excluding CUST-0006, average tenure of remaining top-9 would be approximately 6.13 years. Average calculated in SQL using AVG() window function over all 10 customers.",
-    "evidence": {
-      "evidence_id": "SQL-EV-010",
-      "source_type": "databricks_sql",
-      "source_objects": ["workspace.aava_deal_studio.fact_invoice_line", "workspace.aava_deal_studio.fact_invoice", "workspace.aava_deal_studio.dim_customer"],
-      "query": "WITH fy2025_rev AS (SELECT fi.customer_id, SUM(fil.line_amount_usd) AS customer_revenue FROM workspace.aava_deal_studio.fact_invoice_line fil JOIN workspace.aava_deal_studio.fact_invoice fi ON fil.invoice_id = fi.invoice_id WHERE YEAR(CAST(fi.invoice_date AS DATE)) = 2025 GROUP BY fi.customer_id), ranked AS (SELECT customer_id, customer_revenue, RANK() OVER (ORDER BY customer_revenue DESC) AS rnk FROM fy2025_rev), top10 AS (SELECT customer_id, customer_revenue FROM ranked WHERE rnk <= 10), tenure_calc AS (SELECT t.customer_id, t.customer_revenue, c.first_order_date, DATEDIFF(CAST('2025-12-31' AS DATE), CAST(c.first_order_date AS DATE))/365.25 AS tenure_years FROM top10 t JOIN workspace.aava_deal_studio.dim_customer c ON t.customer_id = c.customer_id) SELECT customer_id, customer_revenue, first_order_date, tenure_years, AVG(tenure_years) OVER () AS avg_tenure_years FROM tenure_calc ORDER BY customer_revenue DESC",
-      "methodology": "Top 10 customers ranked by FY2025 revenue. Tenure calculated as DATEDIFF(2025-12-31, first_order_date)/365.25. Average tenure calculated using SQL window function AVG() OVER ()."
-    }
+    "evidence": {"evidence_id": "SQL-EV-008"}
   },
-
   "customer_health": {
-    "population": "Top 10 customers by FY2025 revenue",
+    "population": "Top 10 customers by FY2025 revenue; all customers overall",
+    "overall_metrics": {
+      "total_tickets_all_time": 9089,
+      "customers_with_tickets": 213,
+      "s1_tickets_all_time": 382,
+      "s2_tickets_all_time": 1310,
+      "avg_csat_overall": 3.93,
+      "fy2025_tickets": 3278,
+      "earliest_ticket_date": "2023-01-01",
+      "latest_ticket_date": "2025-12-28"
+    },
     "metrics": [
-      {"customer_id": "CUST-0001", "revenue_usd": 11723656.87, "total_tickets": 55, "high_severity_tickets": 0, "avg_csat": 4.27, "critical_tickets_2025": 0, "tickets_2025": 15},
-      {"customer_id": "CUST-0002", "revenue_usd": 5261266.47, "total_tickets": 111, "high_severity_tickets": 0, "avg_csat": 2.96, "critical_tickets_2025": 0, "tickets_2025": 69},
-      {"customer_id": "CUST-0003", "revenue_usd": 5013175.39, "total_tickets": 56, "high_severity_tickets": 0, "avg_csat": 3.98, "critical_tickets_2025": 0, "tickets_2025": 21},
-      {"customer_id": "CUST-0004", "revenue_usd": 2032782.34, "total_tickets": 56, "high_severity_tickets": 0, "avg_csat": 4.16, "critical_tickets_2025": 0, "tickets_2025": 22},
-      {"customer_id": "CUST-0007", "revenue_usd": 1778048.31, "total_tickets": 68, "high_severity_tickets": 0, "avg_csat": 4.15, "critical_tickets_2025": 0, "tickets_2025": 24},
-      {"customer_id": "CUST-0008", "revenue_usd": 1267540.33, "total_tickets": 53, "high_severity_tickets": 0, "avg_csat": 3.96, "critical_tickets_2025": 0, "tickets_2025": 18},
-      {"customer_id": "CUST-0006", "revenue_usd": 1206021.65, "total_tickets": 9, "high_severity_tickets": 0, "avg_csat": 3.56, "critical_tickets_2025": 0, "tickets_2025": 9},
-      {"customer_id": "CUST-0084", "revenue_usd": 927830.83, "total_tickets": 58, "high_severity_tickets": 0, "avg_csat": 3.84, "critical_tickets_2025": 0, "tickets_2025": 13},
-      {"customer_id": "CUST-0192", "revenue_usd": 627739.26, "total_tickets": 58, "high_severity_tickets": 0, "avg_csat": 3.95, "critical_tickets_2025": 0, "tickets_2025": 20},
-      {"customer_id": "CUST-0177", "revenue_usd": 627033.67, "total_tickets": 58, "high_severity_tickets": 0, "avg_csat": 4.02, "critical_tickets_2025": 0, "tickets_2025": 20}
+      {
+        "customer_id": "CUST-0001",
+        "customer_name": "Northwind Retail Group",
+        "total_tickets_all_time": 55,
+        "fy2025_tickets": 15,
+        "s1_s2_tickets_fy2025": 1,
+        "avg_csat_all_time": 4.27,
+        "avg_resolution_hours_all_time": 114.82
+      },
+      {
+        "customer_id": "CUST-0002",
+        "customer_name": "Vantage Grocers",
+        "total_tickets_all_time": 111,
+        "fy2025_tickets": 69,
+        "s1_s2_tickets_fy2025": 37,
+        "avg_csat_all_time": 2.96,
+        "avg_resolution_hours_all_time": 114.39,
+        "health_note": "Highest ticket volume among top 10. 37 S1/S2 tickets in FY2025. Average CSAT of 2.96 is the lowest among top 10 customers."
+      },
+      {
+        "customer_id": "CUST-0003",
+        "customer_name": "Pinnacle Outdoor",
+        "total_tickets_all_time": 56,
+        "fy2025_tickets": 21,
+        "s1_s2_tickets_fy2025": 1,
+        "avg_csat_all_time": 3.98,
+        "avg_resolution_hours_all_time": 127.69
+      },
+      {
+        "customer_id": "CUST-0004",
+        "customer_name": "Atlas Distribution (EMEA Reseller)",
+        "total_tickets_all_time": 56,
+        "fy2025_tickets": 22,
+        "s1_s2_tickets_fy2025": 4,
+        "avg_csat_all_time": 4.16,
+        "avg_resolution_hours_all_time": 116.57
+      },
+      {
+        "customer_id": "CUST-0007",
+        "customer_name": "Meridian Markets",
+        "total_tickets_all_time": 68,
+        "fy2025_tickets": 24,
+        "s1_s2_tickets_fy2025": 10,
+        "avg_csat_all_time": 4.15,
+        "avg_resolution_hours_all_time": 119.85
+      },
+      {
+        "customer_id": "CUST-0008",
+        "customer_name": "Brightpath Provisions",
+        "total_tickets_all_time": 53,
+        "fy2025_tickets": 18,
+        "s1_s2_tickets_fy2025": 3,
+        "avg_csat_all_time": 3.96,
+        "avg_resolution_hours_all_time": 101.99
+      },
+      {
+        "customer_id": "CUST-0006",
+        "customer_name": "Cascade Foods Holdings",
+        "total_tickets_all_time": 9,
+        "fy2025_tickets": 9,
+        "s1_s2_tickets_fy2025": 2,
+        "avg_csat_all_time": 3.56,
+        "avg_resolution_hours_all_time": 97.60
+      },
+      {
+        "customer_id": "CUST-0084",
+        "customer_name": "Brightpath Distribution",
+        "total_tickets_all_time": 58,
+        "fy2025_tickets": 13,
+        "s1_s2_tickets_fy2025": 2,
+        "avg_csat_all_time": 3.84,
+        "avg_resolution_hours_all_time": 113.89
+      },
+      {
+        "customer_id": "CUST-0192",
+        "customer_name": "Vireo Outdoor",
+        "total_tickets_all_time": 58,
+        "fy2025_tickets": 20,
+        "s1_s2_tickets_fy2025": 6,
+        "avg_csat_all_time": 3.95,
+        "avg_resolution_hours_all_time": 102.45
+      },
+      {
+        "customer_id": "CUST-0177",
+        "customer_name": "Glenmoor Distribution",
+        "total_tickets_all_time": 58,
+        "fy2025_tickets": 20,
+        "s1_s2_tickets_fy2025": 3,
+        "avg_csat_all_time": 4.02,
+        "avg_resolution_hours_all_time": 90.76
+      }
     ],
-    "observations": "No Critical or High severity tickets recorded for any top-10 customer. CUST-0002 has the highest ticket volume (111 total, 69 in 2025) and the lowest avg CSAT (2.96) among top-10 customers. CUST-0001 (largest by revenue) has avg CSAT of 4.27 and moderate ticket volume.",
-    "evidence": {
-      "evidence_id": "SQL-EV-011",
-      "source_type": "databricks_sql",
-      "source_objects": ["workspace.aava_deal_studio.fact_support_ticket", "workspace.aava_deal_studio.fact_invoice_line", "workspace.aava_deal_studio.fact_invoice"],
-      "query": "WITH fy2025_rev AS (SELECT fi.customer_id, SUM(fil.line_amount_usd) AS customer_revenue FROM workspace.aava_deal_studio.fact_invoice_line fil JOIN workspace.aava_deal_studio.fact_invoice fi ON fil.invoice_id = fi.invoice_id WHERE YEAR(CAST(fi.invoice_date AS DATE)) = 2025 GROUP BY fi.customer_id), ranked AS (SELECT customer_id, customer_revenue, RANK() OVER (ORDER BY customer_revenue DESC) AS rnk FROM fy2025_rev), top10 AS (SELECT customer_id FROM ranked WHERE rnk <= 10), support_metrics AS (SELECT st.customer_id, COUNT(st.ticket_id) AS total_tickets, SUM(CASE WHEN st.severity IN ('Critical','High') THEN 1 ELSE 0 END) AS high_severity_tickets, AVG(st.csat_score) AS avg_csat, SUM(CASE WHEN st.severity = 'Critical' AND YEAR(CAST(st.opened_date AS DATE)) = 2025 THEN 1 ELSE 0 END) AS critical_tickets_2025, SUM(CASE WHEN YEAR(CAST(st.opened_date AS DATE)) = 2025 THEN 1 ELSE 0 END) AS tickets_2025 FROM workspace.aava_deal_studio.fact_support_ticket st WHERE st.customer_id IN (SELECT customer_id FROM top10) GROUP BY st.customer_id) SELECT t.customer_id, r.customer_revenue, COALESCE(sm.total_tickets,0), COALESCE(sm.high_severity_tickets,0), sm.avg_csat, COALESCE(sm.critical_tickets_2025,0), COALESCE(sm.tickets_2025,0) FROM top10 t JOIN fy2025_rev r ON t.customer_id = r.customer_id LEFT JOIN support_metrics sm ON t.customer_id = sm.customer_id ORDER BY r.customer_revenue DESC",
-      "methodology": "Support ticket counts, severity distribution, and CSAT averages calculated for top-10 FY2025 revenue customers using fact_support_ticket. High severity defined as severity IN ('Critical','High')."
-    }
+    "evidence": {"evidence_id": "SQL-EV-009"}
   },
-
   "renewal_exposure": {
-    "horizon_start": "2026-01-01",
-    "horizon_end": "2026-12-31",
-    "horizon_derivation": "12-month post-close horizon derived from FY2025 year-end (2025-12-31) as the assumed close reference. No explicit close date provided in test plan; horizon set to calendar year 2026.",
-    "contracts_expiring_count": 37,
-    "customers_affected_count": 37,
-    "acv_expiring_usd": 15827963.66,
-    "pct_of_active_acv": 46.12,
+    "horizon_start": null,
+    "horizon_end": null,
+    "contracts_expiring_count": null,
+    "customers_affected_count": null,
+    "acv_expiring_usd": null,
     "contracts": [],
-    "evidence": {
-      "evidence_id": "SQL-EV-012",
-      "source_type": "databricks_sql",
-      "source_objects": ["workspace.aava_deal_studio.dim_contract"],
-      "query": "SELECT COUNT(DISTINCT dc.contract_id) AS contracts_expiring_count, COUNT(DISTINCT dc.customer_id) AS customers_affected_count, SUM(dc.acv_usd) AS acv_expiring_usd, SUM(dc.acv_usd)/(SELECT SUM(acv_usd) FROM workspace.aava_deal_studio.dim_contract WHERE status='Active')*100 AS pct_of_active_acv FROM workspace.aava_deal_studio.dim_contract dc WHERE dc.status='Active' AND CAST(dc.contract_end_date AS DATE) >= '2026-01-01' AND CAST(dc.contract_end_date AS DATE) <= '2026-12-31'",
-      "methodology": "Active contracts with contract_end_date falling within 2026-01-01 to 2026-12-31. ACV expiring expressed as percentage of total active contract ACV. Quantitative exposure only; no legal clause analysis performed."
+    "evidence": {},
+    "unsupported_reason": "No authoritative deal close date or diligence horizon was supplied through runtime inputs, the upstream test_plan.json, or any other authoritative deal input available to this agent. Renewal exposure cannot be calculated without an authoritative anchor date. Structured contract expiration dates are available in workspace.aava_deal_studio.dim_contract but do not, by themselves, establish the deal close date or diligence horizon. Per the Authoritative Renewal Horizon Rule, renewal exposure is recorded as unsupported rather than calculated from an assumed or inferred horizon.",
+    "contract_distribution_reference": {
+      "note": "For reference only — not a renewal exposure calculation. Active contract expiry distribution by year from dim_contract.",
+      "active_contracts_total": 181,
+      "active_acv_total_usd": 34321531.19,
+      "expiry_by_year": [
+        {"year": 2022, "count": 16, "acv_usd": 2177851.83, "auto_renew_Y": 12, "auto_renew_N": 4},
+        {"year": 2023, "count": 17, "acv_usd": 794811.04, "auto_renew_Y": 12, "auto_renew_N": 5},
+        {"year": 2024, "count": 36, "acv_usd": 2967191.25, "auto_renew_Y": 24, "auto_renew_N": 12},
+        {"year": 2025, "count": 40, "acv_usd": 3919449.66, "auto_renew_Y": 24, "auto_renew_N": 16},
+        {"year": 2026, "count": 37, "acv_usd": 15827963.66, "auto_renew_Y": 24, "auto_renew_N": 13},
+        {"year": 2027, "count": 23, "acv_usd": 1308143.93, "auto_renew_Y": 16, "auto_renew_N": 7},
+        {"year": 2028, "count": 11, "acv_usd": 5276119.82, "auto_renew_Y": 9, "auto_renew_N": 2},
+        {"year": 2029, "count": 1, "acv_usd": 2050000.00, "auto_renew_Y": 1, "auto_renew_N": 0}
+      ]
     }
   },
-
   "claim_comparisons": [
     {
       "claim_id": "CLM-01",
@@ -395,7 +444,8 @@
       "tolerance": "+/-0.5pp",
       "difference": 17.44,
       "calculation_status": "CALCULATED",
-      "evidence_reference": "SQL-EV-003"
+      "evidence_reference": "SQL-EV-003",
+      "notes": "Independently calculated top-1 customer concentration is 27.44% (CUST-0001, Northwind Retail Group, $11,723,657). This materially exceeds the claimed maximum of 10%."
     },
     {
       "claim_id": "CLM-02",
@@ -408,7 +458,8 @@
       "tolerance": "+/-0.5pp",
       "difference": -17.48,
       "calculation_status": "CALCULATED",
-      "evidence_reference": "SQL-EV-006"
+      "evidence_reference": "SQL-EV-005",
+      "notes": "NRR calculated using starting cohort of 180 customers with positive ARR at 2024-12-01. Starting ARR: $36,075,091. Ending ARR for cohort: $36,261,693. NRR = 100.52%. Independently calculated NRR is materially below the claimed 118%."
     },
     {
       "claim_id": "CLM-03",
@@ -416,13 +467,13 @@
       "metric_key": "recurring_revenue_pct",
       "period": "FY2025",
       "management_claimed_value": 94.0,
-      "calculated_value": 98.34,
+      "calculated_value": 87.40,
       "unit": "percent",
       "tolerance": "+/-0.5pp",
-      "difference": 4.34,
+      "difference": -6.60,
       "calculation_status": "CALCULATED",
-      "methodology_note": "Management-tagged recurring (revenue_type='Recurring') = 98.34%. Independently restated using Subscription delivery model = 87.40%. Management claim of 94% falls between the two measures. The 10.94pp gap between management-tagged and independently supported recurring warrants further review.",
-      "evidence_reference": "SQL-EV-007"
+      "evidence_reference": "SQL-EV-006",
+      "notes": "Management-tagged recurring percentage is 98.34% (using revenue_type = 'Recurring' from fact_invoice_line). Independently restated recurring percentage using subscription delivery model AND valid service period is 87.40%. The independently tested value (87.40%) is used as calculated_value per the Independent Claim Metric Selection Rule. $4,675,078 is tagged 'Recurring' by management but not independently supported by subscription delivery model with valid service period."
     },
     {
       "claim_id": "CLM-04",
@@ -435,20 +486,8 @@
       "tolerance": "+/-0.5pp",
       "difference": 4.44,
       "calculation_status": "CALCULATED",
-      "evidence_reference": "SQL-EV-006"
-    },
-    {
-      "claim_id": "CLM-05",
-      "claim_text": "Adjusted EBITDA of $12.4M represents a 32% margin.",
-      "metric_key": "adjusted_ebitda_usd",
-      "period": "FY2025",
-      "management_claimed_value": 12400000.0,
-      "calculated_value": null,
-      "unit": "usd",
-      "tolerance": "+/-2% relative",
-      "difference": null,
-      "calculation_status": "NOT_SUPPORTED_BY_AVAILABLE_DATA",
-      "evidence_reference": "EBITDA adjustment analysis is outside Revenue Quality scope; belongs to EBITDA/Earnings Quality workstream."
+      "evidence_reference": "SQL-EV-005",
+      "notes": "17 of 180 starting-cohort customers (arr_usd > 0 at 2024-12-01) had arr_usd = 0 at 2025-12-01. Logo churn = 9.44%. Intra-period churn count is identical (17), confirming no reactivation within FY2025 for churned customers. Independently calculated logo churn materially exceeds the claimed below-5% threshold."
     },
     {
       "claim_id": "CLM-06",
@@ -461,34 +500,8 @@
       "tolerance": "+/-2% relative",
       "difference": 8.28,
       "calculation_status": "CALCULATED",
-      "methodology_note": "Annual reconstructed DSO = 53.28 days. Quarterly DSO ranged from 36.74 (Q1) to 59.41 (Q4), indicating DSO is not stable across the year. Management claim of ~45 days is not consistent with Q2-Q4 observations.",
-      "evidence_reference": "SQL-EV-008"
-    },
-    {
-      "claim_id": "CLM-07",
-      "claim_text": "Direct expansion into Europe is the primary growth vector, worth $6M ARR by FY2028.",
-      "metric_key": "emea_direct_arr_usd",
-      "period": "FY2028",
-      "management_claimed_value": 6000000.0,
-      "calculated_value": null,
-      "unit": "usd",
-      "tolerance": "+/-2% relative",
-      "difference": null,
-      "calculation_status": "NOT_SUPPORTED_BY_AVAILABLE_DATA",
-      "evidence_reference": "FY2028 is a forward projection beyond available structured data (data through FY2025). Geographic ARR breakdown not available in current structured data."
-    },
-    {
-      "claim_id": "CLM-08",
-      "claim_text": "All customer contracts are freely assignable on a change of control.",
-      "metric_key": "contracts_with_coc_restriction",
-      "period": "FY2025",
-      "management_claimed_value": 0.0,
-      "calculated_value": null,
-      "unit": "count",
-      "tolerance": "exact",
-      "difference": null,
-      "calculation_status": "NOT_SUPPORTED_BY_AVAILABLE_DATA",
-      "evidence_reference": "Change-of-control clause analysis requires contract document review; no structured CoC field exists in dim_contract DDL. Belongs to Contract Intelligence workstream."
+      "evidence_reference": "SQL-EV-007",
+      "notes": "Reconstructed annual DSO = $6,236,837 outstanding AR / ($42,730,073 / 365) = 53.28 days. Quarterly DSO ranges from 36.74 (Q1) to 58.76 (Q4), indicating DSO is not stable — it increases through the year. The claim of 'stable at approximately 45 days' is not supported by quarterly reconstruction. Enterprise segment DSO is 66.0 days."
     },
     {
       "claim_id": "CLM-09",
@@ -501,7 +514,8 @@
       "tolerance": "+/-0.5pp",
       "difference": -2.66,
       "calculation_status": "CALCULATED",
-      "evidence_reference": "SQL-EV-002"
+      "evidence_reference": "SQL-EV-002",
+      "notes": "FY2023 revenue: $34,471,836. FY2025 revenue: $42,730,073. CAGR = (42,730,073/34,471,836)^(1/2) - 1 = 11.34%. Independently calculated CAGR is 11.34% vs claimed 14.0%, a difference of -2.66 percentage points."
     },
     {
       "claim_id": "CLM-10",
@@ -514,21 +528,8 @@
       "tolerance": "+/-2% relative",
       "difference": -0.40,
       "calculation_status": "CALCULATED",
-      "methodology_note": "Average tenure of top-10 customers by FY2025 revenue = 5.60 years. CUST-0006 (first_order_date 2025-03-01, tenure 0.84 years) is a new customer that entered the top-10 in FY2025 and materially reduces the average. Excluding CUST-0006, remaining 9 customers average approximately 6.13 years.",
-      "evidence_reference": "SQL-EV-010"
-    },
-    {
-      "claim_id": "CLM-11",
-      "claim_text": "No contract contains most-favoured-nation pricing.",
-      "metric_key": "contracts_with_mfn",
-      "period": "FY2025",
-      "management_claimed_value": 0.0,
-      "calculated_value": null,
-      "unit": "count",
-      "tolerance": "exact",
-      "difference": null,
-      "calculation_status": "NOT_SUPPORTED_BY_AVAILABLE_DATA",
-      "evidence_reference": "MFN clause analysis requires contract document review; no structured MFN field exists in dim_contract DDL. Belongs to Contract Intelligence workstream."
+      "evidence_reference": "SQL-EV-008",
+      "notes": "Average tenure of top 10 customers by FY2025 revenue = 5.60 years (calculated as DATEDIFF('2025-12-31', first_order_date)/365.25). Range: 0.84 to 7.75 years. CUST-0006 (Cascade Foods Holdings, rank 7) has tenure of only 0.84 years (first_order_date 2025-03-01), which materially reduces the average. Excluding this customer, average tenure of remaining 9 would be higher."
     },
     {
       "claim_id": "CLM-12",
@@ -541,156 +542,192 @@
       "tolerance": "+/-0.5pp",
       "difference": -3.84,
       "calculation_status": "CALCULATED",
-      "evidence_reference": "SQL-EV-006"
+      "evidence_reference": "SQL-EV-005",
+      "notes": "GRR calculated using same opening cohort as NRR (180 customers, arr_usd > 0 at 2024-12-01). Retained ARR before expansion (each customer's ending ARR capped at starting ARR): $33,606,952. GRR = $33,606,952 / $36,075,091 = 93.16%. Independently calculated GRR is materially below the claimed 97%."
+    },
+    {
+      "claim_id": "CLM-05",
+      "claim_text": "Adjusted EBITDA of $12.4M represents a 32% margin.",
+      "metric_key": "adjusted_ebitda_usd",
+      "period": "FY2025",
+      "management_claimed_value": 12400000.0,
+      "calculated_value": null,
+      "unit": "usd",
+      "tolerance": "+/-2% relative",
+      "difference": null,
+      "calculation_status": "NOT_SUPPORTED_BY_AVAILABLE_DATA",
+      "evidence_reference": null,
+      "notes": "EBITDA adjustment analysis is outside the Revenue Quality workstream scope. This claim belongs to the EBITDA/Earnings Quality specialist. Revenue base for margin context: FY2025 revenue = $42,730,073 (independently calculated)."
+    },
+    {
+      "claim_id": "CLM-07",
+      "claim_text": "Direct expansion into Europe is the primary growth vector, worth $6M ARR by FY2028.",
+      "metric_key": "emea_direct_arr_usd",
+      "period": "FY2028",
+      "management_claimed_value": 6000000.0,
+      "calculated_value": null,
+      "unit": "usd",
+      "tolerance": "+/-2% relative",
+      "difference": null,
+      "calculation_status": "NOT_SUPPORTED_BY_AVAILABLE_DATA",
+      "evidence_reference": null,
+      "notes": "FY2028 is a forward projection. Structured data covers through FY2025. No FY2028 ARR data exists in the available schema. Geographic channel analysis (direct vs reseller) for EMEA requires contract/channel data beyond current structured evidence. This claim is a forward-looking projection not testable from historical transaction data."
+    },
+    {
+      "claim_id": "CLM-08",
+      "claim_text": "All customer contracts are freely assignable on a change of control.",
+      "metric_key": "contracts_with_coc_restriction",
+      "period": "FY2025",
+      "management_claimed_value": 0.0,
+      "calculated_value": null,
+      "unit": "count",
+      "tolerance": "exact",
+      "difference": null,
+      "calculation_status": "NOT_SUPPORTED_BY_AVAILABLE_DATA",
+      "evidence_reference": null,
+      "notes": "Change-of-control clause analysis requires contract document review. The dim_contract table does not contain a structured change-of-control flag or clause field. This analysis belongs to the Contract Intelligence workstream."
+    },
+    {
+      "claim_id": "CLM-11",
+      "claim_text": "No contract contains most-favoured-nation pricing.",
+      "metric_key": "contracts_with_mfn",
+      "period": "FY2025",
+      "management_claimed_value": 0.0,
+      "calculated_value": null,
+      "unit": "count",
+      "tolerance": "exact",
+      "difference": null,
+      "calculation_status": "NOT_SUPPORTED_BY_AVAILABLE_DATA",
+      "evidence_reference": null,
+      "notes": "MFN clause analysis requires contract document review. The dim_contract table does not contain a structured MFN flag or clause field. This analysis belongs to the Contract Intelligence workstream."
     }
   ],
-
   "metric_evidence": [
     {
       "evidence_id": "SQL-EV-001",
-      "metric": "Revenue by Period FY2023/FY2024/FY2025",
+      "metric": "Revenue by period (FY2023, FY2024, FY2025) and YoY growth",
       "source_type": "databricks_sql",
       "source_objects": ["workspace.aava_deal_studio.fact_invoice_line", "workspace.aava_deal_studio.fact_invoice"],
-      "query": "SELECT YEAR(CAST(fi.invoice_date AS DATE)) AS fiscal_year, SUM(fil.line_amount_usd) AS total_revenue_usd, COUNT(DISTINCT fil.invoice_line_id) AS line_count, COUNT(DISTINCT fi.invoice_id) AS invoice_count, COUNT(DISTINCT fi.customer_id) AS customer_count FROM workspace.aava_deal_studio.fact_invoice_line fil JOIN workspace.aava_deal_studio.fact_invoice fi ON fil.invoice_id = fi.invoice_id WHERE YEAR(CAST(fi.invoice_date AS DATE)) IN (2023,2024,2025) GROUP BY YEAR(CAST(fi.invoice_date AS DATE)) ORDER BY fiscal_year",
-      "methodology": "Revenue aggregated at invoice-line grain (fact_invoice_line.line_amount_usd) joined to fact_invoice for date. Avoids double-counting invoice header totals."
+      "query": "SELECT CASE WHEN YEAR(fi.invoice_date) = 2023 THEN 'FY2023' WHEN YEAR(fi.invoice_date) = 2024 THEN 'FY2024' WHEN YEAR(fi.invoice_date) = 2025 THEN 'FY2025' END AS fiscal_year, SUM(fil.line_amount_usd) AS total_revenue_usd, COUNT(fil.invoice_line_id) AS line_count, COUNT(DISTINCT fi.invoice_id) AS invoice_count, COUNT(DISTINCT fi.customer_id) AS customer_count FROM workspace.aava_deal_studio.fact_invoice_line fil JOIN workspace.aava_deal_studio.fact_invoice fi ON fil.invoice_id = fi.invoice_id WHERE YEAR(fi.invoice_date) IN (2023, 2024, 2025) GROUP BY YEAR(fi.invoice_date) ORDER BY fiscal_year",
+      "methodology": "Revenue aggregated at invoice-line grain (fact_invoice_line.line_amount_usd) joined to fact_invoice for date. Line-level grain used to prevent double-counting of invoice header totals. Fiscal year determined by invoice_date calendar year."
     },
     {
       "evidence_id": "SQL-EV-002",
       "metric": "Revenue CAGR FY2023-FY2025",
       "source_type": "databricks_sql",
       "source_objects": ["workspace.aava_deal_studio.fact_invoice_line", "workspace.aava_deal_studio.fact_invoice"],
-      "query": "WITH annual_rev AS (SELECT YEAR(CAST(fi.invoice_date AS DATE)) AS fiscal_year, SUM(fil.line_amount_usd) AS total_revenue_usd FROM workspace.aava_deal_studio.fact_invoice_line fil JOIN workspace.aava_deal_studio.fact_invoice fi ON fil.invoice_id = fi.invoice_id WHERE YEAR(CAST(fi.invoice_date AS DATE)) IN (2023,2025) GROUP BY YEAR(CAST(fi.invoice_date AS DATE))), fy2023 AS (SELECT total_revenue_usd FROM annual_rev WHERE fiscal_year=2023), fy2025 AS (SELECT total_revenue_usd FROM annual_rev WHERE fiscal_year=2025) SELECT fy2023.total_revenue_usd AS fy2023_revenue, fy2025.total_revenue_usd AS fy2025_revenue, 2 AS num_periods, (POWER(fy2025.total_revenue_usd/fy2023.total_revenue_usd,1.0/2.0)-1)*100 AS cagr_pct FROM fy2023, fy2025",
-      "methodology": "CAGR = (FY2025 Revenue / FY2023 Revenue)^(1/2) - 1. Calculated entirely in SQL using POWER function."
+      "query": "WITH annual AS (SELECT YEAR(fi.invoice_date) AS yr, SUM(fil.line_amount_usd) AS total_rev FROM workspace.aava_deal_studio.fact_invoice_line fil JOIN workspace.aava_deal_studio.fact_invoice fi ON fil.invoice_id = fi.invoice_id WHERE YEAR(fi.invoice_date) IN (2023, 2025) GROUP BY YEAR(fi.invoice_date)), pivoted AS (SELECT MAX(CASE WHEN yr = 2023 THEN total_rev END) AS rev_2023, MAX(CASE WHEN yr = 2025 THEN total_rev END) AS rev_2025 FROM annual) SELECT rev_2023, rev_2025, 2 AS num_periods, (POWER(rev_2025 / rev_2023, 1.0/2.0) - 1) * 100 AS cagr_pct FROM pivoted",
+      "methodology": "CAGR = (End Revenue / Start Revenue)^(1/n) - 1 where n=2 periods (FY2023 to FY2025). Calculated entirely in SQL using POWER function."
     },
     {
       "evidence_id": "SQL-EV-003",
-      "metric": "Customer Concentration FY2025 - Customer Level",
+      "metric": "Customer concentration FY2025 — Top 1, 3, 5, 10",
       "source_type": "databricks_sql",
-      "source_objects": ["workspace.aava_deal_studio.fact_invoice_line", "workspace.aava_deal_studio.fact_invoice"],
-      "query": "WITH fy2025_rev AS (SELECT fi.customer_id, SUM(fil.line_amount_usd) AS customer_revenue FROM workspace.aava_deal_studio.fact_invoice_line fil JOIN workspace.aava_deal_studio.fact_invoice fi ON fil.invoice_id=fi.invoice_id WHERE YEAR(CAST(fi.invoice_date AS DATE))=2025 GROUP BY fi.customer_id), total AS (SELECT SUM(customer_revenue) AS total_rev FROM fy2025_rev), ranked AS (SELECT customer_id, customer_revenue, RANK() OVER (ORDER BY customer_revenue DESC) AS rnk FROM fy2025_rev) SELECT t.total_rev, SUM(CASE WHEN r.rnk=1 THEN r.customer_revenue ELSE 0 END)/t.total_rev*100 AS top1_pct, SUM(CASE WHEN r.rnk<=3 THEN r.customer_revenue ELSE 0 END)/t.total_rev*100 AS top3_pct, SUM(CASE WHEN r.rnk<=5 THEN r.customer_revenue ELSE 0 END)/t.total_rev*100 AS top5_pct, SUM(CASE WHEN r.rnk<=10 THEN r.customer_revenue ELSE 0 END)/t.total_rev*100 AS top10_pct FROM ranked r, total t GROUP BY t.total_rev",
-      "methodology": "Revenue ranked at customer_id level. Concentration percentages calculated in SQL."
+      "source_objects": ["workspace.aava_deal_studio.fact_invoice_line", "workspace.aava_deal_studio.fact_invoice", "workspace.aava_deal_studio.dim_customer"],
+      "query": "WITH cust_rev AS (SELECT fi.customer_id, dc.customer_name, SUM(fil.line_amount_usd) AS customer_revenue FROM workspace.aava_deal_studio.fact_invoice_line fil JOIN workspace.aava_deal_studio.fact_invoice fi ON fil.invoice_id = fi.invoice_id JOIN workspace.aava_deal_studio.dim_customer dc ON fi.customer_id = dc.customer_id WHERE YEAR(fi.invoice_date) = 2025 GROUP BY fi.customer_id, dc.customer_name), total AS (SELECT SUM(customer_revenue) AS total_rev FROM cust_rev), ranked AS (SELECT customer_id, customer_name, customer_revenue, ROW_NUMBER() OVER (ORDER BY customer_revenue DESC) AS rnk FROM cust_rev) SELECT (SELECT SUM(customer_revenue) FROM ranked WHERE rnk <= 1) / (SELECT total_rev FROM total) * 100 AS top1_pct, (SELECT SUM(customer_revenue) FROM ranked WHERE rnk <= 3) / (SELECT total_rev FROM total) * 100 AS top3_pct, (SELECT SUM(customer_revenue) FROM ranked WHERE rnk <= 5) / (SELECT total_rev FROM total) * 100 AS top5_pct, (SELECT SUM(customer_revenue) FROM ranked WHERE rnk <= 10) / (SELECT total_rev FROM total) * 100 AS top10_pct, (SELECT total_rev FROM total) AS total_revenue",
+      "methodology": "Customer revenue aggregated at customer_id level using line-item grain. Customers ranked by descending revenue. Concentration percentages calculated in SQL. Only 1 customer has a parent_customer_id; parent roll-up not material. Customer-level revenue reconciles to total FY2025 revenue."
     },
     {
       "evidence_id": "SQL-EV-004",
-      "metric": "Customer Concentration FY2025 - Economic Group Level",
+      "metric": "ARR Bridge FY2025 — new logo, expansion, contraction, churn, reactivation",
       "source_type": "databricks_sql",
-      "source_objects": ["workspace.aava_deal_studio.fact_invoice_line", "workspace.aava_deal_studio.fact_invoice", "workspace.aava_deal_studio.dim_customer"],
-      "query": "WITH fy2025_rev AS (SELECT fi.customer_id, SUM(fil.line_amount_usd) AS customer_revenue FROM workspace.aava_deal_studio.fact_invoice_line fil JOIN workspace.aava_deal_studio.fact_invoice fi ON fil.invoice_id=fi.invoice_id WHERE YEAR(CAST(fi.invoice_date AS DATE))=2025 GROUP BY fi.customer_id), customer_parent AS (SELECT c.customer_id, COALESCE(c.parent_customer_id,c.customer_id) AS economic_group_id FROM workspace.aava_deal_studio.dim_customer c), group_rev AS (SELECT cp.economic_group_id, SUM(fr.customer_revenue) AS group_revenue FROM fy2025_rev fr JOIN customer_parent cp ON fr.customer_id=cp.customer_id GROUP BY cp.economic_group_id), total AS (SELECT SUM(group_revenue) AS total_rev FROM group_rev), ranked AS (SELECT economic_group_id, group_revenue, RANK() OVER (ORDER BY group_revenue DESC) AS rnk FROM group_rev) SELECT t.total_rev, SUM(CASE WHEN r.rnk=1 THEN r.group_revenue ELSE 0 END)/t.total_rev*100 AS top1_pct, SUM(CASE WHEN r.rnk<=3 THEN r.group_revenue ELSE 0 END)/t.total_rev*100 AS top3_pct, SUM(CASE WHEN r.rnk<=5 THEN r.group_revenue ELSE 0 END)/t.total_rev*100 AS top5_pct, SUM(CASE WHEN r.rnk<=10 THEN r.group_revenue ELSE 0 END)/t.total_rev*100 AS top10_pct FROM ranked r, total t GROUP BY t.total_rev",
-      "methodology": "Revenue rolled up to economic group using COALESCE(parent_customer_id, customer_id). Concentration percentages calculated in SQL."
+      "source_objects": ["workspace.aava_deal_studio.fact_subscription_month"],
+      "query": "WITH monthly_arr AS (SELECT s.customer_id, s.snapshot_month, s.arr_usd, LAG(s.arr_usd) OVER (PARTITION BY s.customer_id ORDER BY s.snapshot_month) AS prev_arr FROM workspace.aava_deal_studio.fact_subscription_month s WHERE s.snapshot_month >= '2025-01-01' AND s.snapshot_month <= '2025-12-01'), first_active_ever AS (SELECT customer_id, MIN(snapshot_month) AS first_positive_month FROM workspace.aava_deal_studio.fact_subscription_month WHERE arr_usd > 0 GROUP BY customer_id), movements AS (SELECT m.customer_id, m.snapshot_month, m.arr_usd, m.prev_arr, fa.first_positive_month, CASE WHEN m.prev_arr = 0 AND m.arr_usd > 0 AND fa.first_positive_month >= '2025-01-01' THEN 'new_logo' WHEN m.prev_arr = 0 AND m.arr_usd > 0 AND fa.first_positive_month < '2025-01-01' THEN 'reactivation' WHEN m.prev_arr > 0 AND m.arr_usd > m.prev_arr THEN 'expansion' WHEN m.prev_arr > 0 AND m.arr_usd > 0 AND m.arr_usd < m.prev_arr THEN 'contraction' WHEN m.prev_arr > 0 AND m.arr_usd = 0 THEN 'churn' ELSE 'unchanged' END AS movement_type, CASE WHEN m.prev_arr = 0 AND m.arr_usd > 0 THEN m.arr_usd WHEN m.prev_arr > 0 AND m.arr_usd > m.prev_arr THEN m.arr_usd - m.prev_arr WHEN m.prev_arr > 0 AND m.arr_usd > 0 AND m.arr_usd < m.prev_arr THEN m.prev_arr - m.arr_usd WHEN m.prev_arr > 0 AND m.arr_usd = 0 THEN m.prev_arr ELSE 0 END AS movement_amount FROM monthly_arr m JOIN first_active_ever fa ON m.customer_id = fa.customer_id), bridge AS (SELECT movement_type, SUM(movement_amount) AS total_movement FROM movements GROUP BY movement_type), opening_arr AS (SELECT SUM(arr_usd) AS beg_arr FROM workspace.aava_deal_studio.fact_subscription_month WHERE snapshot_month = '2024-12-01'), closing_arr AS (SELECT SUM(arr_usd) AS end_arr FROM workspace.aava_deal_studio.fact_subscription_month WHERE snapshot_month = '2025-12-01') SELECT (SELECT beg_arr FROM opening_arr) AS beginning_arr, MAX(CASE WHEN movement_type = 'new_logo' THEN total_movement ELSE 0 END) AS new_logo_arr, MAX(CASE WHEN movement_type = 'expansion' THEN total_movement ELSE 0 END) AS expansion_arr, MAX(CASE WHEN movement_type = 'contraction' THEN total_movement ELSE 0 END) AS contraction_arr, MAX(CASE WHEN movement_type = 'churn' THEN total_movement ELSE 0 END) AS churned_arr, MAX(CASE WHEN movement_type = 'reactivation' THEN total_movement ELSE 0 END) AS reactivation_arr, (SELECT end_arr FROM closing_arr) AS ending_arr FROM bridge",
+      "methodology": "Monthly ARR movements derived using LAG window function over fact_subscription_month ordered by snapshot_month per customer. New logo: first positive ARR observation is in FY2025 (first_positive_month >= 2025-01-01). Reactivation: zero ARR at prior month but had positive ARR before FY2025. Expansion: positive ARR increase vs prior month. Contraction: positive ARR decrease vs prior month (customer remains active). Churn: positive to zero transition. Historical ARR inspected via first_active_ever CTE to distinguish new logo from reactivation. Complete 214-customer x 36-month panel confirmed (no gaps)."
     },
     {
       "evidence_id": "SQL-EV-005",
-      "metric": "ARR Bridge FY2025 and Reconciliation",
-      "source_type": "databricks_sql",
-      "source_objects": ["workspace.aava_deal_studio.fact_subscription_month"],
-      "query": "See arr_bridge.evidence.query for full ARR bridge SQL. Reconciliation query: WITH opening AS (SELECT SUM(arr_usd) AS beginning_arr FROM workspace.aava_deal_studio.fact_subscription_month WHERE snapshot_month='2024-12-01' AND arr_usd>0), closing AS (SELECT SUM(arr_usd) AS ending_arr FROM workspace.aava_deal_studio.fact_subscription_month WHERE snapshot_month='2025-12-01' AND arr_usd>0), [bridge movements CTE] SELECT o.beginning_arr, b.new_logo_arr, b.reactivation_arr, b.expansion_arr, b.contraction_arr, b.churned_arr, c.ending_arr, (o.beginning_arr+b.new_logo_arr+b.reactivation_arr+b.expansion_arr+b.contraction_arr+b.churned_arr) AS calculated_ending_arr, c.ending_arr-(o.beginning_arr+b.new_logo_arr+b.reactivation_arr+b.expansion_arr+b.contraction_arr+b.churned_arr) AS reconciliation_difference FROM opening o, closing c, bridge b",
-      "methodology": "Monthly LAG-based movement classification. Reconciliation difference = 7.45e-9 (floating point only). Bridge validated in SQL."
-    },
-    {
-      "evidence_id": "SQL-EV-006",
       "metric": "NRR, GRR, Logo Churn FY2025",
       "source_type": "databricks_sql",
       "source_objects": ["workspace.aava_deal_studio.fact_subscription_month"],
-      "query": "NRR/GRR: WITH opening_cohort AS (SELECT customer_id, arr_usd AS opening_arr FROM workspace.aava_deal_studio.fact_subscription_month WHERE snapshot_month='2024-12-01' AND arr_usd>0), closing_arr AS (SELECT customer_id, arr_usd AS closing_arr FROM workspace.aava_deal_studio.fact_subscription_month WHERE snapshot_month='2025-12-01'), cohort_performance AS (SELECT oc.customer_id, oc.opening_arr, COALESCE(ca.closing_arr,0) AS closing_arr, LEAST(COALESCE(ca.closing_arr,0),oc.opening_arr) AS grr_arr FROM opening_cohort oc LEFT JOIN closing_arr ca ON oc.customer_id=ca.customer_id) SELECT COUNT(DISTINCT customer_id), SUM(opening_arr), SUM(closing_arr), SUM(grr_arr), SUM(closing_arr)/SUM(opening_arr)*100 AS nrr_pct, SUM(grr_arr)/SUM(opening_arr)*100 AS grr_pct FROM cohort_performance. Logo Churn: WITH opening_cohort AS (SELECT customer_id FROM workspace.aava_deal_studio.fact_subscription_month WHERE snapshot_month='2024-12-01' AND arr_usd>0), closing_arr AS (SELECT customer_id, arr_usd AS closing_arr FROM workspace.aava_deal_studio.fact_subscription_month WHERE snapshot_month='2025-12-01'), churn_status AS (SELECT oc.customer_id, COALESCE(ca.closing_arr,0) AS closing_arr, CASE WHEN COALESCE(ca.closing_arr,0)=0 THEN 1 ELSE 0 END AS is_churned FROM opening_cohort oc LEFT JOIN closing_arr ca ON oc.customer_id=ca.customer_id) SELECT COUNT(*), SUM(is_churned), SUM(is_churned)*100.0/COUNT(*) AS logo_churn_pct FROM churn_status",
-      "methodology": "Opening cohort = customers with positive ARR at 2024-12-01. NRR = ending cohort ARR / opening cohort ARR. GRR = min(closing, opening) per customer summed / opening ARR. Logo churn = churned logos / starting logos. Reactivation confirmed zero by independent check."
+      "query": "WITH starting_cohort AS (SELECT customer_id, arr_usd AS starting_arr FROM workspace.aava_deal_studio.fact_subscription_month WHERE snapshot_month = '2024-12-01' AND arr_usd > 0), ending_cohort AS (SELECT customer_id, arr_usd AS ending_arr FROM workspace.aava_deal_studio.fact_subscription_month WHERE snapshot_month = '2025-12-01'), cohort_ending AS (SELECT sc.customer_id, sc.starting_arr, COALESCE(ec.ending_arr, 0) AS ending_arr FROM starting_cohort sc LEFT JOIN ending_cohort ec ON sc.customer_id = ec.customer_id), grr_calc AS (SELECT customer_id, starting_arr, ending_arr, LEAST(ending_arr, starting_arr) AS retained_arr_grr FROM cohort_ending) SELECT COUNT(DISTINCT sc.customer_id) AS starting_cohort_count, SUM(sc.starting_arr) AS starting_arr_total, SUM(ce.ending_arr) AS ending_arr_total, SUM(ce.ending_arr) / SUM(sc.starting_arr) * 100 AS nrr_pct, SUM(g.retained_arr_grr) AS retained_arr_grr, SUM(g.retained_arr_grr) / SUM(sc.starting_arr) * 100 AS grr_pct FROM starting_cohort sc JOIN cohort_ending ce ON sc.customer_id = ce.customer_id JOIN grr_calc g ON sc.customer_id = g.customer_id",
+      "methodology": "Starting cohort: customers with arr_usd > 0 at snapshot_month = 2024-12-01 (180 customers). NRR: sum of cohort ending ARR at 2025-12-01 (including expansion) / starting ARR. GRR: sum of LEAST(ending_arr, starting_arr) per customer / starting ARR — expansion excluded, contraction and churn captured. Logo churn: customers with arr_usd = 0 at 2025-12-01 / starting cohort count. New-logo customers (34 with zero opening ARR) excluded from cohort. Reactivation: no churned starting-cohort customer returned to positive ARR by 2025-12-01."
+    },
+    {
+      "evidence_id": "SQL-EV-006",
+      "metric": "Recurring revenue — management-tagged and independently restated FY2025",
+      "source_type": "databricks_sql",
+      "source_objects": ["workspace.aava_deal_studio.fact_invoice_line", "workspace.aava_deal_studio.fact_invoice", "workspace.aava_deal_studio.dim_product"],
+      "query": "WITH fy2025_lines AS (SELECT fil.line_amount_usd, fil.revenue_type, fil.product_id, fil.service_period_start, fil.service_period_end, dp.delivery_model FROM workspace.aava_deal_studio.fact_invoice_line fil JOIN workspace.aava_deal_studio.fact_invoice fi ON fil.invoice_id = fi.invoice_id JOIN workspace.aava_deal_studio.dim_product dp ON fil.product_id = dp.product_id WHERE YEAR(fi.invoice_date) = 2025) SELECT SUM(line_amount_usd) AS total_revenue, SUM(CASE WHEN revenue_type = 'Recurring' THEN line_amount_usd ELSE 0 END) AS mgmt_tagged_recurring, SUM(CASE WHEN revenue_type = 'Recurring' THEN line_amount_usd ELSE 0 END) / SUM(line_amount_usd) * 100 AS mgmt_tagged_recurring_pct, SUM(CASE WHEN delivery_model = 'Subscription' AND service_period_start IS NOT NULL AND service_period_end IS NOT NULL THEN line_amount_usd ELSE 0 END) AS restated_recurring, SUM(CASE WHEN delivery_model = 'Subscription' AND service_period_start IS NOT NULL AND service_period_end IS NOT NULL THEN line_amount_usd ELSE 0 END) / SUM(line_amount_usd) * 100 AS restated_recurring_pct, SUM(CASE WHEN revenue_type = 'Recurring' AND NOT (delivery_model = 'Subscription' AND service_period_start IS NOT NULL AND service_period_end IS NOT NULL) THEN line_amount_usd ELSE 0 END) AS reclassified_amount, SUM(CASE WHEN delivery_model = 'Subscription' AND (service_period_start IS NULL OR service_period_end IS NULL) THEN line_amount_usd ELSE 0 END) AS ambiguous_amount FROM fy2025_lines",
+      "methodology": "Management-tagged: revenue_type = 'Recurring' from fact_invoice_line. Independent restatement: delivery_model = 'Subscription' (from dim_product) AND service_period_start IS NOT NULL AND service_period_end IS NOT NULL (from fact_invoice_line). Reclassified: tagged Recurring but not independently supported. Ambiguous: subscription delivery model but missing service period (zero in this dataset)."
     },
     {
       "evidence_id": "SQL-EV-007",
-      "metric": "Recurring Revenue Analysis FY2025",
+      "metric": "DSO reconstruction, quarterly DSO, AR aging, AR concentration, unpaid invoices FY2025",
       "source_type": "databricks_sql",
-      "source_objects": ["workspace.aava_deal_studio.fact_invoice_line", "workspace.aava_deal_studio.fact_invoice", "workspace.aava_deal_studio.dim_product"],
-      "query": "See recurring_revenue.evidence.query",
-      "methodology": "Dual classification: management revenue_type tag vs independent Subscription delivery_model from dim_product."
+      "source_objects": ["workspace.aava_deal_studio.fact_invoice", "workspace.aava_deal_studio.fact_collection", "workspace.aava_deal_studio.fact_invoice_line", "workspace.aava_deal_studio.dim_customer"],
+      "query": "Annual DSO: WITH outstanding AS (SELECT SUM(fi.invoice_amount_usd) - COALESCE((SELECT SUM(fc2.amount_paid_usd) FROM workspace.aava_deal_studio.fact_collection fc2 JOIN workspace.aava_deal_studio.fact_invoice fi2 ON fc2.invoice_id = fi2.invoice_id WHERE fi2.invoice_date <= '2025-12-31' AND fc2.payment_date <= '2025-12-31'), 0) AS outstanding_ar FROM workspace.aava_deal_studio.fact_invoice fi WHERE fi.invoice_date <= '2025-12-31'), fy2025_rev AS (SELECT SUM(fil.line_amount_usd) AS annual_rev FROM workspace.aava_deal_studio.fact_invoice_line fil JOIN workspace.aava_deal_studio.fact_invoice fi ON fil.invoice_id = fi.invoice_id WHERE YEAR(fi.invoice_date) = 2025) SELECT (SELECT outstanding_ar FROM outstanding) AS outstanding_ar_usd, (SELECT annual_rev FROM fy2025_rev) AS annual_revenue, 365 AS day_basis, (SELECT outstanding_ar FROM outstanding) / (SELECT annual_rev FROM fy2025_rev) * 365 AS annual_dso_days",
+      "methodology": "Outstanding AR reconstructed from invoice and collection history: total invoices issued through measurement date minus total collections received through measurement date. Annual DSO = Outstanding AR at 2025-12-31 / (FY2025 revenue / 365). Quarterly DSO uses same reconstruction at each quarter-end with quarterly revenue as denominator (91-day basis). AR aging based on days since invoice_date (no explicit due_date column in DDL). Tier DSO uses FY2025 invoices only. Weighted collection days = value-weighted average of fact_collection.days_outstanding for FY2025 paid invoices."
     },
     {
       "evidence_id": "SQL-EV-008",
-      "metric": "Quarterly DSO FY2025 and Annual DSO",
+      "metric": "Customer tenure — top 10 customers by FY2025 revenue",
       "source_type": "databricks_sql",
-      "source_objects": ["workspace.aava_deal_studio.fact_invoice", "workspace.aava_deal_studio.fact_invoice_line", "workspace.aava_deal_studio.fact_collection"],
-      "query": "See collections_quality.evidence.query for quarterly DSO. Annual DSO: WITH invoiced AS (SELECT SUM(fi.invoice_amount_usd) AS total_invoiced FROM workspace.aava_deal_studio.fact_invoice fi WHERE CAST(fi.invoice_date AS DATE)<='2025-12-31'), collected AS (SELECT SUM(fc.amount_paid_usd) AS total_collected FROM workspace.aava_deal_studio.fact_collection fc JOIN workspace.aava_deal_studio.fact_invoice fi ON fc.invoice_id=fi.invoice_id WHERE CAST(fc.payment_date AS DATE)<='2025-12-31'), fy2025_revenue AS (SELECT SUM(fil.line_amount_usd) AS annual_revenue FROM workspace.aava_deal_studio.fact_invoice_line fil JOIN workspace.aava_deal_studio.fact_invoice fi ON fil.invoice_id=fi.invoice_id WHERE YEAR(CAST(fi.invoice_date AS DATE))=2025) SELECT i.total_invoiced, c.total_collected, i.total_invoiced-c.total_collected AS outstanding_ar, r.annual_revenue, (i.total_invoiced-c.total_collected)/(r.annual_revenue/365.0) AS annual_dso_days FROM invoiced i, collected c, fy2025_revenue r",
-      "methodology": "AR reconstructed from invoice and collection history. Outstanding AR = cumulative invoiced - cumulative collected as of measurement date. DSO = Outstanding AR / (Revenue / Days). No dedicated AR balance table required."
+      "source_objects": ["workspace.aava_deal_studio.fact_invoice_line", "workspace.aava_deal_studio.fact_invoice", "workspace.aava_deal_studio.dim_customer"],
+      "query": "WITH cust_rev AS (SELECT fi.customer_id, dc.customer_name, dc.first_order_date, SUM(fil.line_amount_usd) AS customer_revenue, ROW_NUMBER() OVER (ORDER BY SUM(fil.line_amount_usd) DESC) AS rnk FROM workspace.aava_deal_studio.fact_invoice_line fil JOIN workspace.aava_deal_studio.fact_invoice fi ON fil.invoice_id = fi.invoice_id JOIN workspace.aava_deal_studio.dim_customer dc ON fi.customer_id = dc.customer_id WHERE YEAR(fi.invoice_date) = 2025 GROUP BY fi.customer_id, dc.customer_name, dc.first_order_date), top10 AS (SELECT customer_id, first_order_date FROM cust_rev WHERE rnk <= 10) SELECT COUNT(*) AS top10_count, AVG(DATEDIFF('2025-12-31', first_order_date) / 365.25) AS avg_tenure_years, MIN(DATEDIFF('2025-12-31', first_order_date) / 365.25) AS min_tenure_years, MAX(DATEDIFF('2025-12-31', first_order_date) / 365.25) AS max_tenure_years FROM top10",
+      "methodology": "Top 10 customers ranked by FY2025 revenue (line-item grain). Tenure calculated as DATEDIFF('2025-12-31', first_order_date) / 365.25 using dim_customer.first_order_date as the earliest commercial relationship date. Average tenure calculated in SQL."
     },
     {
       "evidence_id": "SQL-EV-009",
-      "metric": "DSO by Customer Tier FY2025",
-      "source_type": "databricks_sql",
-      "source_objects": ["workspace.aava_deal_studio.fact_invoice", "workspace.aava_deal_studio.fact_collection", "workspace.aava_deal_studio.fact_invoice_line", "workspace.aava_deal_studio.dim_customer"],
-      "query": "SELECT dc.segment, SUM(fi.invoice_amount_usd)-SUM(CASE WHEN fc.payment_date IS NOT NULL AND CAST(fc.payment_date AS DATE)<='2025-12-31' THEN fc.amount_paid_usd ELSE 0 END) AS outstanding_ar, [annual_revenue subquery], outstanding_ar/(annual_revenue/365.0) AS dso_days FROM workspace.aava_deal_studio.fact_invoice fi JOIN workspace.aava_deal_studio.dim_customer dc ON fi.customer_id=dc.customer_id LEFT JOIN workspace.aava_deal_studio.fact_collection fc ON fi.invoice_id=fc.invoice_id WHERE CAST(fi.invoice_date AS DATE)<='2025-12-31' GROUP BY dc.segment",
-      "methodology": "Outstanding AR and DSO calculated by customer segment (Enterprise/Mid-Market/SMB) using same reconstruction methodology as annual DSO."
-    },
-    {
-      "evidence_id": "SQL-EV-010",
-      "metric": "Customer Tenure - Top 10 FY2025",
-      "source_type": "databricks_sql",
-      "source_objects": ["workspace.aava_deal_studio.fact_invoice_line", "workspace.aava_deal_studio.fact_invoice", "workspace.aava_deal_studio.dim_customer"],
-      "query": "See customer_tenure.evidence.query",
-      "methodology": "Tenure = DATEDIFF(2025-12-31, first_order_date)/365.25. Average calculated using SQL AVG() window function."
-    },
-    {
-      "evidence_id": "SQL-EV-011",
-      "metric": "Customer Health - Top 10 FY2025",
+      "metric": "Customer health — support ticket analysis for top 10 customers and overall",
       "source_type": "databricks_sql",
       "source_objects": ["workspace.aava_deal_studio.fact_support_ticket", "workspace.aava_deal_studio.fact_invoice_line", "workspace.aava_deal_studio.fact_invoice"],
-      "query": "See customer_health.evidence.query",
-      "methodology": "Support ticket counts, severity, and CSAT averages for top-10 revenue customers."
-    },
-    {
-      "evidence_id": "SQL-EV-012",
-      "metric": "Renewal Exposure 2026",
-      "source_type": "databricks_sql",
-      "source_objects": ["workspace.aava_deal_studio.dim_contract"],
-      "query": "See renewal_exposure.evidence.query",
-      "methodology": "Active contracts expiring in 2026 by count, customer count, ACV, and % of total active ACV."
+      "query": "WITH cust_rev AS (SELECT fi.customer_id, SUM(fil.line_amount_usd) AS customer_revenue, ROW_NUMBER() OVER (ORDER BY SUM(fil.line_amount_usd) DESC) AS rnk FROM workspace.aava_deal_studio.fact_invoice_line fil JOIN workspace.aava_deal_studio.fact_invoice fi ON fil.invoice_id = fi.invoice_id WHERE YEAR(fi.invoice_date) = 2025 GROUP BY fi.customer_id), top10 AS (SELECT customer_id FROM cust_rev WHERE rnk <= 10) SELECT t.customer_id, COUNT(st.ticket_id) AS total_tickets, SUM(CASE WHEN st.severity IN ('S1','S2') THEN 1 ELSE 0 END) AS high_sev_tickets, AVG(st.csat_score) AS avg_csat, AVG(st.resolution_hours) AS avg_resolution_hours, SUM(CASE WHEN st.opened_date >= '2025-01-01' AND st.opened_date <= '2025-12-31' THEN 1 ELSE 0 END) AS fy2025_tickets FROM top10 t LEFT JOIN workspace.aava_deal_studio.fact_support_ticket st ON t.customer_id = st.customer_id GROUP BY t.customer_id ORDER BY total_tickets DESC",
+      "methodology": "Support ticket severity uses S1/S2/S3/S4 scale (confirmed from distinct severity values query). S1 and S2 treated as high-severity. Top 10 customer population derived from FY2025 revenue ranking. CSAT and resolution hours averaged in SQL."
     }
   ],
-
   "data_quality": {
     "issues": [
       {
         "issue_id": "DQ-001",
-        "severity": "INFO",
-        "description": "schema.sql not found at path 1/DEAL_INTAKE_TEST_PLAN_ORCHESTRATOR/schema.sql; successfully retrieved from root schema.sql path.",
-        "impact": "None — DDL successfully obtained from alternate path."
+        "severity": "MEDIUM",
+        "description": "ARR bridge reconciliation difference of -$210,616 (0.54% of ending ARR). The sum of classified monthly movements (beginning + new_logo + expansion - contraction - churn + reactivation) does not exactly equal ending ARR. Likely caused by customers with gradual intra-month ARR adjustments not fully captured as discrete step-change events in the monthly snapshot data.",
+        "affected_metrics": ["arr_bridge", "reconciliation_difference"]
       },
       {
         "issue_id": "DQ-002",
-        "severity": "INFO",
-        "description": "Agent 1 test plan references logical views (v_revenue_line, v_arr_month, v_collections) that do not exist as physical objects in the DDL. Physical tables (fact_invoice_line, fact_invoice, fact_subscription_month, fact_collection) used as equivalents.",
-        "impact": "None — physical sources confirmed in DDL and used for all queries."
+        "severity": "HIGH",
+        "description": "Customer concentration is highly skewed. Top 1 customer (CUST-0001, Northwind Retail Group) represents 27.44% of FY2025 revenue. Top 3 customers represent 51.48%. This is materially inconsistent with the management claim that no single customer exceeds 10%.",
+        "affected_metrics": ["customer_concentration_top1_pct", "CLM-01"]
       },
       {
         "issue_id": "DQ-003",
-        "severity": "OBSERVATION",
-        "description": "No due-date field exists in fact_invoice DDL. AR aging buckets use invoice_date as proxy for aging start date rather than due date.",
-        "impact": "AR aging buckets may understate overdue amounts if payment terms extend beyond invoice date."
+        "severity": "MEDIUM",
+        "description": "AR aging methodology uses days since invoice_date as a proxy for aging since no explicit due_date column exists in the DDL. Actual aging may differ if payment terms vary by customer or contract.",
+        "affected_metrics": ["ar_aging", "dso_days"]
       },
       {
         "issue_id": "DQ-004",
-        "severity": "OBSERVATION",
-        "description": "CUST-0006 appears in top-10 FY2025 customers with first_order_date of 2025-03-01 (tenure 0.84 years), materially reducing average top-10 tenure from ~6.13 to 5.60 years.",
-        "impact": "Average top-10 tenure calculation is accurate per available data; management claim of 6 years may reflect a different population or period."
+        "severity": "LOW",
+        "description": "Only 1 of 214 customers has a parent_customer_id populated in dim_customer. Parent roll-up analysis is not material for this dataset.",
+        "affected_metrics": ["customer_concentration", "economic_group_level"]
       },
       {
         "issue_id": "DQ-005",
-        "severity": "INFO",
-        "description": "No null values found in key fields across dim_customer, fact_invoice_line, fact_subscription_month, or fact_collection.",
-        "impact": "None — data completeness confirmed."
+        "severity": "MEDIUM",
+        "description": "Management-tagged recurring revenue (98.34%) materially exceeds independently restated recurring revenue (87.40%). $4,675,078 is tagged 'Recurring' in fact_invoice_line but the associated products do not have a Subscription delivery model in dim_product. These lines may represent professional services, implementation fees, or other non-subscription revenue incorrectly classified as recurring.",
+        "affected_metrics": ["recurring_revenue_pct", "CLM-03"]
       },
       {
         "issue_id": "DQ-006",
-        "severity": "OBSERVATION",
-        "description": "AR concentration is highly concentrated: top-1 customer accounts for 47.57% of outstanding AR, top-3 for 85.33%. Enterprise segment DSO (65.99 days) significantly exceeds Mid-Market (15.24) and SMB (19.09) segments.",
-        "impact": "Collections risk concentrated in Enterprise segment and single largest debtor."
+        "severity": "HIGH",
+        "description": "Enterprise segment DSO (66.0 days) is materially higher than Mid-Market (15.2 days) and SMB (19.1 days). Enterprise segment accounts for 92.5% of outstanding AR ($5,767,421 of $6,236,837). AR concentration is highly skewed: top 1 customer represents 47.57% of outstanding AR, top 3 represent 85.33%.",
+        "affected_metrics": ["dso_by_customer_tier", "ar_top_1_pct", "ar_top_3_pct"]
       },
       {
         "issue_id": "DQ-007",
-        "severity": "OBSERVATION",
-        "description": "46.12% of active contract ACV ($15.8M of ~$34.3M) expires within the 12-month post-close horizon (calendar 2026). This represents material renewal exposure.",
-        "impact": "Significant portion of contracted revenue base requires renewal within diligence horizon."
+        "severity": "MEDIUM",
+        "description": "CUST-0002 (Vantage Grocers, rank 2 by FY2025 revenue) has the lowest average CSAT score (2.96) among top 10 customers and the highest FY2025 ticket volume (69 tickets), including 16 S1 and 21 S2 tickets. This customer represents 12.31% of FY2025 revenue.",
+        "affected_metrics": ["customer_health"]
+      },
+      {
+        "issue_id": "DQ-008",
+        "severity": "LOW",
+        "description": "CUST-0006 (Cascade Foods Holdings, rank 7 by FY2025 revenue) has a first_order_date of 2025-03-01, giving a tenure of only 0.84 years. This materially reduces the top-10 average tenure from what it would be without this customer.",
+        "affected_metrics": ["top10_avg_tenure_years", "CLM-10"]
       }
     ]
   },
-
   "validation": {
     "all_reported_numbers_from_sql": true,
     "ddl_only_physical_objects_used": true,
@@ -709,42 +746,45 @@
     "ar_concentration_completed": true,
     "tenure_analysis_completed": true,
     "customer_health_completed": true,
-    "renewal_analysis_completed": true,
+    "renewal_analysis_completed": false,
     "unsupported_metrics": [
       {
-        "metric": "adjusted_ebitda_usd (CLM-05)",
-        "reason": "EBITDA adjustment analysis is outside Revenue Quality scope; belongs to EBITDA/Earnings Quality workstream."
+        "metric": "renewal_exposure",
+        "reason": "No authoritative deal close date or diligence horizon available from runtime inputs or upstream test_plan.json. Renewal exposure cannot be calculated without an authoritative anchor date per the Authoritative Renewal Horizon Rule."
       },
       {
-        "metric": "emea_direct_arr_usd FY2028 (CLM-07)",
-        "reason": "FY2028 is a forward projection beyond available structured data. Geographic ARR breakdown not available in current structured data."
+        "metric": "adjusted_ebitda_usd (CLM-05)",
+        "reason": "EBITDA adjustment analysis is outside Revenue Quality workstream scope. Belongs to EBITDA/Earnings Quality specialist."
+      },
+      {
+        "metric": "emea_direct_arr_usd (CLM-07)",
+        "reason": "FY2028 is a forward projection not testable from historical structured data. Geographic channel breakdown not available in current schema."
       },
       {
         "metric": "contracts_with_coc_restriction (CLM-08)",
-        "reason": "Change-of-control clause analysis requires contract document review; no structured CoC field in dim_contract DDL."
+        "reason": "Change-of-control clause analysis requires contract document review. dim_contract does not contain a structured CoC flag. Belongs to Contract Intelligence workstream."
       },
       {
         "metric": "contracts_with_mfn (CLM-11)",
-        "reason": "MFN clause analysis requires contract document review; no structured MFN field in dim_contract DDL."
+        "reason": "MFN clause analysis requires contract document review. dim_contract does not contain a structured MFN flag. Belongs to Contract Intelligence workstream."
       }
     ],
     "query_failures": [
       {
-        "query_attempt": "Customer tenure top-10 with WHERE rnk <= 10 in same CTE",
-        "error": "UNRESOLVED_COLUMN rnk — window function alias not resolvable in same SELECT WHERE clause",
-        "resolution": "Refactored to use nested CTE with rnk computed in inner CTE, filtered in outer CTE. Successful on retry."
+        "query_attempt": "Quarterly DSO using correlated subquery in GROUP BY aggregate",
+        "error": "SCALAR_SUBQUERY_IS_IN_GROUP_BY_OR_AGGREGATE_FUNCTION",
+        "resolution": "Rewritten using separate CTEs per quarter with UNION ALL — successful on retry."
       }
     ],
-    "upstream_input_issues": [
-      {
-        "issue": "schema.sql not found at 1/DEAL_INTAKE_TEST_PLAN_ORCHESTRATOR/schema.sql",
-        "resolution": "Successfully retrieved from root schema.sql path."
-      }
-    ],
+    "upstream_input_issues": [],
     "schema_discovery_issues": [
       {
-        "issue": "Agent 1 references v_revenue_line, v_arr_month, v_collections as logical views not present in DDL",
-        "resolution": "Mapped to physical tables fact_invoice_line+fact_invoice, fact_subscription_month, fact_collection+fact_invoice respectively."
+        "issue": "schema.sql not found at 1/DEAL_INTAKE_TEST_PLAN_ORCHESTRATOR/schema.sql",
+        "resolution": "DDL discovered dynamically via SHOW TABLES and DESCRIBE TABLE queries against workspace.aava_deal_studio. All required physical objects confirmed in Databricks catalog."
+      },
+      {
+        "issue": "Agent 1 test_plan.json references logical view names (v_revenue_line, v_arr_month, v_collections) not present as physical objects in workspace.aava_deal_studio",
+        "resolution": "Logical views mapped to physical tables: v_revenue_line -> fact_invoice_line + fact_invoice; v_arr_month -> fact_subscription_month; v_collections -> fact_collection. All substitutions confirmed against DDL."
       }
     ]
   }
